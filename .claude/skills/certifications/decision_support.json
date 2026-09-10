@@ -1,0 +1,55 @@
+{
+ "skill_id": "decision_support",
+ "skill_version": "1.2.0",
+ "maturity_level": "L2",
+ "declared_maturity": "L2",
+ "computed_maturity": "L3",
+ "tests": [
+  "test_skills.T05_Execution.test_decision_support",
+  "test_skills.T08_MultiSkill.test_run_plan_with_supplied_data_partially_executes"
+ ],
+ "failure_tests": [
+  "test_failclosed.F01_EveryBlockedCode.test_CONFLICTING_SOURCE",
+  "test_failclosed.F02_NeverMisrepresented.test_partial_preserves_completed_evidence_and_marks_incomplete",
+  "test_skills.T05_Execution.test_decision_support"
+ ],
+ "hardening_cases": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "adversarial": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "failure_injection": [],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "completion_verification": [
+  "test_skills.T05_Execution.test_decision_support"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [],
+ "evals": [
+  "eval:head_decision",
+  "eval:sales_decline",
+  "eval:sales_decline_with_data"
+ ],
+ "routing_evals": [
+  "eval:r_sales_down",
+  "eval:r_sales_down_hy",
+  "eval:r_tariff",
+  "test_skills.T02_Router.test_chain_sales_decline"
+ ],
+ "failed_tests": [],
+ "certified_at": "2026-09-10T14:12:27",
+ "fingerprint": "6f9e0876129f22093c30e1a3",
+ "core_fingerprint": "ad2f7cc2b20d1f40",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement"
+ ],
+ "audit_infrastructure": false
+}

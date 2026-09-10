@@ -1,0 +1,19 @@
+# ── Business/personal data stays OUT of the repository (repo = the assistant system only) ──
+# Գև-ի աշխատանքային ֆայլերը (WhatsApp, xlsx, docx, օրագիր) չեն հրապարակվում։
+00_ԳՑԻՐ_ԱՅՍՏԵՂ/
+01_Ընթացիկ/
+02_Արխիվ/
+03_Ավարտված/
+04_WhatsApp/
+Առաջադրանքներ.xlsx
+ՕՐԱԳԻՐ.md
+ԱՆԵԼԻՔՆԵՐ.md
+desktop.ini
+
+# ── Runtime state (hardened store, audit, tickets, quarantine) — never versioned ──
+.claude/skills/state/
+.claude/skills/audit/
+.claude/skills/__pycache__/
+.claude/hooks/__pycache__/
+*.pyc
+.claude/settings.local.json

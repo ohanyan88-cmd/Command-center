@@ -1,0 +1,41 @@
+{
+ "skill_id": "bottleneck_detection",
+ "skill_version": "1.2.0",
+ "maturity_level": "L1",
+ "declared_maturity": "L1",
+ "computed_maturity": "L1",
+ "tests": [],
+ "failure_tests": [],
+ "hardening_cases": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "adversarial": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "failure_injection": [],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "completion_verification": [],
+ "concurrency_tests": [],
+ "enforcement_tests": [],
+ "evals": [
+  "eval:ops_backlog"
+ ],
+ "routing_evals": [
+  "eval:r_backlog"
+ ],
+ "failed_tests": [],
+ "certified_at": "2026-09-10T14:12:27",
+ "fingerprint": "c8af78719143aefc503611f6",
+ "core_fingerprint": "ad2f7cc2b20d1f40",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement"
+ ],
+ "audit_infrastructure": true
+}

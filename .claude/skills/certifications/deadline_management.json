@@ -1,0 +1,76 @@
+{
+ "skill_id": "deadline_management",
+ "skill_version": "1.2.0",
+ "maturity_level": "L4",
+ "declared_maturity": "L4",
+ "computed_maturity": "L4",
+ "tests": [
+  "test_skills.T05_Execution.test_deadline_management",
+  "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
+ ],
+ "failure_tests": [
+  "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
+  "test_failclosed.F01_EveryBlockedCode.test_DISABLED_SKILL",
+  "test_failclosed.F01_EveryBlockedCode.test_INVALID_SOURCE",
+  "test_failclosed.F01_EveryBlockedCode.test_MISSING_SKILL",
+  "test_failclosed.F01_EveryBlockedCode.test_STALE_SOURCE",
+  "test_failclosed.F01_EveryBlockedCode.test_VALIDATION_FAILED",
+  "test_failclosed.F02_NeverMisrepresented.test_blocked_never_carries_result_data_as_success",
+  "test_skills.T05_Execution.test_missing_source_blocks_before_execution"
+ ],
+ "hardening_cases": [
+  "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
+  "test_hardening.H02_SourceFailureInjection.test_schema_drift",
+  "test_hardening.H02_SourceFailureInjection.test_source_missing_blocks_not_fabricates",
+  "test_hardening.H02_SourceFailureInjection.test_stale_source_blocks_unless_acknowledged",
+  "test_hardening.H04_AdversarialInputs.test_armenian_triggers_and_unicode_safe",
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_hardening.H05_ChainFailureInjection.test_disabled_core_skill_blocks_chain_step",
+  "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success"
+ ],
+ "adversarial": [
+  "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
+  "test_hardening.H04_AdversarialInputs.test_armenian_triggers_and_unicode_safe",
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "failure_injection": [
+  "test_hardening.H02_SourceFailureInjection.test_schema_drift",
+  "test_hardening.H02_SourceFailureInjection.test_source_missing_blocks_not_fabricates",
+  "test_hardening.H02_SourceFailureInjection.test_stale_source_blocks_unless_acknowledged",
+  "test_hardening.H05_ChainFailureInjection.test_disabled_core_skill_blocks_chain_step",
+  "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success"
+ ],
+ "authority_tests": [
+  "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "completion_verification": [
+  "test_skills.T05_Execution.test_deadline_management",
+  "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [
+  "test_enforcement.E04_MultiStepAndNarration.test_plan_runs_full_graph_cannot_skip_intermediate"
+ ],
+ "evals": [
+  "eval:daily_brief",
+  "eval:overdue_action"
+ ],
+ "routing_evals": [
+  "test_skills.T02_Router.test_armenian_trigger",
+  "test_skills.T02_Router.test_trigger_resolution"
+ ],
+ "failed_tests": [],
+ "certified_at": "2026-09-10T14:12:27",
+ "fingerprint": "383b3d44997cbcf8778bb2fc",
+ "core_fingerprint": "ad2f7cc2b20d1f40",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement"
+ ],
+ "audit_infrastructure": false
+}

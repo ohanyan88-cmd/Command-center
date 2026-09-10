@@ -1,0 +1,5932 @@
+{
+ "schema_version": "2.0.0",
+ "generated": "2026-09-10",
+ "authority_ladder": [
+  "READ",
+  "ANALYZE",
+  "RECOMMEND",
+  "DRAFT",
+  "CREATE_INTERNAL_TASK",
+  "EXECUTE_REVERSIBLE",
+  "EXECUTE_EXTERNAL",
+  "EXECUTE_MATERIAL"
+ ],
+ "maturity_levels": [
+  "L0",
+  "L1",
+  "L2",
+  "L3",
+  "L4"
+ ],
+ "tools_available": {
+  "python": true,
+  "filesystem": true,
+  "xlsx": true,
+  "docx": true,
+  "memory_files": true,
+  "audit_log": true,
+  "state_store": true,
+  "crm": false,
+  "bitrix24": false,
+  "billing_db": false,
+  "bi_dashboard": false,
+  "calendar": false,
+  "email": false,
+  "scheduler": false,
+  "database": false,
+  "api": false,
+  "whatsapp_live": false
+ },
+ "tool_intents": {
+  "email": [
+   "send email",
+   "send an email",
+   "email them",
+   "email him",
+   "email her",
+   "նամակ ուղարկ",
+   "մեյլ"
+  ],
+  "calendar": [
+   "add to calendar",
+   "create event",
+   "calendar event",
+   "book a meeting",
+   "օրացույց"
+  ],
+  "bitrix24": [
+   "create task in bitrix",
+   "bitrix task create",
+   "in bitrix",
+   "բիտրիքսում",
+   "crm update",
+   "update the crm"
+  ],
+  "bi_dashboard": [
+   "power bi",
+   "dashboard query",
+   "open the dashboard"
+  ],
+  "database": [
+   "query the db",
+   "sql query",
+   "run sql"
+  ],
+  "api": [
+   "api call",
+   "call the api",
+   "webhook"
+  ],
+  "scheduler": [
+   "set a timer",
+   "schedule a job",
+   "cron"
+  ],
+  "whatsapp_live": [
+   "send whatsapp",
+   "send on whatsapp",
+   "whatsapp-ով ուղարկ"
+  ]
+ },
+ "material_actions": [
+  "pricing_change",
+  "compensation_change",
+  "hiring",
+  "termination",
+  "contract",
+  "financial_commitment",
+  "customer_concession",
+  "public_statement",
+  "policy_change",
+  "irreversible_operational_change"
+ ],
+ "chains": {
+  "investigate_sales_decline": [
+   "sales_kpi_monitoring",
+   "data_analysis",
+   "root_cause_analysis",
+   "decision_support"
+  ],
+  "sales_target_missed": [
+   "target_vs_actual",
+   "sales_forecasting",
+   "root_cause_analysis",
+   "decision_support"
+  ],
+  "ops_backlog_growing": [
+   "operations_kpi_monitoring",
+   "backlog_management",
+   "bottleneck_detection",
+   "root_cause_analysis",
+   "decision_support"
+  ],
+  "employee_underperformance": [
+   "performance_gap_diagnosis",
+   "root_cause_analysis",
+   "decision_support"
+  ],
+  "churn_increase": [
+   "churn_analysis",
+   "data_analysis",
+   "root_cause_analysis",
+   "decision_support"
+  ],
+  "pipeline_stagnation": [
+   "pipeline_management",
+   "decision_support"
+  ],
+  "complaint_trend": [
+   "customer_complaint_pattern_analysis",
+   "root_cause_analysis",
+   "decision_support"
+  ],
+  "prepare_sales_review": [
+   "meeting_preparation",
+   "executive_summarization"
+  ],
+  "conversational_reminder": [
+   "commitment_tracking",
+   "reminder_intelligence"
+  ],
+  "daily_brief": [
+   "daily_briefing"
+  ],
+  "cross_department_blocker": [
+   "waiting_for_tracking",
+   "follow_up_management",
+   "escalation_management"
+  ],
+  "broken_promise": [
+   "follow_up_management"
+  ],
+  "head_decision": [
+   "decision_support",
+   "risk_classification",
+   "authority_checking",
+   "approval_management"
+  ],
+  "conflicting_reports": [
+   "source_reconciliation",
+   "confidence_handling"
+  ],
+  "completed_no_evidence": [
+   "completion_verification"
+  ],
+  "outgoing_message": [
+   "management_communication"
+  ]
+ },
+ "chain_triggers": {
+  "investigate_sales_decline": [
+   "why did sales drop",
+   "sales dropped",
+   "sales decline",
+   "վաճառք իջել",
+   "վաճառքն իջել",
+   "sales fell",
+   "why are sales down",
+   "sales are down",
+   "sales down"
+  ],
+  "sales_target_missed": [
+   "missed target",
+   "missed the target",
+   "missed the sales target",
+   "պլանը չկատար",
+   "target missed",
+   "below target",
+   "behind target"
+  ],
+  "ops_backlog_growing": [
+   "backlog growing",
+   "backlog is growing",
+   "backlog doubled",
+   "backlog has doubled",
+   "կուտակ աճ",
+   "queue growing",
+   "backlog up"
+  ],
+  "employee_underperformance": [
+   "underperform",
+   "չի աշխատում լավ",
+   "performance problem",
+   "not performing"
+  ],
+  "churn_increase": [
+   "churn increase",
+   "churn is up",
+   "չըռն աճ",
+   "more cancellations",
+   "churn up"
+  ],
+  "pipeline_stagnation": [
+   "pipeline stagn",
+   "deals not moving",
+   "deals are not moving",
+   "pipeline stuck",
+   "pipeline is stuck",
+   "stale pipeline",
+   "գործարքները չեն շարժվում"
+  ],
+  "complaint_trend": [
+   "complaint trend",
+   "complaints increasing",
+   "complaints are increasing",
+   "increasing complaints",
+   "more complaints",
+   "complaints are up",
+   "բողոքներ շատացել",
+   "բողոքները շատ"
+  ],
+  "prepare_sales_review": [
+   "prepare sales review",
+   "sales review",
+   "prepare me for",
+   "prepare tomorrow",
+   "վաճառքի ժողով",
+   "prepare the meeting",
+   "sales meeting",
+   "ժողովին պատրաստ"
+  ],
+  "conversational_reminder": [
+   "remind me",
+   "հիշեցրու"
+  ],
+  "daily_brief": [
+   "daily brief",
+   "morning brief",
+   "օրվա բրիֆ",
+   "good morning",
+   "առավոտյան պլան"
+  ],
+  "cross_department_blocker": [
+   "blocked by another department",
+   "cross-department",
+   "other department",
+   "բաժինը չի տալիս",
+   "stuck waiting on"
+  ],
+  "broken_promise": [
+   "still hasn't",
+   "hasn't sent",
+   "hasn't delivered",
+   "չի ուղարկել",
+   "դեռ չի տվել"
+  ],
+  "head_decision": [
+   "need your decision",
+   "requires your approval",
+   "should we approve",
+   "decide on",
+   "should we change",
+   "should we raise",
+   "should we lower",
+   "փոխե՞նք"
+  ],
+  "conflicting_reports": [
+   "conflicting reports",
+   "reports disagree",
+   "numbers don't match",
+   "երկու տարբեր թիվ"
+  ],
+  "completed_no_evidence": [
+   "he says it's done",
+   "says it is done",
+   "ասում է արել է",
+   "claims completed",
+   "says it's done"
+  ],
+  "outgoing_message": [
+   "send finance",
+   "send them a follow-up",
+   "send him a follow-up",
+   "send her a follow-up",
+   "write to gadukyan",
+   "գադուկյանին գրիր",
+   "message to management",
+   "a follow-up to"
+  ]
+ },
+ "skills": [
+  {
+   "skill_id": "executive_prioritization",
+   "name": "Executive Prioritization",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Rank open items P1–P4 by business impact, urgency, owner and deadline; surface the 3–5 that need the Head's attention.",
+   "business_outcome": "Head sees the few things that matter, not a flat list.",
+   "description": "Rank open items P1–P4 by business impact, urgency, owner and deadline; surface the 3–5 that need the Head's attention.",
+   "maturity_level": "L3",
+   "declared_maturity": "L3",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "prioritize",
+    "priorit",
+    "առաջնահերթ",
+    "what matters",
+    "top priorities",
+    "ինչ է կարևոր",
+    "what should i do",
+    "do first",
+    "ինչից սկսեմ",
+    "need my attention",
+    "needs my attention",
+    "which problems",
+    "ուշադրության",
+    "three problems",
+    "top 3"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "tasks"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [
+    "task_management"
+   ],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [
+    "load open tasks",
+    "score: overdue>today>tomorrow>later; escalate ball-with-other",
+    "cap P1 at 5"
+   ],
+   "expected_outputs": [
+    "ranked list with P-level and reason"
+   ],
+   "validation_rules": [
+    "every open task assigned exactly one P-level",
+    "P1 count <= 5"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [
+    "P1 items resolved within deadline"
+   ],
+   "test_cases": [],
+   "eval_cases": [
+    "daily_brief",
+    "overdue_action",
+    "r_attention"
+   ],
+   "executor": "executive_prioritization",
+   "absorbed": [],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 2,
+    "hardening_cases": 5,
+    "authority_tests": 1,
+    "completion_verification": 2,
+    "evals": 2,
+    "routing_evals": 2,
+    "concurrency_tests": 0,
+    "enforcement_tests": 1
+   },
+   "certification": {
+    "maturity_level": "L3",
+    "result": "PASS",
+    "fingerprint": "7773e9511dec5fbd98ae9bce",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/executive_prioritization.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "task_management",
+   "name": "Task Management",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Read, list and inspect tasks from the source of truth (xlsx); normalize fields. Also the read/write primitive for the tracker.",
+   "business_outcome": "Single accurate view of every task.",
+   "description": "Read, list and inspect tasks from the source of truth (xlsx); normalize fields. Also the read/write primitive for the tracker.",
+   "maturity_level": "L4",
+   "declared_maturity": "L4",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "list tasks",
+    "show tasks",
+    "task list",
+    "open tasks",
+    "task status",
+    "առաջադրանքների ցուցակ",
+    "ցուցակը",
+    "excel",
+    "xlsx",
+    "spreadsheet",
+    "աղյուսակ"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [],
+   "optional_inputs": [
+    "task_id",
+    "status_filter"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [
+    "open xlsx",
+    "parse rows 13+ (№,task,status,comment,due,owner)",
+    "normalize dates/status"
+   ],
+   "expected_outputs": [
+    "task records"
+   ],
+   "validation_rules": [
+    "every record has id,task,status",
+    "status in allowed set"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [
+    "xlsx missing",
+    "sheet missing",
+    "schema drift"
+   ],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "task_management",
+   "absorbed": [
+    "spreadsheet_data_operations"
+   ],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 9,
+    "hardening_cases": 13,
+    "authority_tests": 4,
+    "completion_verification": 2,
+    "evals": 1,
+    "routing_evals": 1,
+    "concurrency_tests": 0,
+    "enforcement_tests": 1
+   },
+   "certification": {
+    "maturity_level": "L4",
+    "result": "PASS",
+    "fingerprint": "5433e51dc28ada6d1e72b0ea",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/task_management.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "delegation_design",
+   "name": "Delegation & Instruction Design",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Turn a vague instruction, meeting note or recommendation into an executable task: one named owner, deadline, expected output.",
+   "business_outcome": "One accountable owner per task; no 'sales team' ownership.",
+   "description": "Turn a vague instruction, meeting note or recommendation into an executable task: one named owner, deadline, expected output.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "delegate",
+    "assign",
+    "հանձնարար",
+    "who should do",
+    "bitrix task",
+    "թասկ",
+    "action plan",
+    "next steps",
+    "action items",
+    "meeting actions",
+    "draft instruction",
+    "write an instruction",
+    "հանձնարարական գրիր",
+    "notes to tasks"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "instruction"
+   ],
+   "optional_inputs": [
+    "owner",
+    "deadline",
+    "expected_output",
+    "notes",
+    "recommendation"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [],
+   "execution_steps": [
+    "extract task",
+    "require single named owner",
+    "require deadline",
+    "define expected output"
+   ],
+   "expected_outputs": [
+    "task draft: task/owner/deadline/expected_output"
+   ],
+   "validation_rules": [
+    "owner is a single named person, not a team",
+    "deadline present or flagged"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "DRAFT",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "delegation_design",
+   "absorbed": [
+    "meeting_action_capture",
+    "action_plan",
+    "instruction_drafting"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 2,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "fe0962b1815fad888d3ea57f",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/delegation_design.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "commitment_tracking",
+   "name": "Commitment Tracking",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Record commitments ('I'll call Friday', 'if X then tell me') as tracked items with idempotency in the hardened store.",
+   "business_outcome": "Nothing promised is forgotten.",
+   "description": "Record commitments ('I'll call Friday', 'if X then tell me') as tracked items with idempotency in the hardened store.",
+   "maturity_level": "L4",
+   "declared_maturity": "L4",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "remind me",
+    "i will",
+    "կզանգեմ",
+    "կտամ",
+    "խոստանում եմ",
+    "my commitment",
+    "remember to",
+    "հիշեցրու",
+    "don't let me forget"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "text"
+   ],
+   "optional_inputs": [
+    "due",
+    "owner",
+    "condition"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "state_store",
+    "audit_log"
+   ],
+   "execution_steps": [
+    "normalize text",
+    "op_id = sha256(normalized text|owner|due)",
+    "store.record → RECORDED|DUPLICATE (DB decides)"
+   ],
+   "expected_outputs": [
+    "commitment record with op_id and status RECORDED|DUPLICATE"
+   ],
+   "validation_rules": [
+    "op_id deterministic",
+    "duplicate text → DUPLICATE not second record",
+    "record re-read from store after write"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [
+    "state dir unwritable",
+    "store corrupt"
+   ],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "conversational_reminder",
+    "r_remind"
+   ],
+   "executor": "commitment_tracking",
+   "absorbed": [],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 7,
+    "hardening_cases": 15,
+    "authority_tests": 2,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 3,
+    "concurrency_tests": 4,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L4",
+    "result": "PASS",
+    "fingerprint": "e5edcbfa82b7136a079d5041",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/commitment_tracking.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "waiting_for_tracking",
+   "name": "Waiting-for & Accountability Tracking",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Register of what we are waiting for, from whom, since when, expected by when — including cross-department handoffs.",
+   "business_outcome": "Ball-with-others items never disappear.",
+   "description": "Register of what we are waiting for, from whom, since when, expected by when — including cross-department handoffs.",
+   "maturity_level": "L4",
+   "declared_maturity": "L4",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "waiting for",
+    "waiting on",
+    "սպասում",
+    "who owes",
+    "ով է պարտք",
+    "ումից",
+    "waiting-for",
+    "handoff",
+    "between departments",
+    "բաժինների միջև",
+    "cross-functional",
+    "accountab",
+    "պատասխանատվ",
+    "who committed",
+    "owes me"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "tasks"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [
+    "task_management"
+   ],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [
+    "filter open tasks whose owner is not Գև or contains →",
+    "group by counterpart",
+    "attach due"
+   ],
+   "expected_outputs": [
+    "waiting-for list grouped by counterpart"
+   ],
+   "validation_rules": [
+    "every item names a counterpart"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "cross_department_blocker",
+    "r_who_owes"
+   ],
+   "executor": "waiting_for_tracking",
+   "absorbed": [
+    "cross_department_handoff_control",
+    "accountability_tracking"
+   ],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 8,
+    "hardening_cases": 6,
+    "authority_tests": 2,
+    "completion_verification": 2,
+    "evals": 4,
+    "routing_evals": 4,
+    "concurrency_tests": 0,
+    "enforcement_tests": 1
+   },
+   "certification": {
+    "maturity_level": "L4",
+    "result": "PASS",
+    "fingerprint": "b7ce64dc39594ee03f904033",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/waiting_for_tracking.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "deadline_management",
+   "name": "Deadline Management",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Bucket open tasks: overdue / today / tomorrow / upcoming / no deadline.",
+   "business_outcome": "No deadline is missed silently.",
+   "description": "Bucket open tasks: overdue / today / tomorrow / upcoming / no deadline.",
+   "maturity_level": "L4",
+   "declared_maturity": "L4",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "deadline",
+    "ժամկետ",
+    "overdue",
+    "ժամկետանց",
+    "due today",
+    "due tomorrow",
+    "what's due",
+    "late",
+    "ուշաց"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "tasks"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [
+    "task_management"
+   ],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [
+    "load open tasks",
+    "compute days to due",
+    "bucket + sort"
+   ],
+   "expected_outputs": [
+    "buckets with counts"
+   ],
+   "validation_rules": [
+    "bucket set exact",
+    "no closed task in buckets"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "overdue_action",
+    "daily_brief"
+   ],
+   "executor": "deadline_management",
+   "absorbed": [],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 8,
+    "hardening_cases": 8,
+    "authority_tests": 2,
+    "completion_verification": 2,
+    "evals": 2,
+    "routing_evals": 2,
+    "concurrency_tests": 0,
+    "enforcement_tests": 1
+   },
+   "certification": {
+    "maturity_level": "L4",
+    "result": "PASS",
+    "fingerprint": "383b3d44997cbcf8778bb2fc",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/deadline_management.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "reminder_intelligence",
+   "name": "Reminder Intelligence",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Turn a due item into a contextual reminder plan: 7d prep / 3d readiness / 1d confirm / same-day / after-deadline check.",
+   "business_outcome": "Reminders arrive early and with context, never bare.",
+   "description": "Turn a due item into a contextual reminder plan: 7d prep / 3d readiness / 1d confirm / same-day / after-deadline check.",
+   "maturity_level": "L3",
+   "declared_maturity": "L3",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "reminder plan",
+    "when should i be reminded",
+    "հիշեցման պլան"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "item",
+    "due"
+   ],
+   "optional_inputs": [
+    "prep_items"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [
+    "scheduler_available reported honestly (False in this runtime)",
+    "plan contains after-deadline check"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "conversational_reminder",
+    "r_remind"
+   ],
+   "executor": "reminder_intelligence",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 2,
+    "hardening_cases": 2,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 3,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L3",
+    "result": "PASS",
+    "fingerprint": "3f5948cb0cabaadbc2a14ecb",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/reminder_intelligence.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "follow_up_management",
+   "name": "Follow-up Management",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Who needs to be chased for what, since when, and the exact next action; escalate repeated slippage.",
+   "business_outcome": "Open items are chased, not forgotten.",
+   "description": "Who needs to be chased for what, since when, and the exact next action; escalate repeated slippage.",
+   "maturity_level": "L3",
+   "declared_maturity": "L3",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "follow up on",
+    "follow-ups",
+    "follow up list",
+    "who to chase",
+    "հետևել",
+    "chase",
+    "still hasn't",
+    "hasn't sent",
+    "hasn't delivered",
+    "չի ուղարկել",
+    "չի տվել",
+    "promised",
+    "խոստացել էր",
+    "manager follow up",
+    "people follow-up",
+    "overdue items"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "tasks"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [
+    "deadline_management",
+    "waiting_for_tracking"
+   ],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [
+    "follow-up list: owner, since, next_action"
+   ],
+   "validation_rules": [
+    "every follow-up has owner and next_action"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "cross_department_blocker",
+    "r_broken_promise"
+   ],
+   "executor": "follow_up_management",
+   "absorbed": [
+    "management_follow_up"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 5,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 1,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L3",
+    "result": "PASS",
+    "fingerprint": "682b762ac8c54949cc3ba7f3",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/follow_up_management.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "escalation_management",
+   "name": "Escalation Management",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Structure an escalation: problem, impact, owner, deadline status, done so far, Head action — and draft the message.",
+   "business_outcome": "Escalations reach the Head in a decidable form.",
+   "description": "Structure an escalation: problem, impact, owner, deadline status, done so far, Head action — and draft the message.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "escalat",
+    "էսկալ",
+    "escalation message",
+    "draft escalation"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "item"
+   ],
+   "optional_inputs": [
+    "impact",
+    "owner",
+    "deadline_status",
+    "done_so_far",
+    "head_action"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [
+    "all six escalation fields present"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "DRAFT",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "escalation_management",
+   "absorbed": [
+    "escalation_drafting"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "c9dfcf8dc71d1b0d3299587d",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/escalation_management.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "decision_support",
+   "name": "Decision Support & Recommendation",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Prepare a decision for the Head: issue, context, options, recommendation, risk of delay, deadline — or frame an analysis into a recommendation with owner/deadline/Head action.",
+   "business_outcome": "Decisions, not data dumps.",
+   "description": "Prepare a decision for the Head: issue, context, options, recommendation, risk of delay, deadline — or frame an analysis into a recommendation with owner/deadline/Head action.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "should we",
+    "decide",
+    "որոշ",
+    "pros/cons",
+    "pros and cons",
+    "recommend",
+    "what should we do",
+    "առաջարկ",
+    "ինչ անենք",
+    "your decision",
+    "need a decision"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [],
+   "optional_inputs": [
+    "issue",
+    "analysis",
+    "options",
+    "context",
+    "recommendation",
+    "risk_of_delay",
+    "deadline"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [
+    "recommendation never invented without facts: INSUFFICIENT DATA when options/facts absent"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "head_decision",
+    "r_tariff"
+   ],
+   "executor": "decision_support",
+   "absorbed": [
+    "recommendation"
+   ],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 3,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 3,
+    "routing_evals": 4,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "6f9e0876129f22093c30e1a3",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/decision_support.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "decision_logging",
+   "name": "Decision Logging",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Record a decision (what/why/who/effective date/follow-up) idempotently in the hardened store.",
+   "business_outcome": "Decisions are not reopened blindly.",
+   "description": "Record a decision (what/why/who/effective date/follow-up) idempotently in the hardened store.",
+   "maturity_level": "L3",
+   "declared_maturity": "L3",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "log the decision",
+    "record the decision",
+    "we decided",
+    "որոշեցինք",
+    "decision log",
+    "decided that"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "decision"
+   ],
+   "optional_inputs": [
+    "reason",
+    "owner",
+    "effective_date",
+    "follow_up"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "state_store",
+    "audit_log"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "decision_logging",
+   "absorbed": [],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 2,
+    "hardening_cases": 12,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 4,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L3",
+    "result": "PASS",
+    "fingerprint": "ce0e647876a74e70dc74e222",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/decision_logging.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "approval_management",
+   "name": "Approval Management",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Detect when an action level needs explicit Head approval and check the approval token.",
+   "business_outcome": "Approvals never skipped.",
+   "description": "Detect when an action level needs explicit Head approval and check the approval token.",
+   "maturity_level": "L4",
+   "declared_maturity": "L4",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "needs approval",
+    "requires sign-off",
+    "approval needed",
+    "հաստատում է պետք",
+    "approve this"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "action_level"
+   ],
+   "optional_inputs": [
+    "approval_token"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [
+    "EXECUTE_EXTERNAL/EXECUTE_MATERIAL without token → BLOCKED APPROVAL_REQUIRED"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "approval_management",
+   "absorbed": [
+    "approval_requirement_detection"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 6,
+    "hardening_cases": 14,
+    "authority_tests": 8,
+    "completion_verification": 1,
+    "evals": 6,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 15
+   },
+   "certification": {
+    "maturity_level": "L4",
+    "result": "PASS",
+    "fingerprint": "9692048057693818cca0fe41",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/approval_management.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "meeting_preparation",
+   "name": "Meeting Preparation",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Prepare a meeting pack: purpose, participants, previous decisions, open actions, overdue, waiting-for, decisions required, talking points.",
+   "business_outcome": "Head walks in prepared.",
+   "description": "Prepare a meeting pack: purpose, participants, previous decisions, open actions, overdue, waiting-for, decisions required, talking points.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "prepare me for",
+    "prepare for the meeting",
+    "meeting prep",
+    "meeting preparation",
+    "ժողովին պատրաստ",
+    "prepare the meeting",
+    "performance review",
+    "review pack",
+    "ատեստ"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "meeting"
+   ],
+   "optional_inputs": [
+    "topic",
+    "purpose",
+    "participants"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [
+    "task_management",
+    "deadline_management",
+    "waiting_for_tracking"
+   ],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "meeting_prep",
+    "r_meeting"
+   ],
+   "executor": "meeting_preparation",
+   "absorbed": [
+    "performance_review_preparation"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 2,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "a0c077c0a44878cc69ba25aa",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/meeting_preparation.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "daily_briefing",
+   "name": "Daily Briefing",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "GOOD MORNING BRIEF: top priorities, Head actions, decisions pending, deadlines today/overdue/tomorrow, waiting-for, data gaps.",
+   "business_outcome": "Day starts with control.",
+   "description": "GOOD MORNING BRIEF: top priorities, Head actions, decisions pending, deadlines today/overdue/tomorrow, waiting-for, data gaps.",
+   "maturity_level": "L4",
+   "declared_maturity": "L4",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "daily brief",
+    "morning brief",
+    "օրվա բրիֆ",
+    "good morning",
+    "առավոտյան պլան",
+    "today's priorities",
+    "այսօրվա պլան",
+    "what should i do today"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "tasks"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [
+    "executive_prioritization",
+    "deadline_management",
+    "waiting_for_tracking"
+   ],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [
+    "top_priorities/overdue/deadlines_today/waiting_for/counts present",
+    "counts equal open tasks"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "daily_brief"
+   ],
+   "executor": "daily_briefing",
+   "absorbed": [
+    "daily_priority_management"
+   ],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 8,
+    "hardening_cases": 12,
+    "authority_tests": 5,
+    "completion_verification": 2,
+    "evals": 1,
+    "routing_evals": 1,
+    "concurrency_tests": 0,
+    "enforcement_tests": 1
+   },
+   "certification": {
+    "maturity_level": "L4",
+    "result": "PASS",
+    "fingerprint": "97860c3f694e57129bf78cf6",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/daily_briefing.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "end_of_day_control",
+   "name": "End-of-Day Control",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "EOD: completed / not completed / decisions pending / waiting / tomorrow.",
+   "business_outcome": "Day closes cleanly.",
+   "description": "EOD: completed / not completed / decisions pending / waiting / tomorrow.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "end of day",
+    "eod",
+    "երեկոյան ամփոփ",
+    "wrap up",
+    "close the day",
+    "ամփոփում"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "tasks"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [
+    "deadline_management"
+   ],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "end_of_day_control",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "78be9aa0a7c712a93d733e8f",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/end_of_day_control.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "weekly_executive_review",
+   "name": "Weekly Executive Review",
+   "version": "1.2.0",
+   "domain": "A_EXECUTIVE_CONTROL",
+   "purpose": "Weekly S&O review skeleton from available data; sales/ops sections marked UNKNOWN without datasets.",
+   "business_outcome": "Weekly rhythm maintained.",
+   "description": "Weekly S&O review skeleton from available data; sales/ops sections marked UNKNOWN without datasets.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "weekly review",
+    "weekly executive review",
+    "week in review",
+    "շաբաթվա ամփոփ",
+    "շաբաթական"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "tasks"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "weekly_review",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "ccf2b562bf3bef6271d63165",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/weekly_executive_review.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "sales_kpi_monitoring",
+   "name": "Sales KPI Monitoring",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Track leads/conversion/sales/revenue vs target from a supplied dataset.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Track leads/conversion/sales/revenue vs target from a supplied dataset.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "sales kpi",
+    "վաճառքի ցուցանիշ",
+    "sales numbers",
+    "how are sales",
+    "sales performance",
+    "sales figures"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "sales_decline",
+    "r_sales_down"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 5,
+    "hardening_cases": 3,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 2,
+    "routing_evals": 3,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "c52db32ee5d6d491feb94298",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/sales_kpi_monitoring.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "target_vs_actual",
+   "name": "Target vs Actual & Gap",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Compare target, actual, gap; quantify shortfall.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Compare target, actual, gap; quantify shortfall.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "target vs actual",
+    "gap to target",
+    "shortfall",
+    "plan vs actual",
+    "պլան-փաստ",
+    "թիրախ"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "missed_target"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [
+    "gap_analysis"
+   ],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "7635bb0ea06a87727ecc64b8",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/target_vs_actual.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "sales_forecasting",
+   "name": "Sales Forecasting",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Run-rate based forecast, projection and gap.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Run-rate based forecast, projection and gap.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "forecast",
+    "կանխատես",
+    "run rate",
+    "will we hit",
+    "projection",
+    "project forward"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [
+    "target_vs_actual"
+   ],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "missed_target"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [
+    "forecasting"
+   ],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "e651daadd9cbe9bc9a823206",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/sales_forecasting.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "sales_funnel_analysis",
+   "name": "Sales Funnel, Lead & Conversion Analysis",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Stage conversion, drop-off, lead volume/quality/source.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Stage conversion, drop-off, lead volume/quality/source.",
+   "maturity_level": "L0",
+   "declared_maturity": "L0",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "funnel",
+    "ֆաննել",
+    "drop-off",
+    "stage conversion",
+    "conversion",
+    "փոխարկում",
+    "leads",
+    "լիդ",
+    "lead quality"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "crm"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "sales_decline"
+   ],
+   "executor": null,
+   "absorbed": [
+    "conversion_analysis",
+    "lead_analysis"
+   ],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L0",
+    "result": "PASS",
+    "fingerprint": "2b3c5d73424e0b8eb1557b2e",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/sales_funnel_analysis.json"
+   },
+   "last_verified": null
+  },
+  {
+   "skill_id": "pipeline_management",
+   "name": "Pipeline Management",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Stale/overdue/no-next-action opportunities.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Stale/overdue/no-next-action opportunities.",
+   "maturity_level": "L0",
+   "declared_maturity": "L0",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "pipeline",
+    "փայփլայն",
+    "opportunities",
+    "stale deals"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "crm"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "pipeline_stagnation"
+   ],
+   "executor": null,
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 2,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L0",
+    "result": "PASS",
+    "fingerprint": "0081573f8b47970939b98179",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/pipeline_management.json"
+   },
+   "last_verified": null
+  },
+  {
+   "skill_id": "channel_performance_analysis",
+   "name": "Channel Performance Analysis",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Performance by channel (D2D, telesales, corporate).",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Performance by channel (D2D, telesales, corporate).",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "by channel",
+    "channel performance",
+    "ալիք",
+    "d2d",
+    "telesales",
+    "կորպորատիվ ալիք"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "sales_decline"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "b5d2f219436f1561e8a1a3cb",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/channel_performance_analysis.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "lost_opportunity_analysis",
+   "name": "Lost Opportunity Analysis",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Why deals are lost.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Why deals are lost.",
+   "maturity_level": "L0",
+   "declared_maturity": "L0",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "lost deals",
+    "lost opportunit",
+    "կորցրած գործարք",
+    "why we lose"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "crm"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "sales_decline"
+   ],
+   "executor": null,
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L0",
+    "result": "PASS",
+    "fingerprint": "7d57dff1d1cd07faec44c8d0",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/lost_opportunity_analysis.json"
+   },
+   "last_verified": null
+  },
+  {
+   "skill_id": "upsell_analysis",
+   "name": "Upsell / Cross-sell Analysis",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Upsell and cross-sell potential and results.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Upsell and cross-sell potential and results.",
+   "maturity_level": "L0",
+   "declared_maturity": "L0",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "upsell",
+    "cross-sell",
+    "cross sell"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "crm"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "sales_decline"
+   ],
+   "executor": null,
+   "absorbed": [
+    "cross_sell_analysis"
+   ],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L0",
+    "result": "PASS",
+    "fingerprint": "1959f070790c2925d06a031f",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/upsell_analysis.json"
+   },
+   "last_verified": null
+  },
+  {
+   "skill_id": "customer_acquisition_analysis",
+   "name": "Customer Acquisition Analysis",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "New connections, CAC, payback.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "New connections, CAC, payback.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "acquisition",
+    "նոր միացում",
+    "new connections",
+    "cac"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "sales_decline"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "19ee9dee63d5c44bb02eef69",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/customer_acquisition_analysis.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "churn_analysis",
+   "name": "Churn & Retention Analysis",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Churn rate, drivers, risk signals; retention flow effectiveness.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Churn rate, drivers, risk signals; retention flow effectiveness.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "churn",
+    "չըռն",
+    "cancellations",
+    "հրաժարվ",
+    "retention",
+    "ռեթենշն",
+    "save list",
+    "պահել հաճախորդ"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "churn_increase"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [
+    "retention_analysis"
+   ],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "ccb9a1072dfece1ffaa9701d",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/churn_analysis.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "revenue_leakage_detection",
+   "name": "Revenue Leakage Detection",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Service delivered vs billed mismatch.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Service delivered vs billed mismatch.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "leakage",
+    "revenue assurance",
+    "չգանձված",
+    "billing mismatch"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "sales_decline"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "9cf5000a766ef6f68b30ee56",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/revenue_leakage_detection.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "campaign_performance_analysis",
+   "name": "Campaign Performance Analysis",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Campaign ROI.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Campaign ROI.",
+   "maturity_level": "L0",
+   "declared_maturity": "L0",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "campaign",
+    "քամփեյն",
+    "promo"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "crm"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "sales_decline"
+   ],
+   "executor": null,
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L0",
+    "result": "PASS",
+    "fingerprint": "7826f1d48eec8c770f4f3bbb",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/campaign_performance_analysis.json"
+   },
+   "last_verified": null
+  },
+  {
+   "skill_id": "pricing_performance_analysis",
+   "name": "Pricing Performance Analysis",
+   "version": "1.2.0",
+   "domain": "B_SALES_MANAGEMENT",
+   "purpose": "Price/tariff performance from supplied data.",
+   "business_outcome": "Sales deviations identified early.",
+   "description": "Price/tariff performance from supplied data.",
+   "maturity_level": "L0",
+   "declared_maturity": "L0",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "pricing performance",
+    "tariff performance",
+    "price performance",
+    "սակագնի արդյունավետ",
+    "price elasticity"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sales_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "crm"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live sales data source; requires user-supplied dataset (sales_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "sales_decline"
+   ],
+   "executor": null,
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L0",
+    "result": "PASS",
+    "fingerprint": "1fe50e292df431380d86d382",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/pricing_performance_analysis.json"
+   },
+   "last_verified": null
+  },
+  {
+   "skill_id": "operations_kpi_monitoring",
+   "name": "Operations KPI & SLA Monitoring",
+   "version": "1.2.0",
+   "domain": "C_OPERATIONS_MANAGEMENT",
+   "purpose": "Backlog/SLA/aging/rework/delivery/fulfillment KPIs from a supplied dataset.",
+   "business_outcome": "Operational problems detected early.",
+   "description": "Backlog/SLA/aging/rework/delivery/fulfillment KPIs from a supplied dataset.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "ops kpi",
+    "operations kpi",
+    "գործառնական ցուցանիշ",
+    "sla",
+    "service level",
+    "order fulfillment",
+    "order to activation",
+    "install times",
+    "delivery performance"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "ops_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live operations data; requires user-supplied dataset (ops_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "ops_backlog",
+    "r_backlog"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [
+    "sla_monitoring",
+    "service_delivery_monitoring",
+    "order_fulfillment_monitoring"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "37d8c37d8663355f9e66941a",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/operations_kpi_monitoring.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "workload_analysis",
+   "name": "Workload & Capacity Analysis",
+   "version": "1.2.0",
+   "domain": "C_OPERATIONS_MANAGEMENT",
+   "purpose": "Incoming vs completed vs open; capacity vs demand; rebalancing.",
+   "business_outcome": "Operational problems detected early.",
+   "description": "Incoming vs completed vs open; capacity vs demand; rebalancing.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "workload",
+    "ծանրաբեռն",
+    "capacity",
+    "թողունակ",
+    "rebalance",
+    "balance workload",
+    "բաշխել"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "ops_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live operations data; requires user-supplied dataset (ops_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "ops_backlog"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [
+    "capacity_analysis",
+    "workload_balancing"
+   ],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "f945644030d6995998ca1627",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/workload_analysis.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "backlog_management",
+   "name": "Backlog & Aging Management",
+   "version": "1.2.0",
+   "domain": "C_OPERATIONS_MANAGEMENT",
+   "purpose": "Backlog size, aging distribution, trend.",
+   "business_outcome": "Operational problems detected early.",
+   "description": "Backlog size, aging distribution, trend.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "backlog",
+    "կուտակ",
+    "queue",
+    "aging",
+    "how old is"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "ops_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live operations data; requires user-supplied dataset (ops_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "ops_backlog",
+    "r_backlog"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [
+    "aging_analysis"
+   ],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 1,
+    "routing_evals": 1,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "49da4fcd696c691ed991f42c",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/backlog_management.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "bottleneck_detection",
+   "name": "Bottleneck Detection",
+   "version": "1.2.0",
+   "domain": "C_OPERATIONS_MANAGEMENT",
+   "purpose": "Where work accumulates and why.",
+   "business_outcome": "Operational problems detected early.",
+   "description": "Where work accumulates and why.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "bottleneck",
+    "խցան",
+    "where is it stuck",
+    "where does it get stuck"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "ops_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live operations data; requires user-supplied dataset (ops_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "ops_backlog",
+    "r_backlog"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 1,
+    "routing_evals": 1,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "c8af78719143aefc503611f6",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/bottleneck_detection.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "failure_rework_analysis",
+   "name": "Failure/Rework Analysis",
+   "version": "1.2.0",
+   "domain": "C_OPERATIONS_MANAGEMENT",
+   "purpose": "Failed installs, rework rate.",
+   "business_outcome": "Operational problems detected early.",
+   "description": "Failed installs, rework rate.",
+   "maturity_level": "L0",
+   "declared_maturity": "L0",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "rework",
+    "failed install",
+    "կրկնակի այց"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "ops_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "bi_dashboard"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live operations data; requires user-supplied dataset (ops_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "ops_backlog"
+   ],
+   "executor": null,
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L0",
+    "result": "PASS",
+    "fingerprint": "c5f85bfb788586aecff636ce",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/failure_rework_analysis.json"
+   },
+   "last_verified": null
+  },
+  {
+   "skill_id": "operational_incident_management",
+   "name": "Operational Incident Management",
+   "version": "1.2.0",
+   "domain": "C_OPERATIONS_MANAGEMENT",
+   "purpose": "Track incidents to closure.",
+   "business_outcome": "Operational problems detected early.",
+   "description": "Track incidents to closure.",
+   "maturity_level": "L0",
+   "declared_maturity": "L0",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "incident",
+    "outage",
+    "ինցիդենտ",
+    "խափանում"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "ops_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "bi_dashboard"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live operations data; requires user-supplied dataset (ops_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "ops_backlog"
+   ],
+   "executor": null,
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L0",
+    "result": "PASS",
+    "fingerprint": "2067147b8746a0b15593ef13",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/operational_incident_management.json"
+   },
+   "last_verified": null
+  },
+  {
+   "skill_id": "customer_complaint_pattern_analysis",
+   "name": "Customer Complaint Pattern Analysis",
+   "version": "1.2.0",
+   "domain": "C_OPERATIONS_MANAGEMENT",
+   "purpose": "Isolated vs systemic complaints.",
+   "business_outcome": "Operational problems detected early.",
+   "description": "Isolated vs systemic complaints.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "complaint",
+    "բողոք"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "ops_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live operations data; requires user-supplied dataset (ops_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "complaint_trend"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "c2877eb29c3cdd9d3c8c880e",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/customer_complaint_pattern_analysis.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "operational_risk_detection",
+   "name": "Operational Risk Detection",
+   "version": "1.2.0",
+   "domain": "C_OPERATIONS_MANAGEMENT",
+   "purpose": "Leading indicators of failure.",
+   "business_outcome": "Operational problems detected early.",
+   "description": "Leading indicators of failure.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "ops risk",
+    "operational risk",
+    "գործառնական ռիսկ"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "ops_data"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: no live operations data; requires user-supplied dataset (ops_data).",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "ops_backlog"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [],
+   "evidence": {
+    "tests": 0,
+    "failure_tests": 0,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 0,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "89a58551e78bfd2a8dd66e2e",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/operational_risk_detection.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "performance_gap_diagnosis",
+   "name": "Employee Performance & Gap Diagnosis",
+   "version": "1.2.0",
+   "domain": "D_PEOPLE_PERFORMANCE",
+   "purpose": "Diagnose an employee/salesperson performance gap: classify cause PERSON/PROCESS/SYSTEM/POLICY/CAPACITY/TRAINING/MANAGEMENT/INCENTIVE/DATA; never blame first.",
+   "business_outcome": "Root cause separated from blame.",
+   "description": "Diagnose an employee/salesperson performance gap: classify cause PERSON/PROCESS/SYSTEM/POLICY/CAPACITY/TRAINING/MANAGEMENT/INCENTIVE/DATA; never blame first.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "employee performance",
+    "աշխատակցի կատարում",
+    "underperform",
+    "performance gap",
+    "ինչու չի աշխատում",
+    "productivity",
+    "արտադրող",
+    "training need",
+    "needs training",
+    "overloaded",
+    "too much work",
+    "salesperson performance",
+    "by employee",
+    "who is selling"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "performance_data"
+   ],
+   "optional_inputs": [
+    "description"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [
+    "Any compensation/termination action requires explicit Head approval"
+   ],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: requires performance data; never attribute cause without diagnosis.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "employee_underperformance"
+   ],
+   "executor": "performance_gap_diagnosis",
+   "absorbed": [
+    "employee_performance_analysis",
+    "productivity_analysis",
+    "training_need_detection",
+    "capacity_vs_performance_diagnosis",
+    "salesperson_performance_analysis"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "7fbd049b46cc926a695f4469",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/performance_gap_diagnosis.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "root_cause_analysis",
+   "name": "Root Cause Analysis (5 Whys)",
+   "version": "1.2.0",
+   "domain": "E_PROCESS_AUTOMATION",
+   "purpose": "SYMPTOM → why-chain → ROOT CAUSE → CORRECTIVE ACTION; never solution-first.",
+   "business_outcome": "Problems fixed at the root.",
+   "description": "SYMPTOM → why-chain → ROOT CAUSE → CORRECTIVE ACTION; never solution-first.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "why did",
+    "why are",
+    "why is",
+    "root cause",
+    "ինչու",
+    "պատճառ",
+    "what caused",
+    "5 whys",
+    "five whys"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "description"
+   ],
+   "optional_inputs": [
+    "whys",
+    "symptom",
+    "corrective_action"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "sales_decline",
+    "ops_backlog",
+    "employee_underperformance"
+   ],
+   "executor": "root_cause_analysis",
+   "absorbed": [
+    "five_whys"
+   ],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 2,
+    "hardening_cases": 2,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 5,
+    "routing_evals": 4,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "0bb6244eaca5d97ae746afe7",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/root_cause_analysis.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "process_mapping",
+   "name": "Process Mapping & Analysis",
+   "version": "1.2.0",
+   "domain": "E_PROCESS_AUTOMATION",
+   "purpose": "Map a process (trigger/steps/owners/decisions/exceptions/KPI/systems) and analyse it for waits, handoffs, waste, duplicate work.",
+   "business_outcome": "Process visible before it is changed.",
+   "description": "Map a process (trigger/steps/owners/decisions/exceptions/KPI/systems) and analyse it for waits, handoffs, waste, duplicate work.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "map the process",
+    "process map",
+    "how does it work",
+    "workflow analysis",
+    "waste",
+    "ավելորդ քայլ",
+    "inefficien",
+    "duplicate work",
+    "done twice",
+    "handoff analysis",
+    "փոխանցում"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "description"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "structured_analysis",
+   "absorbed": [
+    "workflow_analysis",
+    "waste_detection",
+    "duplicate_work_detection",
+    "handoff_analysis"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "36591abd53842001b37b1c89",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/process_mapping.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "process_improvement",
+   "name": "Process & Control Design",
+   "version": "1.2.0",
+   "domain": "E_PROCESS_AUTOMATION",
+   "purpose": "Recommend simplify → standardize → control before automate; design workflows, controls and exception handling.",
+   "business_outcome": "Processes improved in the right order.",
+   "description": "Recommend simplify → standardize → control before automate; design workflows, controls and exception handling.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "improve process",
+    "բարելավ",
+    "optimize the process",
+    "design workflow",
+    "design the flow",
+    "control design",
+    "add a control",
+    "exception handling",
+    "edge cases",
+    "բացառություն"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "description"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "structured_analysis",
+   "absorbed": [
+    "workflow_design",
+    "control_design",
+    "exception_handling_design"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "cc2787945bf19837d0fee707",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/process_improvement.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "automation_opportunity_detection",
+   "name": "Automation Assessment",
+   "version": "1.2.0",
+   "domain": "E_PROCESS_AUTOMATION",
+   "purpose": "Detect repetitive manual work, assess readiness (stable/logical enough), outline the automation.",
+   "business_outcome": "Only stable processes get automated.",
+   "description": "Detect repetitive manual work, assess readiness (stable/logical enough), outline the automation.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "automate",
+    "ավտոմատ",
+    "automation",
+    "what can be automated",
+    "ready to automate"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "description"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "structured_analysis",
+   "absorbed": [
+    "automation_readiness_assessment",
+    "automation_design"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "f0a55c1ea2c2e0e385c694c1",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/automation_opportunity_detection.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "data_analysis",
+   "name": "Supplied-Data Analysis",
+   "version": "1.2.0",
+   "domain": "F_DATA_BI",
+   "purpose": "Descriptive statistics and trend/variance on a SUPPLIED dataset (never live); labels output DERIVED.",
+   "business_outcome": "Numbers explained, not invented.",
+   "description": "Descriptive statistics and trend/variance on a SUPPLIED dataset (never live); labels output DERIVED.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "analyze data",
+    "analyse data",
+    "վերլուծիր տվյալ",
+    "trend",
+    "միտում",
+    "variance",
+    "շեղում",
+    "deviation",
+    "anomaly",
+    "spike",
+    "unusual",
+    "interpret kpi",
+    "kpi change",
+    "kpi changed",
+    "kpi dropped",
+    "what does the kpi mean",
+    "segment",
+    "breakdown by",
+    "by region",
+    "impact",
+    "ազդեցություն",
+    "what does it cost",
+    "what if",
+    "scenario",
+    "սցենար",
+    "dashboard export"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "dataset"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [
+    "never invent numbers",
+    "label CONFIRMED/DERIVED/UNVERIFIED/UNKNOWN"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "BLOCKED: dataset required; label missing data UNKNOWN.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "missing_kpi_data",
+    "sales_decline"
+   ],
+   "executor": "analysis_on_supplied_data",
+   "absorbed": [
+    "trend_analysis",
+    "variance_analysis",
+    "kpi_interpretation",
+    "anomaly_detection",
+    "segmentation",
+    "business_impact_assessment",
+    "scenario_analysis",
+    "dashboard_interpretation"
+   ],
+   "evidence": {
+    "tests": 2,
+    "failure_tests": 4,
+    "hardening_cases": 3,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 4,
+    "routing_evals": 3,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "25eb114d0f2c4833b9fe9457",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/data_analysis.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "source_reconciliation",
+   "name": "Source Reconciliation & Contradiction Detection",
+   "version": "1.2.0",
+   "domain": "F_DATA_BI",
+   "purpose": "Reconcile two sources; surface A-says-X/B-says-Y, which is newer/authoritative, impact; never silently choose.",
+   "business_outcome": "No silent choice between conflicting sources.",
+   "description": "Reconcile two sources; surface A-says-X/B-says-Y, which is newer/authoritative, impact; never silently choose.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "reconcile",
+    "reconciliation",
+    "համադր",
+    "two sources",
+    "contradict",
+    "doesn't match",
+    "don't match",
+    "conflict",
+    "հակաս",
+    "disagree",
+    "mismatch"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "sources"
+   ],
+   "optional_inputs": [
+    "impact"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "conflicting_reports"
+   ],
+   "executor": "source_reconciliation",
+   "absorbed": [
+    "contradiction_detection"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 2,
+    "hardening_cases": 2,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "6ed2143f7f5407586d0a2ad6",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/source_reconciliation.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "executive_reporting",
+   "name": "Executive Reporting",
+   "version": "1.2.0",
+   "domain": "F_DATA_BI",
+   "purpose": "EXECUTIVE SNAPSHOT over real task data: RED/YELLOW/GREEN + deviations/risks/decisions/owners; sales/ops marked UNKNOWN.",
+   "business_outcome": "Status is reportable upward in one screen.",
+   "description": "EXECUTIVE SNAPSHOT over real task data: RED/YELLOW/GREEN + deviations/risks/decisions/owners; sales/ops marked UNKNOWN.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "executive report",
+    "status report",
+    "ռեփորթ",
+    "executive summary",
+    "snapshot",
+    "status update for"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "tasks"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "executive_reporting",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "c55a0b0d26140520dbc1fa0a",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/executive_reporting.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "information_classification",
+   "name": "Information Triage & Classification",
+   "version": "1.2.0",
+   "domain": "G_COMMUNICATION",
+   "purpose": "Classify incoming items (email/chat/notes) ACTION/DECISION/DELEGATE/MONITOR/FYI/IGNORE; protect the Head's attention.",
+   "business_outcome": "Only meaningful items reach the Head.",
+   "description": "Classify incoming items (email/chat/notes) ACTION/DECISION/DELEGATE/MONITOR/FYI/IGNORE; protect the Head's attention.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "classify",
+    "դասակարգ",
+    "triage",
+    "what kind of item",
+    "incoming messages",
+    "inbox",
+    "emails",
+    "նամակներ",
+    "filter the noise"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [],
+   "optional_inputs": [
+    "content",
+    "items"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "ANALYZE",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "information_classification",
+   "absorbed": [
+    "email_triage",
+    "message_triage",
+    "executive_attention_management"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "705ce56dc889664915b0e493",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/information_classification.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "executive_summarization",
+   "name": "Executive Summarization",
+   "version": "1.2.0",
+   "domain": "G_COMMUNICATION",
+   "purpose": "What happened / why it matters / recommendation / Head action; meeting notes → decisions, tasks, owners, deadlines.",
+   "business_outcome": "Head reads one screen, not ten.",
+   "description": "What happened / why it matters / recommendation / Head action; meeting notes → decisions, tasks, owners, deadlines.",
+   "maturity_level": "L1",
+   "declared_maturity": "L1",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "summarize",
+    "summarise",
+    "ամփոփիր",
+    "tl;dr",
+    "short version",
+    "meeting summary",
+    "ժողովի ամփոփ"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "content"
+   ],
+   "optional_inputs": [
+    "kind"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "DRAFT",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "meeting_prep"
+   ],
+   "executor": "drafting",
+   "absorbed": [
+    "meeting_summary"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L1",
+    "result": "PASS",
+    "fingerprint": "776b0995410df5ce5a9fec1f",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/executive_summarization.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "management_communication",
+   "name": "Outgoing Communication (Գև's voice)",
+   "version": "1.2.0",
+   "domain": "G_COMMUNICATION",
+   "purpose": "Draft outgoing messages (management, Finance, Gadukyan, follow-ups) in «Գև» voice, internal wording stripped; sending needs Head OK.",
+   "business_outcome": "Nothing leaves in the wrong voice or without OK.",
+   "description": "Draft outgoing messages (management, Finance, Gadukyan, follow-ups) in «Գև» voice, internal wording stripped; sending needs Head OK.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "write to",
+    "գրիր",
+    "message to",
+    "send finance",
+    "send them",
+    "send him",
+    "send her",
+    "a follow-up to",
+    "follow-up message",
+    "outgoing",
+    "draft a message",
+    "reply to",
+    "email to",
+    "send email",
+    "նամակ գրիր"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "content"
+   ],
+   "optional_inputs": [
+    "kind",
+    "recipient"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [
+    "outgoing text uses «Գև», never «Ես»/internal wording",
+    "requires_head_ok_before_send is True"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "DRAFT",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "r_send_finance"
+   ],
+   "executor": "outgoing_communication",
+   "absorbed": [
+    "follow_up_drafting"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 2,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "5bb9bb1b58bb096fd75f151f",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/management_communication.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "communication_quality_checking",
+   "name": "Communication Quality Checking",
+   "version": "1.2.0",
+   "domain": "G_COMMUNICATION",
+   "purpose": "Check clarity/assignment/deadline/tone; flag internal wording.",
+   "business_outcome": "Messages are clear and assignable.",
+   "description": "Check clarity/assignment/deadline/tone; flag internal wording.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "check the message",
+    "proofread",
+    "ստուգիր տեքստը",
+    "quality check the text"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "content"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "ANALYZE",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "communication_quality_check",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "a1fa7177a64d38463e29d108",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/communication_quality_checking.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "commitment_memory",
+   "name": "Commitment Memory",
+   "version": "1.2.0",
+   "domain": "H_MEMORY_CONTEXT",
+   "purpose": "Retrieve open commitments from the hardened store.",
+   "business_outcome": "Promises are remembered.",
+   "description": "Retrieve open commitments from the hardened store.",
+   "maturity_level": "L3",
+   "declared_maturity": "L3",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "what did i promise",
+    "խոստացել եմ",
+    "my commitments",
+    "open commitments"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "state_store"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "commitment_memory",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 10,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 2,
+    "routing_evals": 0,
+    "concurrency_tests": 4,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L3",
+    "result": "PASS",
+    "fingerprint": "1124fdd6f60d9027dca44ed6",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/commitment_memory.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "decision_memory",
+   "name": "Decision Memory",
+   "version": "1.2.0",
+   "domain": "H_MEMORY_CONTEXT",
+   "purpose": "Retrieve logged decisions.",
+   "business_outcome": "Decisions not reopened blindly.",
+   "description": "Retrieve logged decisions.",
+   "maturity_level": "L3",
+   "declared_maturity": "L3",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "what did we decide",
+    "որոշել էինք",
+    "past decisions",
+    "decision history"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "state_store"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "decision_memory",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 10,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 4,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L3",
+    "result": "PASS",
+    "fingerprint": "51f1ac3a760da0a5c139b2fa",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/decision_memory.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "information_retrieval",
+   "name": "Context & Information Retrieval",
+   "version": "1.2.0",
+   "domain": "H_MEMORY_CONTEXT",
+   "purpose": "Find facts, history, project context, dependencies and links across workspace + memory files.",
+   "business_outcome": "Answers and context are findable.",
+   "description": "Find facts, history, project context, dependencies and links across workspace + memory files.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "find",
+    "where is",
+    "գտիր",
+    "որտեղ է",
+    "search",
+    "history of",
+    "what happened before",
+    "նախկինում",
+    "earlier we",
+    "background on",
+    "context on",
+    "related to",
+    "depends on",
+    "կախված",
+    "blocked by"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [],
+   "optional_inputs": [
+    "query"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "filesystem",
+    "memory_files"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "memory_retrieval",
+   "absorbed": [
+    "project_context_retrieval",
+    "historical_context_retrieval",
+    "context_linking",
+    "dependency_memory"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "c5ff3a52ff9e1fc8837a8020",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/information_retrieval.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "open_loop_memory",
+   "name": "Open-loop Memory",
+   "version": "1.2.0",
+   "domain": "H_MEMORY_CONTEXT",
+   "purpose": "All open loops: tasks + waiting + commitments + decisions pending.",
+   "business_outcome": "Nothing left open silently.",
+   "description": "All open loops: tasks + waiting + commitments + decisions pending.",
+   "maturity_level": "L3",
+   "declared_maturity": "L3",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "open loops",
+    "what's open",
+    "anything pending",
+    "what's outstanding",
+    "բաց հարցեր"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "tasks"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [
+    "Առաջադրանքներ.xlsx"
+   ],
+   "source_policy": {
+    "max_age_hours": 336
+   },
+   "dependencies": [
+    "deadline_management",
+    "waiting_for_tracking",
+    "commitment_memory"
+   ],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "xlsx",
+    "audit_log"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "open_loops",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 4,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L3",
+    "result": "PASS",
+    "fingerprint": "d9bc501e7a918d64a91277fb",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/open_loop_memory.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "authority_checking",
+   "name": "Authority Checking",
+   "version": "1.2.0",
+   "domain": "I_GOVERNANCE",
+   "purpose": "Check a requested action level against a skill's max_action and the approval policy.",
+   "business_outcome": "No unauthorized action.",
+   "description": "Check a requested action level against a skill's max_action and the approval policy.",
+   "maturity_level": "L4",
+   "declared_maturity": "L4",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "can i",
+    "am i allowed",
+    "authority",
+    "լիազոր",
+    "permission to"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "action_level"
+   ],
+   "optional_inputs": [
+    "approval_token",
+    "skill_id"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [
+    "EXECUTE_MATERIAL requires token",
+    "level not in ladder → BLOCKED"
+   ],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "head_decision",
+    "r_tariff"
+   ],
+   "executor": "authority_checking",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 7,
+    "hardening_cases": 15,
+    "authority_tests": 9,
+    "completion_verification": 1,
+    "evals": 6,
+    "routing_evals": 1,
+    "concurrency_tests": 0,
+    "enforcement_tests": 15
+   },
+   "certification": {
+    "maturity_level": "L4",
+    "result": "PASS",
+    "fingerprint": "defcadc286d6686d0cac2eb3",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/authority_checking.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "risk_classification",
+   "name": "Risk & Policy Classification",
+   "version": "1.2.0",
+   "domain": "I_GOVERNANCE",
+   "purpose": "Classify an action LOW/MEDIUM/HIGH/CRITICAL by materiality (pricing/comp/hiring/contract/public/irreversible) and reversibility.",
+   "business_outcome": "Risk and policy visible before action.",
+   "description": "Classify an action LOW/MEDIUM/HIGH/CRITICAL by materiality (pricing/comp/hiring/contract/public/irreversible) and reversibility.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "how risky",
+    "risk level",
+    "policy",
+    "քաղաքականություն",
+    "is this allowed",
+    "tariff price",
+    "change the price",
+    "change pricing",
+    "սակագինը փոխ",
+    "raise the price",
+    "lower the price"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "action"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "r_tariff"
+   ],
+   "executor": "risk_classification",
+   "absorbed": [
+    "policy_checking"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 3,
+    "authority_tests": 4,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 1,
+    "concurrency_tests": 0,
+    "enforcement_tests": 1
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "9ad12ae322808debe0935282",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/risk_classification.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "data_sensitivity_awareness",
+   "name": "Data Sensitivity Awareness",
+   "version": "1.2.0",
+   "domain": "I_GOVERNANCE",
+   "purpose": "Flag credentials/personal data; redact from logs.",
+   "business_outcome": "No secrets leaked.",
+   "description": "Flag credentials/personal data; redact from logs.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "sensitive",
+    "password",
+    "գաղտնաբառ",
+    "personal data",
+    "credential"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "text"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "sensitivity_check",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 2,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "22ca1d564e0aca9a46713473",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/data_sensitivity_awareness.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "completion_verification",
+   "name": "Completion & Action Verification",
+   "version": "1.2.0",
+   "domain": "I_GOVERNANCE",
+   "purpose": "Distinguish ATTEMPTED/EXECUTED/VERIFIED by re-reading source state (file exists, task status, store record).",
+   "business_outcome": "Done means verified, not narrated.",
+   "description": "Distinguish ATTEMPTED/EXECUTED/VERIFIED by re-reading source state (file exists, task status, store record).",
+   "maturity_level": "L4",
+   "declared_maturity": "L4",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "is it done",
+    "ավարտված է",
+    "verify",
+    "did it work",
+    "ստուգիր որ",
+    "confirm it happened",
+    "արվե՞լ է"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "evidence_spec"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "completed_no_evidence"
+   ],
+   "executor": "completion_verification",
+   "absorbed": [
+    "action_verification"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 6,
+    "hardening_cases": 14,
+    "authority_tests": 2,
+    "completion_verification": 1,
+    "evals": 7,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 14
+   },
+   "certification": {
+    "maturity_level": "L4",
+    "result": "PASS",
+    "fingerprint": "26a924a7707d55c1b927e7c7",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/completion_verification.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "audit_logging",
+   "name": "Audit Logging",
+   "version": "1.2.0",
+   "domain": "I_GOVERNANCE",
+   "purpose": "Append a structured audit record to the hardened store for a skill run or manual event.",
+   "business_outcome": "Every run is traceable.",
+   "description": "Append a structured audit record to the hardened store for a skill run or manual event.",
+   "maturity_level": "L4",
+   "declared_maturity": "L4",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "audit",
+    "log this",
+    "լոգ"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "record"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem",
+    "audit_log"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "audit_logging",
+   "absorbed": [],
+   "evidence": {
+    "tests": 5,
+    "failure_tests": 5,
+    "hardening_cases": 25,
+    "authority_tests": 2,
+    "completion_verification": 2,
+    "evals": 6,
+    "routing_evals": 0,
+    "concurrency_tests": 4,
+    "enforcement_tests": 14
+   },
+   "certification": {
+    "maturity_level": "L4",
+    "result": "PASS",
+    "fingerprint": "35167f1381aaf48e9d9e9ace",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/audit_logging.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "source_verification",
+   "name": "Source Verification & Data Quality",
+   "version": "1.2.0",
+   "domain": "I_GOVERNANCE",
+   "purpose": "Verify a source exists, is readable, schema matches, freshness; pick the authoritative source.",
+   "business_outcome": "Only real, fresh sources used.",
+   "description": "Verify a source exists, is readable, schema matches, freshness; pick the authoritative source.",
+   "maturity_level": "L4",
+   "declared_maturity": "L4",
+   "status": "active",
+   "core": true,
+   "triggers": [
+    "is the source valid",
+    "check the file",
+    "source check",
+    "ֆայլը ճիշտ է",
+    "data quality",
+    "տվյալների որակ",
+    "is the data right",
+    "stale",
+    "which file is right",
+    "source of truth"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [],
+   "optional_inputs": [
+    "path"
+   ],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "filesystem"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "source_verification",
+   "absorbed": [
+    "data_quality_checking",
+    "source_of_truth_selection"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 7,
+    "hardening_cases": 6,
+    "authority_tests": 2,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L4",
+    "result": "PASS",
+    "fingerprint": "ed61e13036d2a0884940566e",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/source_verification.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "confidence_handling",
+   "name": "Confidence Handling",
+   "version": "1.2.0",
+   "domain": "I_GOVERNANCE",
+   "purpose": "Label outputs CONFIRMED/DERIVED/UNVERIFIED/UNKNOWN.",
+   "business_outcome": "Uncertainty is explicit.",
+   "description": "Label outputs CONFIRMED/DERIVED/UNVERIFIED/UNKNOWN.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "how sure",
+    "confidence",
+    "վստահ"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "claims"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "RECOMMEND",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [
+    "conflicting_reports"
+   ],
+   "executor": "confidence_labeling",
+   "absorbed": [],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 2,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 1,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "9ceea9ccdb44d04730c2eb2a",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/confidence_handling.json"
+   },
+   "last_verified": "2026-09-10"
+  },
+  {
+   "skill_id": "structured_data_extraction",
+   "name": "Document & Structured Data Extraction",
+   "version": "1.2.0",
+   "domain": "J_TOOL_INTEGRATION",
+   "purpose": "Read docx/xlsx/text files (SOPs, roadmaps) and extract structure/paragraphs/tables.",
+   "business_outcome": "Documents become usable facts.",
+   "description": "Read docx/xlsx/text files (SOPs, roadmaps) and extract structure/paragraphs/tables.",
+   "maturity_level": "L2",
+   "declared_maturity": "L2",
+   "status": "active",
+   "core": false,
+   "triggers": [
+    "extract",
+    "հանիր",
+    "parse the file",
+    "docx",
+    "read the document",
+    "փաստաթուղթը կարդա",
+    "sop",
+    "procedure document",
+    "ընթացակարգը կարդա"
+   ],
+   "anti_triggers": [],
+   "required_inputs": [
+    "path"
+   ],
+   "optional_inputs": [],
+   "preconditions": [],
+   "required_context": [],
+   "authoritative_sources": [],
+   "source_policy": {},
+   "dependencies": [],
+   "required_skills": [],
+   "allowed_tools": [],
+   "required_tools": [
+    "python",
+    "docx"
+   ],
+   "execution_steps": [],
+   "expected_outputs": [],
+   "validation_rules": [],
+   "approval_requirements": [],
+   "authority_boundary": {
+    "max_action": "ANALYZE",
+    "material_requires_explicit_approval": true
+   },
+   "failure_conditions": [],
+   "fallback_behavior": "Return structured BLOCKED state; never fabricate.",
+   "logging_requirements": [
+    "execution_id",
+    "inputs",
+    "sources",
+    "result_status",
+    "duration_ms"
+   ],
+   "success_metrics": [],
+   "test_cases": [],
+   "eval_cases": [],
+   "executor": "document_extraction",
+   "absorbed": [
+    "document_operations",
+    "sop_interpretation"
+   ],
+   "evidence": {
+    "tests": 1,
+    "failure_tests": 1,
+    "hardening_cases": 1,
+    "authority_tests": 1,
+    "completion_verification": 1,
+    "evals": 0,
+    "routing_evals": 0,
+    "concurrency_tests": 0,
+    "enforcement_tests": 0
+   },
+   "certification": {
+    "maturity_level": "L2",
+    "result": "PASS",
+    "fingerprint": "ff817ed63f8aba34891f5296",
+    "certified_at": "2026-09-10T14:12:27",
+    "record": "certifications/structured_data_extraction.json"
+   },
+   "last_verified": "2026-09-10"
+  }
+ ],
+ "retired": {
+  "daily_priority_management": {
+   "merged_into": "daily_briefing",
+   "reason": "alias: same executor (daily_briefing), same input, same output",
+   "retired_on": "2026-09-10"
+  },
+  "meeting_action_capture": {
+   "merged_into": "delegation_design",
+   "reason": "alias: same executor (delegation_design); notes→tasks is instruction→task",
+   "retired_on": "2026-09-10"
+  },
+  "action_plan": {
+   "merged_into": "delegation_design",
+   "reason": "workflow step / output format of delegation_design (same executor)",
+   "retired_on": "2026-09-10"
+  },
+  "instruction_drafting": {
+   "merged_into": "delegation_design",
+   "reason": "output format: an instruction with owner/deadline IS a delegation draft",
+   "retired_on": "2026-09-10"
+  },
+  "escalation_drafting": {
+   "merged_into": "escalation_management",
+   "reason": "output format of escalation_management",
+   "retired_on": "2026-09-10"
+  },
+  "recommendation": {
+   "merged_into": "decision_support",
+   "reason": "workflow step: a recommendation frame is decision preparation; merged executor",
+   "retired_on": "2026-09-10"
+  },
+  "approval_requirement_detection": {
+   "merged_into": "approval_management",
+   "reason": "alias: same executor (approval_management), same input",
+   "retired_on": "2026-09-10"
+  },
+  "performance_review_preparation": {
+   "merged_into": "meeting_preparation",
+   "reason": "L0 with no executor; a review pack is a meeting pack with topic",
+   "retired_on": "2026-09-10"
+  },
+  "calendar_management": {
+   "merged_into": "<tool:calendar>",
+   "reason": "a tool, not a skill: no capability without the calendar tool (tools_available.calendar=False)",
+   "retired_on": "2026-09-10"
+  },
+  "spreadsheet_data_operations": {
+   "merged_into": "task_management",
+   "reason": "alias: same executor (task_management); xlsx is the task source",
+   "retired_on": "2026-09-10"
+  },
+  "gap_analysis": {
+   "merged_into": "target_vs_actual",
+   "reason": "alias: same executor + input; the gap IS the target-vs-actual output",
+   "retired_on": "2026-09-10"
+  },
+  "forecasting": {
+   "merged_into": "sales_forecasting",
+   "reason": "overlap: generic forecasting duplicated sales_forecasting (same executor)",
+   "retired_on": "2026-09-10"
+  },
+  "conversion_analysis": {
+   "merged_into": "sales_funnel_analysis",
+   "reason": "overlap: conversion by stage is the funnel analysis",
+   "retired_on": "2026-09-10"
+  },
+  "lead_analysis": {
+   "merged_into": "sales_funnel_analysis",
+   "reason": "overlap: lead volume/quality is the top of the funnel",
+   "retired_on": "2026-09-10"
+  },
+  "cross_sell_analysis": {
+   "merged_into": "upsell_analysis",
+   "reason": "overlap: identical L0 contract; one capability",
+   "retired_on": "2026-09-10"
+  },
+  "retention_analysis": {
+   "merged_into": "churn_analysis",
+   "reason": "overlap: retention and churn are one analysis; same executor + input",
+   "retired_on": "2026-09-10"
+  },
+  "salesperson_performance_analysis": {
+   "merged_into": "performance_gap_diagnosis",
+   "reason": "overlap: per-person results diagnosis is the people-performance skill",
+   "retired_on": "2026-09-10"
+  },
+  "sla_monitoring": {
+   "merged_into": "operations_kpi_monitoring",
+   "reason": "overlap: SLA is one KPI family of ops monitoring (L0, no executor)",
+   "retired_on": "2026-09-10"
+  },
+  "service_delivery_monitoring": {
+   "merged_into": "operations_kpi_monitoring",
+   "reason": "overlap: delivery/activation is an ops KPI (L0, no executor)",
+   "retired_on": "2026-09-10"
+  },
+  "order_fulfillment_monitoring": {
+   "merged_into": "operations_kpi_monitoring",
+   "reason": "overlap: order→install→activation is an ops KPI (L0, no executor)",
+   "retired_on": "2026-09-10"
+  },
+  "capacity_analysis": {
+   "merged_into": "workload_analysis",
+   "reason": "overlap: capacity vs demand is workload analysis",
+   "retired_on": "2026-09-10"
+  },
+  "aging_analysis": {
+   "merged_into": "backlog_management",
+   "reason": "overlap: aging is a dimension of the backlog (same executor + input)",
+   "retired_on": "2026-09-10"
+  },
+  "cross_department_handoff_control": {
+   "merged_into": "waiting_for_tracking",
+   "reason": "alias: same executor (waiting_for_tracking), same data",
+   "retired_on": "2026-09-10"
+  },
+  "employee_performance_analysis": {
+   "merged_into": "performance_gap_diagnosis",
+   "reason": "alias: same executor + input (performance_gap_diagnosis)",
+   "retired_on": "2026-09-10"
+  },
+  "productivity_analysis": {
+   "merged_into": "performance_gap_diagnosis",
+   "reason": "overlap: output-per-person is an input metric of the performance diagnosis (L0)",
+   "retired_on": "2026-09-10"
+  },
+  "training_need_detection": {
+   "merged_into": "performance_gap_diagnosis",
+   "reason": "overlap: TRAINING is a cause class of the diagnosis (L0)",
+   "retired_on": "2026-09-10"
+  },
+  "capacity_vs_performance_diagnosis": {
+   "merged_into": "performance_gap_diagnosis",
+   "reason": "overlap: CAPACITY is a cause class of the diagnosis (L0)",
+   "retired_on": "2026-09-10"
+  },
+  "accountability_tracking": {
+   "merged_into": "waiting_for_tracking",
+   "reason": "alias: same executor (waiting_for_tracking)",
+   "retired_on": "2026-09-10"
+  },
+  "management_follow_up": {
+   "merged_into": "follow_up_management",
+   "reason": "overlap: manager-level follow-up is follow-up management (L0)",
+   "retired_on": "2026-09-10"
+  },
+  "workload_balancing": {
+   "merged_into": "workload_analysis",
+   "reason": "overlap: rebalancing is the action side of workload analysis (L0)",
+   "retired_on": "2026-09-10"
+  },
+  "five_whys": {
+   "merged_into": "root_cause_analysis",
+   "reason": "alias: same executor (root_cause_analysis)",
+   "retired_on": "2026-09-10"
+  },
+  "workflow_analysis": {
+   "merged_into": "process_mapping",
+   "reason": "artificially split micro-skill: identical executor/template (structured_analysis), no unique capability",
+   "retired_on": "2026-09-10"
+  },
+  "waste_detection": {
+   "merged_into": "process_mapping",
+   "reason": "artificially split micro-skill: identical executor/template (structured_analysis), no unique capability",
+   "retired_on": "2026-09-10"
+  },
+  "duplicate_work_detection": {
+   "merged_into": "process_mapping",
+   "reason": "artificially split micro-skill: identical executor/template (structured_analysis), no unique capability",
+   "retired_on": "2026-09-10"
+  },
+  "handoff_analysis": {
+   "merged_into": "process_mapping",
+   "reason": "artificially split micro-skill: identical executor/template (structured_analysis), no unique capability",
+   "retired_on": "2026-09-10"
+  },
+  "workflow_design": {
+   "merged_into": "process_improvement",
+   "reason": "artificially split micro-skill: identical executor/template (structured_analysis), no unique capability",
+   "retired_on": "2026-09-10"
+  },
+  "control_design": {
+   "merged_into": "process_improvement",
+   "reason": "artificially split micro-skill: identical executor/template (structured_analysis), no unique capability",
+   "retired_on": "2026-09-10"
+  },
+  "exception_handling_design": {
+   "merged_into": "process_improvement",
+   "reason": "artificially split micro-skill: identical executor/template (structured_analysis), no unique capability",
+   "retired_on": "2026-09-10"
+  },
+  "automation_readiness_assessment": {
+   "merged_into": "automation_opportunity_detection",
+   "reason": "workflow step of one automation assessment; identical executor/template",
+   "retired_on": "2026-09-10"
+  },
+  "automation_design": {
+   "merged_into": "automation_opportunity_detection",
+   "reason": "workflow step of one automation assessment; identical executor/template",
+   "retired_on": "2026-09-10"
+  },
+  "sop_interpretation": {
+   "merged_into": "structured_data_extraction",
+   "reason": "alias: same executor (document_extraction)",
+   "retired_on": "2026-09-10"
+  },
+  "trend_analysis": {
+   "merged_into": "data_analysis",
+   "reason": "identical executor (analysis_on_supplied_data): separate id misrepresented a capability (direction/rate of change)",
+   "retired_on": "2026-09-10"
+  },
+  "variance_analysis": {
+   "merged_into": "data_analysis",
+   "reason": "identical executor (analysis_on_supplied_data): separate id misrepresented a capability (actual vs expected)",
+   "retired_on": "2026-09-10"
+  },
+  "kpi_interpretation": {
+   "merged_into": "data_analysis",
+   "reason": "identical executor (analysis_on_supplied_data): separate id misrepresented a capability (KPI change)",
+   "retired_on": "2026-09-10"
+  },
+  "anomaly_detection": {
+   "merged_into": "data_analysis",
+   "reason": "identical executor (analysis_on_supplied_data): separate id misrepresented a capability (outliers — not implemented)",
+   "retired_on": "2026-09-10"
+  },
+  "segmentation": {
+   "merged_into": "data_analysis",
+   "reason": "identical executor (analysis_on_supplied_data): separate id misrepresented a capability (segments — not implemented)",
+   "retired_on": "2026-09-10"
+  },
+  "business_impact_assessment": {
+   "merged_into": "data_analysis",
+   "reason": "identical executor (analysis_on_supplied_data): separate id misrepresented a capability (impact — not implemented)",
+   "retired_on": "2026-09-10"
+  },
+  "scenario_analysis": {
+   "merged_into": "data_analysis",
+   "reason": "identical executor (analysis_on_supplied_data): separate id misrepresented a capability (what-if — not implemented)",
+   "retired_on": "2026-09-10"
+  },
+  "dashboard_interpretation": {
+   "merged_into": "data_analysis",
+   "reason": "identical executor (analysis_on_supplied_data): separate id misrepresented a capability (L0, no executor)",
+   "retired_on": "2026-09-10"
+  },
+  "data_quality_checking": {
+   "merged_into": "source_verification",
+   "reason": "alias: same executor (source_verification)",
+   "retired_on": "2026-09-10"
+  },
+  "email_triage": {
+   "merged_into": "information_classification",
+   "reason": "alias: same executor (information_classification); channel is not a capability",
+   "retired_on": "2026-09-10"
+  },
+  "message_triage": {
+   "merged_into": "information_classification",
+   "reason": "alias: same executor (information_classification); channel is not a capability",
+   "retired_on": "2026-09-10"
+  },
+  "executive_attention_management": {
+   "merged_into": "information_classification",
+   "reason": "alias: same executor (information_classification)",
+   "retired_on": "2026-09-10"
+  },
+  "meeting_summary": {
+   "merged_into": "executive_summarization",
+   "reason": "output format of summarization (kind=meeting)",
+   "retired_on": "2026-09-10"
+  },
+  "follow_up_drafting": {
+   "merged_into": "management_communication",
+   "reason": "output format of outgoing communication (kind=follow_up)",
+   "retired_on": "2026-09-10"
+  },
+  "project_context_retrieval": {
+   "merged_into": "information_retrieval",
+   "reason": "alias: same executor (memory_retrieval) over the same files",
+   "retired_on": "2026-09-10"
+  },
+  "historical_context_retrieval": {
+   "merged_into": "information_retrieval",
+   "reason": "alias: same executor (memory_retrieval) over the same files",
+   "retired_on": "2026-09-10"
+  },
+  "context_linking": {
+   "merged_into": "information_retrieval",
+   "reason": "alias: same executor (memory_retrieval) over the same files",
+   "retired_on": "2026-09-10"
+  },
+  "dependency_memory": {
+   "merged_into": "information_retrieval",
+   "reason": "alias: same executor (memory_retrieval) over the same files",
+   "retired_on": "2026-09-10"
+  },
+  "source_of_truth_selection": {
+   "merged_into": "source_verification",
+   "reason": "alias: same executor (source_verification)",
+   "retired_on": "2026-09-10"
+  },
+  "contradiction_detection": {
+   "merged_into": "source_reconciliation",
+   "reason": "alias: same executor (source_reconciliation), same input",
+   "retired_on": "2026-09-10"
+  },
+  "policy_checking": {
+   "merged_into": "risk_classification",
+   "reason": "overlap: same MATERIAL regex; risk_classification is the superset (adds reversibility)",
+   "retired_on": "2026-09-10"
+  },
+  "action_verification": {
+   "merged_into": "completion_verification",
+   "reason": "alias: same executor + input (completion_verification)",
+   "retired_on": "2026-09-10"
+  },
+  "document_operations": {
+   "merged_into": "structured_data_extraction",
+   "reason": "alias: same executor (document_extraction)",
+   "retired_on": "2026-09-10"
+  },
+  "calendar_operations": {
+   "merged_into": "<tool:calendar>",
+   "reason": "a tool, not a skill: no executor, no capability; tool 'calendar' is not integrated (tools_available) — routed via tool_intents → TOOL_UNAVAILABLE",
+   "retired_on": "2026-09-10"
+  },
+  "email_operations": {
+   "merged_into": "<tool:email>",
+   "reason": "a tool, not a skill: no executor, no capability; tool 'email' is not integrated (tools_available) — routed via tool_intents → TOOL_UNAVAILABLE",
+   "retired_on": "2026-09-10"
+  },
+  "crm_operations": {
+   "merged_into": "<tool:bitrix24>",
+   "reason": "a tool, not a skill: no executor, no capability; tool 'bitrix24' is not integrated (tools_available) — routed via tool_intents → TOOL_UNAVAILABLE",
+   "retired_on": "2026-09-10"
+  },
+  "bi_dashboard_operations": {
+   "merged_into": "<tool:bi_dashboard>",
+   "reason": "a tool, not a skill: no executor, no capability; tool 'bi_dashboard' is not integrated (tools_available) — routed via tool_intents → TOOL_UNAVAILABLE",
+   "retired_on": "2026-09-10"
+  },
+  "task_management_operations": {
+   "merged_into": "<tool:bitrix24>",
+   "reason": "a tool, not a skill: no executor, no capability; tool 'bitrix24' is not integrated (tools_available) — routed via tool_intents → TOOL_UNAVAILABLE",
+   "retired_on": "2026-09-10"
+  },
+  "database_data_retrieval": {
+   "merged_into": "<tool:database>",
+   "reason": "a tool, not a skill: no executor, no capability; tool 'database' is not integrated (tools_available) — routed via tool_intents → TOOL_UNAVAILABLE",
+   "retired_on": "2026-09-10"
+  },
+  "api_integration_operations": {
+   "merged_into": "<tool:api>",
+   "reason": "a tool, not a skill: no executor, no capability; tool 'api' is not integrated (tools_available) — routed via tool_intents → TOOL_UNAVAILABLE",
+   "retired_on": "2026-09-10"
+  }
+ },
+ "audit": {
+  "before": 132,
+  "after": 61,
+  "retired": 71
+ },
+ "certified": {
+  "at": "2026-09-10T14:12:27",
+  "suites": [
+   "test_skills",
+   "test_store",
+   "test_failclosed",
+   "test_hardening",
+   "test_enforcement"
+  ],
+  "tests_run": 161,
+  "tests_passed": 161,
+  "evals_run": 43,
+  "evals_passed": 43,
+  "core_fingerprint": "ad2f7cc2b20d1f40",
+  "distribution": {
+   "L0": 8,
+   "L1": 21,
+   "L2": 15,
+   "L3": 7,
+   "L4": 10
+  },
+  "downgraded": []
+ }
+}

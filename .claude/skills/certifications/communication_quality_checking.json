@@ -1,0 +1,43 @@
+{
+ "skill_id": "communication_quality_checking",
+ "skill_version": "1.2.0",
+ "maturity_level": "L2",
+ "declared_maturity": "L2",
+ "computed_maturity": "L2",
+ "tests": [
+  "test_skills.T08_MultiSkill.test_communication_quality"
+ ],
+ "failure_tests": [
+  "test_skills.T08_MultiSkill.test_communication_quality"
+ ],
+ "hardening_cases": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "adversarial": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "failure_injection": [],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "completion_verification": [
+  "test_skills.T08_MultiSkill.test_communication_quality"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [],
+ "evals": [],
+ "routing_evals": [],
+ "failed_tests": [],
+ "certified_at": "2026-09-10T14:12:27",
+ "fingerprint": "a1fa7177a64d38463e29d108",
+ "core_fingerprint": "ad2f7cc2b20d1f40",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement"
+ ],
+ "audit_infrastructure": false
+}

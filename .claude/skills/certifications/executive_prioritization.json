@@ -1,0 +1,63 @@
+{
+ "skill_id": "executive_prioritization",
+ "skill_version": "1.2.0",
+ "maturity_level": "L3",
+ "declared_maturity": "L3",
+ "computed_maturity": "L4",
+ "tests": [
+  "test_skills.T05_Execution.test_executive_prioritization",
+  "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
+ ],
+ "failure_tests": [
+  "test_failclosed.F01_EveryBlockedCode.test_VALIDATION_FAILED",
+  "test_skills.T05_Execution.test_prioritization_validation_rejects_too_many_p1"
+ ],
+ "hardening_cases": [
+  "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
+  "test_hardening.H02_SourceFailureInjection.test_source_missing_blocks_not_fabricates",
+  "test_hardening.H02_SourceFailureInjection.test_stale_source_blocks_unless_acknowledged",
+  "test_hardening.H04_AdversarialInputs.test_armenian_triggers_and_unicode_safe",
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "adversarial": [
+  "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
+  "test_hardening.H04_AdversarialInputs.test_armenian_triggers_and_unicode_safe",
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "failure_injection": [
+  "test_hardening.H02_SourceFailureInjection.test_source_missing_blocks_not_fabricates",
+  "test_hardening.H02_SourceFailureInjection.test_stale_source_blocks_unless_acknowledged"
+ ],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "completion_verification": [
+  "test_skills.T05_Execution.test_executive_prioritization",
+  "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [
+  "test_enforcement.E04_MultiStepAndNarration.test_plan_runs_full_graph_cannot_skip_intermediate"
+ ],
+ "evals": [
+  "eval:daily_brief",
+  "eval:overdue_action"
+ ],
+ "routing_evals": [
+  "eval:r_attention",
+  "test_skills.T02_Router.test_trigger_resolution"
+ ],
+ "failed_tests": [],
+ "certified_at": "2026-09-10T14:12:27",
+ "fingerprint": "7773e9511dec5fbd98ae9bce",
+ "core_fingerprint": "ad2f7cc2b20d1f40",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement"
+ ],
+ "audit_infrastructure": false
+}

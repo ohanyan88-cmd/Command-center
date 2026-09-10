@@ -1,0 +1,161 @@
+# -*- coding: utf-8 -*-
+"""Skill System CLI — the ONLY sanctioned entry point for governed execution (the PreToolUse hook denies direct engine access).
+
+  skill.py resolve [--ticket T] "<intent>"          intent → minimum skill graph + gate verdict (refines ticket T if given)
+  skill.py plan    [--ticket T] "<intent>" [json]   resolve + gate + execute chain (attaches to the current open ticket by default)
+  skill.py run     [--ticket T] <skill_id> [json]   execute one skill through the full pipeline
+  skill.py ticket  open "<prompt>" | show [id] | current | close <id> <verdict>
+  skill.py declare [--ticket T] "<reason>"          audited UNGOVERNED declaration (refused if a skill resolved / prompt adversarial)
+  skill.py maintenance [--ticket T]                 grant protected-file edits (only if the USER asked for skill-system maintenance)
+  skill.py audit [n] | audit export <path>          hardened audit trail
+  skill.py store check | recover | export <table> <path>
+  skill.py certs [skill_id]                         per-skill certification status (fresh / stale / missing)
+  skill.py enforcement                              enforcement status: hooks configured, open/escaped tickets
+  skill.py validate | status | test | hardening | eval | certify | build | release
+json inputs may carry _action_level and _approval_token.
+"""
+import sys, json, pathlib, subprocess
+sys.stdout.reconfigure(encoding="utf-8")
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import engine
+
+def _j(o): return json.dumps(o, ensure_ascii=False, indent=1, default=str)
+
+def _opt(rest, flag):
+    if flag in rest:
+        i = rest.index(flag); v = rest[i + 1]; del rest[i:i + 2]; return v
+    return None
+
+def _ticket_id(rest):
+    tid = _opt(rest, "--ticket")
+    if tid: return tid
+    t = engine.current_ticket()
+    return t["ticket_id"] if t else None
+
+def _levels(inputs):
+    return inputs.pop("_action_level", "ANALYZE"), inputs.pop("_approval_token", None)
+
+def main(argv):
+    if not argv: print(__doc__); return 0
+    cmd, rest = argv[0], list(argv[1:])
+    if cmd == "build":
+        return subprocess.call([sys.executable, str(HERE / "build_registry.py")], cwd=str(HERE))
+    reg = engine.load_registry()
+
+    if cmd == "validate":
+        p = engine.validate_registry(reg)
+        print(f"skills: {len(reg['skills'])}  problems: {len(p)}")
+        for x in p: print("  ✗", x)
+        return 1 if p else 0
+
+    if cmd == "resolve":
+        tid = _opt(rest, "--ticket"); intent = " ".join(rest)
+        if tid:
+            t, plan, g = engine.refine_ticket(reg, tid, intent)
+            print(_j({"ticket": tid, "plan": plan, "gate": g})); return 0 if g["status"] != "BLOCKED" else 2
+        plan = engine.resolve(reg, intent); g = engine.gate(reg, plan, {}, action_level="ANALYZE")
+        print(_j({"plan": plan, "gate": g})); return 0 if g["status"] != "BLOCKED" else 2
+
+    if cmd == "run":
+        tid = _ticket_id(rest); sid = rest[0]; inputs = json.loads(rest[1]) if len(rest) > 1 else {}
+        lvl, tok = _levels(inputs)
+        r = engine.run_skill(reg, sid, inputs, intent=f"run {sid}", action_level=lvl, approval_token=tok, ticket_id=tid)
+        print(_j(r)); return 0 if r["status"] in engine.SUCCESS_STATUSES else 2
+
+    if cmd == "plan":
+        tid = _ticket_id(rest); intent = rest[0]; inputs = json.loads(rest[1]) if len(rest) > 1 else {}
+        lvl, tok = _levels(inputs)
+        plan = engine.resolve(reg, intent)
+        if tid:
+            t = engine.get_ticket(tid)
+            if t and t["resolution"]["status"] == "RESOLVED" and plan["status"] != "RESOLVED":
+                plan = engine.resolve(reg, t["resolution"].get("refined_intent") or t["prompt_excerpt"])   # cannot down-route a governed ticket
+        r = engine.run_plan(reg, plan, inputs, action_level=lvl, approval_token=tok, ticket_id=tid)
+        print(_j(r)); return 0 if r["status"] in ("OK", "PARTIAL") else 2
+
+    if cmd == "ticket":
+        sub = rest[0] if rest else "current"
+        if sub == "open":
+            t = engine.open_ticket(reg, " ".join(rest[1:]), session_id="manual", source="MANUAL"); print(_j(t)); return 0
+        if sub == "show":
+            t = engine.get_ticket(rest[1]) if len(rest) > 1 else engine.current_ticket(); print(_j(t)); return 0 if t else 2
+        if sub == "current":
+            t = engine.current_ticket(); print(_j(t) if t else "no open ticket"); return 0
+        if sub == "close":
+            t = engine.close_ticket(rest[1], rest[2] if len(rest) > 2 else "MANUAL_CLOSE"); print(_j(t)); return 0
+        print(__doc__); return 1
+
+    if cmd == "declare":
+        tid = _ticket_id(rest); reason = " ".join(rest)
+        if not tid: print("no open ticket"); return 2
+        r = engine.declare_ungoverned(tid, reason); print(_j(r)); return 0 if r["status"] == "DECLARED" else 2
+
+    if cmd == "maintenance":
+        tid = _ticket_id(rest)
+        if not tid: print("no open ticket"); return 2
+        r = engine.maintenance_grant(tid); print(_j(r)); return 0 if r["status"] == "GRANTED" else 2
+
+    if cmd == "audit":
+        if rest and rest[0] == "export":
+            p = engine._store().export_jsonl("audit", rest[1]); print(f"exported → {p}"); return 0
+        n = int(rest[0]) if rest else 20
+        for rec in engine.read_audit(n):
+            print(f"{rec.get('ts','')}  {str(rec.get('execution_id','')):12}  {str(rec.get('skill_id','')):28}  {str(rec.get('result_status','')):22}  {rec.get('duration_ms','')}")
+        return 0
+
+    if cmd == "store":
+        st = engine._store(); sub = rest[0] if rest else "check"
+        if sub == "check": r = st.check(); print(_j(r)); return 0 if r["ok"] else 2
+        if sub == "recover": print(_j(st.recover(reason="cli"))); return 0
+        if sub == "export": print(st.export_jsonl(rest[1], rest[2])); return 0
+        print(__doc__); return 1
+
+    if cmd == "certs":
+        rows = []
+        for s in reg["skills"]:
+            if rest and s["skill_id"] != rest[0]: continue
+            c = engine.read_certification(s["skill_id"]); fp = engine.skill_fingerprint(reg, s)
+            state = ("MISSING" if not c else "CORRUPT" if c.get("result") == "CORRUPT" else "STALE" if c.get("fingerprint") != fp else c.get("result"))
+            rows.append((s["skill_id"], s["declared_maturity"], s["maturity_level"], c.get("maturity_level") if c else "-", state, (c or {}).get("certified_at", "-")))
+        print(f"{'skill':36} {'declared':8} {'current':8} {'certified':9} {'state':8} certified_at")
+        for r in rows: print(f"{r[0]:36} {r[1]:8} {r[2]:8} {str(r[3]):9} {r[4]:8} {r[5]}")
+        return 0
+
+    if cmd == "enforcement":
+        settings = json.loads((HERE.parent / "settings.json").read_text(encoding="utf-8"))
+        hooks = {k: [h["command"] for grp in v for h in grp.get("hooks", [])] for k, v in settings.get("hooks", {}).items()}
+        st = engine._store()
+        open_t = st.list("tickets", where="status='OPEN'"); esc = [t for t in st.list("tickets") if (t.get("closure") or {}).get("verdict") == "ESCAPE"]
+        print(_j({"hooks_configured": hooks, "open_tickets": [t["ticket_id"] for t in open_t], "escapes_total": len(esc),
+                  "last_ticket": (st.list("tickets", order="updated_at DESC, rowid DESC", limit=1) or [None])[0]}))
+        return 0
+
+    if cmd == "status":
+        from collections import Counter
+        c = Counter(s["maturity_level"] for s in reg["skills"]); core = [s for s in reg["skills"] if s.get("core")]
+        print(f"skills={len(reg['skills'])} (retired {len(reg.get('retired', {}))})  " + "  ".join(f"{k}={c[k]}" for k in sorted(c)))
+        print(f"core={len(core)}  core L3+={sum(s['maturity_level']>='L3' for s in core)}  core L2={sum(s['maturity_level']=='L2' for s in core)}  core L1={sum(s['maturity_level']=='L1' for s in core)}")
+        print("tools:", {k: v for k, v in reg["tools_available"].items()})
+        return 0
+
+    if cmd == "test":
+        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement"], cwd=str(HERE))
+    if cmd == "hardening":
+        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_hardening"], cwd=str(HERE))
+    if cmd == "eval":
+        return subprocess.call([sys.executable, str(HERE / "evals.py")], cwd=str(HERE))
+    if cmd == "certify":
+        return subprocess.call([sys.executable, str(HERE / "certify.py")], cwd=str(HERE))
+    if cmd == "release":
+        # Controlled change management: BUILD → CERTIFY (all suites, per-skill evidence) → VALIDATE (fresh certs) → EVAL. Stops at first failure.
+        for step, args in (("build", [str(HERE / "build_registry.py")]), ("certify", [str(HERE / "certify.py")]),
+                           ("validate", [str(HERE / "skill.py"), "validate"]), ("eval", [str(HERE / "evals.py")])):
+            print(f"\n══════ {step.upper()} ══════")
+            rc = subprocess.call([sys.executable] + args, cwd=str(HERE))
+            if rc != 0: print(f"\nRELEASE STOPPED at {step} (rc={rc})"); return rc
+        print("\nRELEASE OK — registry built, per-skill certified, validated, evals green"); return 0
+    print(__doc__); return 1
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

@@ -1,0 +1,43 @@
+{
+ "skill_id": "end_of_day_control",
+ "skill_version": "1.2.0",
+ "maturity_level": "L2",
+ "declared_maturity": "L2",
+ "computed_maturity": "L2",
+ "tests": [
+  "test_skills.T05_Execution.test_eod"
+ ],
+ "failure_tests": [
+  "test_skills.T05_Execution.test_eod"
+ ],
+ "hardening_cases": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "adversarial": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "failure_injection": [],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "completion_verification": [
+  "test_skills.T05_Execution.test_eod"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [],
+ "evals": [],
+ "routing_evals": [],
+ "failed_tests": [],
+ "certified_at": "2026-09-10T14:12:27",
+ "fingerprint": "78be9aa0a7c712a93d733e8f",
+ "core_fingerprint": "ad2f7cc2b20d1f40",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement"
+ ],
+ "audit_infrastructure": false
+}

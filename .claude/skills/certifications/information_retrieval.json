@@ -1,0 +1,45 @@
+{
+ "skill_id": "information_retrieval",
+ "skill_version": "1.2.0",
+ "maturity_level": "L2",
+ "declared_maturity": "L2",
+ "computed_maturity": "L3",
+ "tests": [
+  "test_skills.T05_Execution.test_information_retrieval"
+ ],
+ "failure_tests": [
+  "test_skills.T05_Execution.test_information_retrieval"
+ ],
+ "hardening_cases": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "adversarial": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "failure_injection": [],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "completion_verification": [
+  "test_skills.T05_Execution.test_information_retrieval"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [],
+ "evals": [
+  "eval:find_context"
+ ],
+ "routing_evals": [],
+ "failed_tests": [],
+ "certified_at": "2026-09-10T14:12:27",
+ "fingerprint": "c5ff3a52ff9e1fc8837a8020",
+ "core_fingerprint": "ad2f7cc2b20d1f40",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement"
+ ],
+ "audit_infrastructure": false
+}

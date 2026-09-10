@@ -1,0 +1,85 @@
+{
+ "skill_id": "daily_briefing",
+ "skill_version": "1.2.0",
+ "maturity_level": "L4",
+ "declared_maturity": "L4",
+ "computed_maturity": "L4",
+ "tests": [
+  "test_skills.T05_Execution.test_daily_briefing",
+  "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
+ ],
+ "failure_tests": [
+  "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
+  "test_failclosed.F01_EveryBlockedCode.test_DISABLED_SKILL",
+  "test_failclosed.F01_EveryBlockedCode.test_INVALID_SOURCE",
+  "test_failclosed.F01_EveryBlockedCode.test_MISSING_SKILL",
+  "test_failclosed.F01_EveryBlockedCode.test_STALE_SOURCE",
+  "test_failclosed.F01_EveryBlockedCode.test_VERIFICATION_FAILED",
+  "test_failclosed.F02_NeverMisrepresented.test_blocked_never_carries_result_data_as_success",
+  "test_failclosed.F02_NeverMisrepresented.test_partial_preserves_completed_evidence_and_marks_incomplete"
+ ],
+ "hardening_cases": [
+  "test_hardening.H01_RegistryFailureInjection.test_bad_authority_rejected",
+  "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
+  "test_hardening.H01_RegistryFailureInjection.test_unknown_dependency_rejected",
+  "test_hardening.H01_RegistryFailureInjection.test_unknown_tool_rejected",
+  "test_hardening.H02_SourceFailureInjection.test_source_missing_blocks_not_fabricates",
+  "test_hardening.H02_SourceFailureInjection.test_stale_source_blocks_unless_acknowledged",
+  "test_hardening.H04_AdversarialInputs.test_forged_token_still_bounded_by_max_action",
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_hardening.H05_ChainFailureInjection.test_completion_verification_failure_is_not_success",
+  "test_hardening.H05_ChainFailureInjection.test_disabled_core_skill_blocks_chain_step",
+  "test_hardening.H05_ChainFailureInjection.test_interrupted_chain_preserves_prior_steps_and_audits",
+  "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success"
+ ],
+ "adversarial": [
+  "test_hardening.H01_RegistryFailureInjection.test_bad_authority_rejected",
+  "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
+  "test_hardening.H04_AdversarialInputs.test_forged_token_still_bounded_by_max_action",
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "failure_injection": [
+  "test_hardening.H01_RegistryFailureInjection.test_unknown_dependency_rejected",
+  "test_hardening.H01_RegistryFailureInjection.test_unknown_tool_rejected",
+  "test_hardening.H02_SourceFailureInjection.test_source_missing_blocks_not_fabricates",
+  "test_hardening.H02_SourceFailureInjection.test_stale_source_blocks_unless_acknowledged",
+  "test_hardening.H05_ChainFailureInjection.test_completion_verification_failure_is_not_success",
+  "test_hardening.H05_ChainFailureInjection.test_disabled_core_skill_blocks_chain_step",
+  "test_hardening.H05_ChainFailureInjection.test_interrupted_chain_preserves_prior_steps_and_audits",
+  "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success"
+ ],
+ "authority_tests": [
+  "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
+  "test_hardening.H04_AdversarialInputs.test_forged_token_still_bounded_by_max_action",
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_skills.T04_Authority.test_authority_gate_material_blocked",
+  "test_skills.T04_Authority.test_maturity_is_not_authority"
+ ],
+ "completion_verification": [
+  "test_skills.T05_Execution.test_daily_briefing",
+  "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [
+  "test_enforcement.E04_MultiStepAndNarration.test_plan_runs_full_graph_cannot_skip_intermediate"
+ ],
+ "evals": [
+  "eval:daily_brief"
+ ],
+ "routing_evals": [
+  "test_skills.T02_Router.test_dependency_order"
+ ],
+ "failed_tests": [],
+ "certified_at": "2026-09-10T14:12:27",
+ "fingerprint": "97860c3f694e57129bf78cf6",
+ "core_fingerprint": "ad2f7cc2b20d1f40",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement"
+ ],
+ "audit_infrastructure": false
+}

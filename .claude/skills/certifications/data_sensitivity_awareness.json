@@ -1,0 +1,45 @@
+{
+ "skill_id": "data_sensitivity_awareness",
+ "skill_version": "1.2.0",
+ "maturity_level": "L2",
+ "declared_maturity": "L2",
+ "computed_maturity": "L2",
+ "tests": [
+  "test_skills.T04_Authority.test_sensitivity"
+ ],
+ "failure_tests": [
+  "test_skills.T04_Authority.test_sensitivity"
+ ],
+ "hardening_cases": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_hardening.H04_AdversarialInputs.test_secret_in_nested_input_redacted"
+ ],
+ "adversarial": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_hardening.H04_AdversarialInputs.test_secret_in_nested_input_redacted"
+ ],
+ "failure_injection": [],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "completion_verification": [
+  "test_skills.T04_Authority.test_sensitivity"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [],
+ "evals": [],
+ "routing_evals": [],
+ "failed_tests": [],
+ "certified_at": "2026-09-10T14:12:27",
+ "fingerprint": "22ca1d564e0aca9a46713473",
+ "core_fingerprint": "ad2f7cc2b20d1f40",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement"
+ ],
+ "audit_infrastructure": false
+}
