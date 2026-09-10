@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Skill executors — REAL logic over real data (Առաջադրանքներ.xlsx, hardened SQLite state store, memory files).
+"""Skill executors — REAL logic over real data (Tasks.xlsx, hardened SQLite state store, memory files).
 Contract: fn(inputs: dict, skill: dict, reg: dict) -> dict with 'status' in
   EXECUTED | VERIFIED | RECORDED | DUPLICATE | BLOCKED | ASSISTED  (+ data).
 Never fabricates numbers: skills needing data the runtime lacks return BLOCKED with a reason.
@@ -12,7 +12,7 @@ ROOT = HERE.parent.parent
 def _st():
     import engine
     return engine._store()
-XLSX = ROOT / "Առաջադրանքներ.xlsx"
+XLSX = ROOT / "Tasks.xlsx"
 SHEET = "ԱՌԱՋԱԴՐԱՆՔՆԵՐ"
 HDR_ROW, FIRST_ROW = 12, 13
 COL = {"id": 2, "task": 3, "status": 6, "comment": 7, "due": 11, "owner": 12}
@@ -403,7 +403,7 @@ def open_loops(inputs, skill=None, reg=None):
 def memory_retrieval(inputs, skill=None, reg=None):
     q = _norm(inputs.get("query", inputs.get("context", ""))); hits = []
     if not q: return {"status": "BLOCKED", "code": "MISSING_INPUT", "reason": "query missing (what to find)"}
-    files = list((ROOT).glob("*.md")) + list((ROOT / "04_WhatsApp").glob("*.md"))
+    files = list((ROOT).glob("*.md")) + list((ROOT / ".claude" / "docs").glob("*.md")) + list((ROOT / "01_Active").rglob("*.md")) + [ROOT / "00_Inbox" / "Input.md"]
     mem = pathlib.Path.home() / ".claude/projects/c--Users-Admin-Desktop-Daily-check/memory"
     if mem.exists(): files += list(mem.glob("*.md"))
     for f in files:

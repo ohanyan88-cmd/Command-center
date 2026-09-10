@@ -61,16 +61,17 @@
   "test_skills.T02_Router.test_trigger_resolution"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:19:45",
- "fingerprint": "98173130ac7fe86476e25473",
- "core_fingerprint": "9facad3d7be30d0b",
+ "certified_at": "2026-09-10T14:54:36",
+ "fingerprint": "73affc1750abaa62e7df9691",
+ "core_fingerprint": "4e7ce8b910119b3d",
  "result": "PASS",
  "suites": [
   "test_skills",
   "test_store",
   "test_failclosed",
   "test_hardening",
-  "test_enforcement"
+  "test_enforcement",
+  "test_workspace"
  ],
  "audit_infrastructure": false
 }

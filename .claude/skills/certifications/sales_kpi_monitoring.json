@@ -45,16 +45,17 @@
   "test_skills.T02_Router.test_chain_sales_decline"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:19:45",
- "fingerprint": "4ea793f57b75955623ea24a4",
- "core_fingerprint": "9facad3d7be30d0b",
+ "certified_at": "2026-09-10T14:54:36",
+ "fingerprint": "35b7fc179fb10c8ac0a2e8fc",
+ "core_fingerprint": "4e7ce8b910119b3d",
  "result": "PASS",
  "suites": [
   "test_skills",
   "test_store",
   "test_failclosed",
   "test_hardening",
-  "test_enforcement"
+  "test_enforcement",
+  "test_workspace"
  ],
  "audit_infrastructure": true
 }

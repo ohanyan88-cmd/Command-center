@@ -11,7 +11,7 @@
   skill.py store check | recover | export <table> <path>
   skill.py certs [skill_id]                         per-skill certification status (fresh / stale / missing)
   skill.py enforcement                              enforcement status: hooks configured, open/escaped tickets
-  skill.py validate | status | test | hardening | eval | certify | build | release
+  skill.py validate | status | test | hardening | eval | certify | build | release   (release = workspace → build → certify → validate → eval)
 json inputs may carry _action_level and _approval_token.
 """
 import sys, json, pathlib, subprocess
@@ -140,21 +140,21 @@ def main(argv):
         return 0
 
     if cmd == "test":
-        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement"], cwd=str(HERE))
+        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement", "test_workspace"], cwd=str(HERE.parent / "tests"))
     if cmd == "hardening":
-        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_hardening"], cwd=str(HERE))
+        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_hardening"], cwd=str(HERE.parent / "tests"))
     if cmd == "eval":
-        return subprocess.call([sys.executable, str(HERE / "evals.py")], cwd=str(HERE))
+        return subprocess.call([sys.executable, str(HERE.parent / "tests" / "evals.py")], cwd=str(HERE.parent / "tests"))
     if cmd == "certify":
         return subprocess.call([sys.executable, str(HERE / "certify.py")], cwd=str(HERE))
     if cmd == "release":
         # Controlled change management: BUILD → CERTIFY (all suites, per-skill evidence) → VALIDATE (fresh certs) → EVAL. Stops at first failure.
-        for step, args in (("build", [str(HERE / "build_registry.py")]), ("certify", [str(HERE / "certify.py")]),
-                           ("validate", [str(HERE / "skill.py"), "validate"]), ("eval", [str(HERE / "evals.py")])):
+        for step, args in (("workspace", [str(HERE.parent / "policy" / "validate_workspace.py")]), ("build", [str(HERE / "build_registry.py")]), ("certify", [str(HERE / "certify.py")]),
+                           ("validate", [str(HERE / "skill.py"), "validate"]), ("eval", [str(HERE.parent / "tests" / "evals.py")])):
             print(f"\n══════ {step.upper()} ══════")
             rc = subprocess.call([sys.executable] + args, cwd=str(HERE))
             if rc != 0: print(f"\nRELEASE STOPPED at {step} (rc={rc})"); return rc
-        print("\nRELEASE OK — registry built, per-skill certified, validated, evals green"); return 0
+        print("\nRELEASE OK — workspace contract satisfied, registry built, per-skill certified, validated, evals green"); return 0
     print(__doc__); return 1
 
 if __name__ == "__main__":

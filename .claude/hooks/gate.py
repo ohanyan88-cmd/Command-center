@@ -22,10 +22,13 @@ READ_ONLY_TOOLS = {"Read","Glob","Grep","LS","WebFetch","WebSearch","ToolSearch"
                    "Monitor","NotebookRead","ListMcpResourcesTool","ReadMcpResourceTool","ReadMcpResourceDirTool","EnterPlanMode","ExitPlanMode",
                    "Skill","Agent","SendMessage","ScheduleWakeup","ReportFindings","SendUserFile","PushNotification","CronList","CronDelete","CronCreate",
                    "EnterWorktree","ExitWorktree","DesignSync","Workflow","Artifact"}
-STATE_TOOLS = {"Write","Edit","MultiEdit","NotebookEdit","Bash","PowerShell"}
-PROTECTED = re.compile(r"(\.claude[/\\](settings(\.local)?\.json|hooks[/\\]|brief\.py|skills[/\\](engine|store|certify|skill|executors|build_registry|testing)\.py"
-                       r"|skills[/\\](registry\.json|certifications|state|audit|test_[a-z_]+\.py|evals\.py))|(^|[/\\])CLAUDE\.md)", re.I)
+STATE_TOOLS = {"Write","Edit","MultiEdit","NotebookEdit","Bash","PowerShell","Monitor"}      # Monitor runs shell commands too
+PROTECTED = re.compile(r"(\.claude[/\\](settings(\.local)?\.json|hooks[/\\]|policy[/\\]|tests[/\\]|state[/\\]|audit[/\\]"
+                       r"|skills[/\\](engine|store|certify|skill|executors|build_registry)\.py|skills[/\\](registry\.json|certifications))|(^|[/\\])CLAUDE\.md)", re.I)
 GOVERNED_CMD = re.compile(r"skill\.py\s+(resolve|plan|run|ticket|declare|maintenance|audit|status|validate|test|hardening|eval|certify|release|build|store|certs|enforcement)\b")
+GOVERNED_ONLY = re.compile(r"^\s*(cd\s+(\"[^\"]*\"|'[^']*'|\S+)\s*&&\s*)?python(3)?(\.exe)?\s+\S*skill\.py\s+"
+                           r"(resolve|plan|run|ticket|declare|maintenance|audit|status|validate|test|hardening|eval|certify|release|build|store|certs|enforcement)\b"
+                           r"(?P<args>[^;&|<>]*)(?P<pipe>\|[^;&|<>]*)?\s*$")
 TEST_CMD = re.compile(r"(python(3)?(\.exe)?\s+(-m\s+unittest|.*(test_[a-z_]+|evals)\.py))")
 DIRECT_ENGINE = re.compile(r"(import\s+(engine|executors|store|certify|build_registry)\b|from\s+(engine|executors|store|certify)\s+import|python(3)?(\.exe)?\s+(\S*[/\\])?(engine|executors|store|certify|build_registry)\.py|sqlite3?\s+.*skill_state)", re.I)
 WRITE_OPS = re.compile(r"(>>?|\btee\b|\bmv\b|\bcp\b|\brm\b|\bdel\b|\bsed\s+-i|Set-Content|Out-File|Remove-Item|Move-Item|Copy-Item|New-Item|\btruncate\b|\bchmod\b|git\s+(checkout|restore|reset|clean)|\bmkdir\b|\bunlink\b|\bmove\b|\bcopy\b)", re.I)
@@ -109,10 +112,15 @@ def on_pretool(data, engine, reg):
     tool, inp = data.get("tool_name", ""), data.get("tool_input") or {}
     if tool in READ_ONLY_TOOLS: out(None, 0)
     if tool.startswith("mcp__") and re.search(r"(search|fetch|get|list|read|query|check)", tool.split("__")[-1], re.I): out(None, 0)
-    cmd = str(inp.get("command", "")) if tool in ("Bash", "PowerShell") else ""
+    cmd = str(inp.get("command", "")) if tool in ("Bash", "PowerShell", "Monitor") else ""
     t = _ticket(engine, data.get("session_id"))
-    if tool in ("Bash", "PowerShell"):
-        if GOVERNED_CMD.search(cmd) and not WRITE_OPS.search(cmd.split("skill.py")[0]): out(None, 0)      # the gate itself
+    if tool in ("Bash", "PowerShell", "Monitor"):
+        # the gate's own CLI is always allowed — but only as the WHOLE command (no chained/appended shell after it),
+        # optionally followed by a read-only pipeline (| grep/head/python -c print)
+        # the gate's own CLI is always allowed — but only when it IS the whole command (optional leading cd, optional read-only pipe).
+        # A skill.py call buried inside a larger/chained command gets no free pass: it is classified like any other command.
+        m = GOVERNED_ONLY.match(cmd)
+        if m and (not m.group("pipe") or _cmd_is_read_only(m.group("pipe").lstrip("|"))): out(None, 0)
         if DIRECT_ENGINE.search(cmd) and not TEST_CMD.search(cmd) and not engine.ticket_has_maintenance(t):
             deny("PreToolUse", "Direct engine/state access bypasses the Skill System. Use `python .claude/skills/skill.py run|plan ...` so the run is gated, validated, verified and audited (maintenance grant required for direct access).")
     protected = _bash_target_protected(cmd) if cmd else any(PROTECTED.search(p) for p in _paths_of(tool, inp))
@@ -144,7 +152,7 @@ def on_posttool(data, engine, reg):
     if tool not in STATE_TOOLS: out(None, 0)
     t = _ticket(engine, data.get("session_id"))
     if not t: out(None, 0)
-    target = (str(inp.get("command", ""))[:120] if tool in ("Bash", "PowerShell") else str(inp.get("file_path") or inp.get("notebook_path") or ""))
+    target = (str(inp.get("command", ""))[:120] if tool in ("Bash", "PowerShell", "Monitor") else str(inp.get("file_path") or inp.get("notebook_path") or ""))
     ev = t.setdefault("tool_events", []); ev.append({"tool": tool, "target": target, "ts": datetime.datetime.now().isoformat(timespec="seconds"), "error": bool(data.get("tool_result_is_error"))})
     if len(ev) > 60: del ev[:-60]
     engine.save_ticket(t); out(None, 0)

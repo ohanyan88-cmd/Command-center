@@ -1,37 +1,55 @@
 # -*- coding: utf-8 -*-
-"""ՀԱՐԴ ԲՐԻՖԻՆԳ — SessionStart hook, routed THROUGH the certified Skill Engine on a governed gate ticket:
-daily_briefing + commitment_memory run via engine.run_skill → audited, verified. Also reports enforcement health
-(escaped tickets, stale certifications, store integrity). Falls back to a direct xlsx read only if the engine is
-unavailable — and says so."""
-import os, sys, io, datetime, pathlib
+"""Deputy Daily Brief — SessionStart hook. Routed THROUGH the certified Skill Engine on a governed gate ticket:
+daily_briefing + commitment_memory run via engine.run_skill → audited, verified. Also validates the workspace contract
+and reports enforcement health (escaped tickets, stale certifications, store integrity). Falls back to a direct
+Tasks.xlsx read only if the engine is unavailable — and says so."""
+import os, sys, io, datetime, pathlib, json
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / ".claude" / "skills"))
+ROOT = pathlib.Path(__file__).resolve().parent.parent.parent          # Command-center/ (workspace root)
+sys.path.insert(0, str(ROOT / ".claude" / "skills")); sys.path.insert(0, str(ROOT / ".claude" / "policy"))
 TODAY = datetime.date.today()
 HY = ["երկուշաբթի","երեքշաբթի","չորեքշաբթի","հինգշաբթի","ուրբաթ","շաբաթ","կիրակի"]
+try:
+    IDENT = json.loads((ROOT / ".claude" / "policy" / "workspace_policy.json").read_text(encoding="utf-8"))["identity"]
+except Exception:
+    IDENT = {"name": "UNKNOWN", "role": "UNKNOWN", "workspace": "UNKNOWN", "owner_native": "Գև"}
 
 def line(): print("─" * 56)
 def d(x): return x[5:] if isinstance(x, str) and len(x) >= 10 else (x or "—")
 
 print(); line()
-print(f"  ⛔ ՊԱՐՏԱԴԻՐ ՍԵՍԻԱՅԻ ՍԿԻԶԲ — {TODAY.isoformat()}, {HY[TODAY.weekday()]}")
-print("  Դու Գև-ի գործադիր օգնականն ես։ Գործիր ըստ CLAUDE.md-ի։ Skill gate՝ մեխանիկական (hooks)։")
+print(f"  ⛔ {IDENT['name']} DAILY BRIEF — {TODAY.isoformat()}, {HY[TODAY.weekday()]}  ·  {IDENT['workspace']}")
+print(f"  Դու {IDENT['name']}-ն ես՝ {IDENT['owner_native']}-ի {IDENT['role']}։ Գործիր ըստ CLAUDE.md-ի։ Skill gate՝ մեխանիկական (hooks)։")
 line()
 
-inbox = ROOT / "00_ԳՑԻՐ_ԱՅՍՏԵՂ"
-items = [f for f in os.listdir(inbox) if f != "_ԿԱՐԴԱ.md"] if inbox.is_dir() else []
-if items:
-    print(f"\n  📥 00_ԳՑԻՐ_ԱՅՍՏԵՂ — {len(items)} ԱՆԴԱՍԱՎՈՐ ԲԱՆ, դասավորի ԱՌԱՋԻՆԸ՝")
-    for f in items: print(f"       • {f}")
-else: print("\n  📥 Մուտքի պանակը դատարկ է ✓")
-
+# 0) workspace contract
 try:
-    raw = io.open(ROOT / "04_WhatsApp" / "ՄՈՒՏՔ.md", encoding="utf-8").read()
+    import validate_workspace as vw
+    probs = vw.validate_tree(ROOT)
+    if probs:
+        print(f"\n  🧱 WORKSPACE CONTRACT — {len(probs)} խախտում (ուղղիր ԱՌԱՋԻՆԸ)՝")
+        for p in probs[:8]: print(f"       ✗ {p}")
+        if len(probs) > 8: print(f"       … և {len(probs) - 8} ևս (python .claude/policy/validate_workspace.py)")
+    else: print("\n  🧱 workspace contract ✓")
+except Exception as e: print(f"\n  🧱 workspace validator unavailable ({type(e).__name__}: {e}) — fail closed: consider the tree UNVERIFIED")
+
+# 1) inbox
+inbox = ROOT / "00_Inbox"
+items = [f for f in os.listdir(inbox) if f != "Input.md"] if inbox.is_dir() else []
+if items:
+    print(f"\n  📥 00_Inbox — {len(items)} ԱՆԴԱՍԱՎՈՐ ԲԱՆ, դասավորի ԱՌԱՋԻՆԸ՝")
+    for f in items: print(f"       • {f}")
+else: print("\n  📥 00_Inbox դատարկ է ✓")
+
+# 2) unprocessed text drop
+try:
+    raw = io.open(ROOT / "00_Inbox" / "Input.md", encoding="utf-8").read()
     seg = raw.split("## Չմշակված", 1); body = seg[1].split("---", 1)[0] if len(seg) > 1 else ""
     if "\n".join(l for l in body.splitlines() if l.strip() and not l.strip().startswith("<!--")).strip():
-        print("\n  ✉  ՄՈՒՏՔ.md-ում կա չմշակված տեքստ — դարձրու առաջադրանք")
+        print("\n  ✉  Input.md-ում կա չմշակված տեքստ — դարձրու առաջադրանք")
 except Exception: pass
 
+# 3) brief via the certified skill engine (audited, governed ticket)
 engine_used = False
 try:
     import engine
@@ -40,7 +58,7 @@ try:
     t = engine.open_ticket(reg, "session-start brief: daily_briefing + commitment_memory", session_id=session, source="SessionStart")
     r = engine.run_skill(reg, "daily_briefing", {}, intent="session-start brief", selection_reason="SessionStart hook", ticket_id=t["ticket_id"])
     if r["status"] == "BLOCKED" and any(b.get("code") == "STALE_SOURCE" for b in r.get("blocked", [])):
-        print(f"\n  ⚠ ԱՂԲՅՈՒՐԸ ՀՆԱՑԱԾ Է — {r['blocked'][0]['reason']}\n     Բրիֆը տրվում է հնացած տվյալով (ընդունված, աուդիտված)։ Թարմացրու Առաջադրանքներ.xlsx-ը։")
+        print(f"\n  ⚠ ԱՂԲՅՈՒՐԸ ՀՆԱՑԱԾ Է — {r['blocked'][0]['reason']}\n     Բրիֆը տրվում է հնացած տվյալով (ընդունված, աուդիտված)։ Թարմացրու Tasks.xlsx-ը։")
         r = engine.run_skill(reg, "daily_briefing", {"accept_stale": True}, intent="session-start brief (stale acknowledged)", selection_reason="SessionStart hook", ticket_id=t["ticket_id"])
     if r["status"] == "EXECUTED":
         b = r["result"]; engine_used = True
@@ -73,13 +91,13 @@ try:
     stale_open = [x for x in st.list("tickets", where="status='OPEN'") if x["ticket_id"] != t["ticket_id"] and x.get("created", "") < cutoff]
     for x in stale_open: engine.close_ticket(x["ticket_id"], "ABANDONED", "left open by a previous session")
     esc = [x for x in st.list("tickets") if (x.get("closure") or {}).get("verdict") == "ESCAPE"]
-    probs = engine.validate_registry(reg)
+    probs_reg = engine.validate_registry(reg)
     flags = []
     if not chk["ok"]: flags.append(f"store integrity ✗ {chk['problems'][:1]}")
     if esc: flags.append(f"ENFORCEMENT ESCAPES ընդհանուր՝ {len(esc)} (վերջինը՝ {esc[-1]['ticket_id']}) — ստուգիր skill.py audit")
-    if probs: flags.append(f"certification problems՝ {len(probs)} — վազեցրու skill.py release")
+    if probs_reg: flags.append(f"certification problems՝ {len(probs_reg)} — վազեցրու skill.py release")
     if stale_open: flags.append(f"{len(stale_open)} բաց ticket փակվեց որպես ABANDONED")
-    print("  🛡  enforcement: hooks UserPromptSubmit/PreToolUse/PostToolUse/Stop · store " + ("ok" if chk["ok"] else "CORRUPT") + (" · " + " · ".join(flags) if flags else " · escapes 0 · certs fresh"))
+    print("  🛡  enforcement: hooks gate(UserPromptSubmit/PreToolUse/PostToolUse/Stop) + workspace_guard · store " + ("ok" if chk["ok"] else "CORRUPT") + (" · " + " · ".join(flags) if flags else " · escapes 0 · certs fresh"))
     engine.close_ticket(t["ticket_id"], "GOVERNED_EXECUTED" if engine_used else "GOVERNED_BLOCKED_REPORTED", "session-start brief")
 except Exception as e:
     print(f"\n  ⚠ skill engine unavailable ({type(e).__name__}: {e}) — fallback read, UNGOVERNED")
@@ -87,7 +105,7 @@ except Exception as e:
 if not engine_used:
     try:
         import openpyxl
-        wb = openpyxl.load_workbook(ROOT / "Առաջադրանքներ.xlsx", data_only=True); ws = wb["ԱՌԱՋԱԴՐԱՆՔՆԵՐ"]
+        wb = openpyxl.load_workbook(ROOT / "Tasks.xlsx", data_only=True); ws = wb["ԱՌԱՋԱԴՐԱՆՔՆԵՐ"]
         over, today = [], []
         for r in range(13, ws.max_row + 1):
             n, task, st, due = ws.cell(row=r,column=2).value, ws.cell(row=r,column=3).value, ws.cell(row=r,column=6).value, ws.cell(row=r,column=11).value
@@ -96,6 +114,6 @@ if not engine_used:
             (over if dd < TODAY else today if dd == TODAY else []).append(f"{n}. {task}")
         if over: print("\n  🔴 ԺԱՄԿԵՏԱՆՑ:", *[f"\n       {x}" for x in over])
         if today: print("\n  🟠 ԱՅՍՕՐ:", *[f"\n       {x}" for x in today])
-    except Exception as e: print(f"\n  (Առաջադրանքներ.xlsx չկարդացվեց՝ {type(e).__name__})")
+    except Exception as e: print(f"\n  (Tasks.xlsx չկարդացվեց՝ {type(e).__name__})")
 
-line(); print("  Հաղորդիր վերևը Գև-ին ՆԱԽՔԱՆ մնացած գործը սկսելը։"); line(); print()
+line(); print(f"  Հաղորդիր վերևը {IDENT['owner_native']}-ին ՆԱԽՔԱՆ մնացած գործը սկսելը։"); line(); print()

@@ -16,7 +16,7 @@ Only skill executors / engine / hooks write here. Direct edits are a governance 
 import sqlite3, json, hashlib, datetime, pathlib, os, shutil, uuid, time
 
 HERE = pathlib.Path(__file__).resolve().parent
-STATE_DIR = HERE / "state"
+STATE_DIR = HERE.parent / "state"          # .claude/state (workspace contract)
 SCHEMA_VERSION = 2
 TABLES = {
     "commitments": "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, payload TEXT NOT NULL, checksum TEXT NOT NULL",

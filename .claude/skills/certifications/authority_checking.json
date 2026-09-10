@@ -101,16 +101,17 @@
   "eval:r_tariff"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:19:45",
- "fingerprint": "6117fbd4a32da0df7e8e9743",
- "core_fingerprint": "9facad3d7be30d0b",
+ "certified_at": "2026-09-10T14:54:36",
+ "fingerprint": "00218741f3b81180c73bea7d",
+ "core_fingerprint": "4e7ce8b910119b3d",
  "result": "PASS",
  "suites": [
   "test_skills",
   "test_store",
   "test_failclosed",
   "test_hardening",
-  "test_enforcement"
+  "test_enforcement",
+  "test_workspace"
  ],
  "audit_infrastructure": false
 }

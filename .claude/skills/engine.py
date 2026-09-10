@@ -13,11 +13,13 @@ Blocked codes (every one has a test in test_failclosed.py):
 import json, re, time, uuid, hashlib, datetime, pathlib, inspect
 
 HERE = pathlib.Path(__file__).resolve().parent
-ROOT = HERE.parent.parent                      # Daily check/
+ROOT = HERE.parent.parent                      # Command-center/ (workspace root)
 import os as _os
 REGISTRY_PATH = pathlib.Path(_os.environ.get("SKILL_REGISTRY_PATH") or (HERE / "registry.json"))
 CERT_DIR = HERE / "certifications"
-STATE_DIR = pathlib.Path(_os.environ.get("SKILL_STATE_DIR") or (HERE / "state"))     # tests/hook-harness redirect state
+AUDIT_JSONL = HERE.parent / "audit" / "skill_audit.jsonl"     # human-readable append-only mirror of the audit table
+POLICY_PATH = HERE.parent / "policy" / "workspace_policy.json"
+STATE_DIR = pathlib.Path(_os.environ.get("SKILL_STATE_DIR") or (HERE.parent / "state"))     # .claude/state (workspace contract); tests/hook-harness redirect
 
 MATURITY = ["L0", "L1", "L2", "L3", "L4"]
 BLOCK_CODES = ["MISSING_SKILL","DISABLED_SKILL","MISSING_INPUT","TOOL_UNAVAILABLE","NOT_OPERATIONAL","AUTHORITY_EXCEEDED",
@@ -303,11 +305,24 @@ def _redact(obj):
     if isinstance(obj, str) and len(obj) > 400: return obj[:400] + "…"
     return obj
 
+_IDENTITY = None
+def identity():
+    """Canonical agent/workspace identity — the single source of truth is .claude/policy/workspace_policy.json → identity."""
+    global _IDENTITY
+    if _IDENTITY is None:
+        try: _IDENTITY = json.loads(POLICY_PATH.read_text(encoding="utf-8"))["identity"]
+        except Exception: _IDENTITY = {"name": "UNKNOWN", "role": "UNKNOWN", "workspace": "UNKNOWN", "owner": "UNKNOWN"}
+    return _IDENTITY
+
 def audit(record):
-    record = dict(record); record.setdefault("ts", _now()); record.setdefault("audit_id", uuid.uuid4().hex[:16])
+    record = dict(record); record.setdefault("ts", _now()); record.setdefault("audit_id", uuid.uuid4().hex[:16]); record.setdefault("agent", identity()["name"])
     rec = _redact(record)
     _store().record("audit", record["audit_id"], rec, extra_cols={"execution_id": rec.get("execution_id"), "skill_id": rec.get("skill_id"),
                                                                    "result_status": rec.get("result_status")})
+    try:
+        AUDIT_JSONL.parent.mkdir(parents=True, exist_ok=True)
+        with AUDIT_JSONL.open("a", encoding="utf-8") as f: f.write(json.dumps(rec, ensure_ascii=False, default=str) + "\n")
+    except OSError: pass                                    # the SQLite table is the truth; the mirror is best-effort
     return rec
 
 def read_audit(limit=50):
@@ -409,9 +424,10 @@ def run_plan(reg, plan, inputs=None, *, action_level="ANALYZE", approval_token=N
 
 # ───────────────────────── gate tickets (mechanical enforcement state) ─────────────────────────
 BYPASS_PATTERNS = [r"ignore (your |the )?(skill|gate|resolver|hook|rules|governance|system prompt|claude\.md)", r"skip (the )?(skill|gate|resolver|hook)",
-                   r"bypass", r"without (the |running )?(gate|resolver|skill|hook)", r"don'?t (run|use) (the )?(skill|gate|resolver)",
-                   r"disable (the )?(hook|gate|skill|enforcement)", r"pretend (it|you)", r"just do it directly", r"no need (for|to run) (the )?(skill|gate)",
-                   r"անտեսիր", r"շրջանցիր", r"առանց (դարպաս|skill|հմտութ)", r"you are (now )?authorized", r"override"]
+                   r"bypass (the |your |all )?(gate|skill|hook|resolver|governance|approval|authority|check)", r"without (the |running )?(gate|resolver|skill|hook)",
+                   r"don'?t (run|use) (the )?(skill|gate|resolver)", r"disable (the )?(hook|gate|skill|enforcement)", r"pretend (it ran|it was done|you ran|you executed|it is done)",
+                   r"just do it directly", r"no need (for|to run) (the )?(skill|gate)", r"անտեսիր (skill|դարպաս|հմտութ|կանոն)", r"շրջանցիր",
+                   r"առանց (դարպաս|skill|հմտութ)", r"you are (now )?authorized", r"override (the |your )?(gate|skill|hook|approval|authority|rules)"]
 EXECUTABLE_PATTERNS = [r"\b(create|write|edit|update|move|rename|delete|remove|send|prepare|make|fix|add|change|run|build|install|record|log|draft|organi[sz]e|file|archive|clean|set up|setup|implement|generate)\b",
                        r"(կազմիր|գրիր|ուղարկիր|պատրաստիր|տեղափոխիր|ջնջիր|փոխիր|ավելացրու|արա|սարքիր|ստեղծիր|դասավորիր|արխիվացրու|գրանցիր|ուղղիր|թարմացրու)"]
 MAINTENANCE_PATTERNS = [r"skill[ _-]?system", r"engine\.py", r"store\.py", r"skill\.py", r"certif", r"hook", r"registry", r"enforcement", r"hardening",
@@ -430,7 +446,7 @@ def open_ticket(reg, prompt, session_id="", source="UserPromptSubmit", inputs=No
     g = gate(reg, plan, inputs or {}, action_level="ANALYZE")
     cls = classify_prompt(prompt)
     tid = uuid.uuid4().hex[:10]
-    ticket = {"ticket_id": tid, "session_id": session_id, "source": source, "created": _now(), "status": "OPEN",
+    ticket = {"ticket_id": tid, "session_id": session_id, "source": source, "created": _now(), "status": "OPEN", "agent": identity()["name"],
               "prompt_excerpt": prompt[:300], "prompt_sha": hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16],
               "resolution": {"status": plan["status"], "primary": plan.get("primary"), "chain": plan.get("chain", []), "chain_name": plan.get("chain_name"),
                              "required_inputs": plan.get("required_inputs", []), "tool_requirements": plan.get("tool_requirements", []), "reasons": plan.get("reasons", [])},

@@ -5,9 +5,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/.claude/brief.py\"",
-            "timeout": 20,
-            "statusMessage": "Օրվա բրիֆինգ..."
+            "command": "python \"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/.claude/hooks/brief.py\"",
+            "timeout": 30,
+            "statusMessage": "Deputy Daily Brief..."
           }
         ]
       }
@@ -19,14 +19,14 @@
             "type": "command",
             "command": "python \"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/.claude/hooks/gate.py\" UserPromptSubmit",
             "timeout": 15,
-            "statusMessage": "Skill gate: intent → skills..."
+            "statusMessage": "Deputy skill gate: intent → skills..."
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell|mcp__.*",
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell|Monitor|mcp__.*",
         "hooks": [
           {
             "type": "command",
@@ -34,16 +34,31 @@
             "timeout": 15
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell|Monitor",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/.claude/hooks/workspace_guard.py\" PreToolUse",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell",
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell|Monitor",
         "hooks": [
           {
             "type": "command",
             "command": "python \"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/.claude/hooks/gate.py\" PostToolUse",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python \"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/.claude/hooks/workspace_guard.py\" PostToolUse",
+            "timeout": 20
           }
         ]
       }

@@ -16,10 +16,11 @@ fingerprint (contract ⊕ executor closure ⊕ engine/store) no longer matches �
 import sys, json, io, pathlib, datetime, unittest, importlib
 sys.stdout.reconfigure(encoding="utf-8")
 HERE = pathlib.Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
+TESTS = HERE.parent / "tests"
+sys.path.insert(0, str(HERE)); sys.path.insert(0, str(TESTS))
 import engine
 
-SUITES = ["test_skills", "test_store", "test_failclosed", "test_hardening", "test_enforcement"]
+SUITES = ["test_skills", "test_store", "test_failclosed", "test_hardening", "test_enforcement", "test_workspace"]
 KIND_FIELD = {"unit": "tests", "failure": "failure_tests", "adversarial": "hardening_cases", "failure_injection": "hardening_cases",
               "authority": "authority_tests", "completion": "completion_verification", "concurrency": "concurrency_tests",
               "enforcement": "enforcement_tests", "routing": "routing_evals"}

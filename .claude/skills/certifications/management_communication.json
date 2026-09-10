@@ -33,16 +33,17 @@
   "eval:r_send_finance"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:19:45",
- "fingerprint": "9ef1861dd4f6b3d5b5424c79",
- "core_fingerprint": "9facad3d7be30d0b",
+ "certified_at": "2026-09-10T14:54:36",
+ "fingerprint": "e2bd6506db91cd815f360d62",
+ "core_fingerprint": "4e7ce8b910119b3d",
  "result": "PASS",
  "suites": [
   "test_skills",
   "test_store",
   "test_failclosed",
   "test_hardening",
-  "test_enforcement"
+  "test_enforcement",
+  "test_workspace"
  ],
  "audit_infrastructure": false
 }

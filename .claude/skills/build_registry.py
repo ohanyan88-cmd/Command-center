@@ -38,7 +38,7 @@ TOOL_INTENTS = {
     "whatsapp_live": ("send whatsapp", "send on whatsapp", "whatsapp-ով ուղարկ"),
 }
 
-XLSX = "Առաջադրանքներ.xlsx"
+XLSX = "Tasks.xlsx"
 CORE_TOOLS = ("python", "filesystem", "xlsx", "audit_log")
 STATE_TOOLS = ("python", "filesystem", "state_store", "audit_log")
 XLSX_POLICY = {"max_age_hours": 24 * 14}      # tracker older than 14 days → STALE_SOURCE unless accept_stale acknowledged
@@ -512,7 +512,7 @@ if __name__ == "__main__":
         for a in s["absorbed"]: assert a in RETIRED and RETIRED[a]["merged_into"] == s["skill_id"], f"absorbed mismatch {a}"
     out = HERE / "registry.json"
     out.write_text(json.dumps(registry, ensure_ascii=False, indent=1), encoding="utf-8")
-    write_audit_md(HERE / f"registry_audit_{TODAY}.md")
+    write_audit_md(HERE.parent / "docs" / "Registry-audit-2026-09-10.md")      # documentation lives in .claude/docs (workspace contract)
     from collections import Counter
     c = Counter(s["maturity_level"] for s in skills)
     print(f"registry.json  ·  {len(skills)} skills (from 132; retired {len(RETIRED)})  ·  declared: " + "  ".join(f"{k}={c[k]}" for k in sorted(c)))

@@ -24,16 +24,17 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:19:45",
- "fingerprint": "99dee52391ac152943905146",
- "core_fingerprint": "9facad3d7be30d0b",
+ "certified_at": "2026-09-10T14:54:36",
+ "fingerprint": "7b9c591dcb74be0bc03e1021",
+ "core_fingerprint": "4e7ce8b910119b3d",
  "result": "PASS",
  "suites": [
   "test_skills",
   "test_store",
   "test_failclosed",
   "test_hardening",
-  "test_enforcement"
+  "test_enforcement",
+  "test_workspace"
  ],
  "audit_infrastructure": true
 }
