@@ -78,7 +78,7 @@
   "test_skills.T02b_DomainBoundary.test_business_intents_with_overlapping_words_still_route"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:38:32",
+ "certified_at": "2026-09-10T16:57:03",
  "fingerprint": "58e13385594ddb4d5453fcfe",
  "core_fingerprint": "0356ece6648346c2",
  "result": "PASS",

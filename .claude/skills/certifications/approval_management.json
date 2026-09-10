@@ -113,7 +113,7 @@
   "test_enforcement.E06_MaintenanceRoutingBoundary.test_system_prompt_with_business_words_is_not_routed_to_sales"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:38:32",
+ "certified_at": "2026-09-10T16:57:03",
  "fingerprint": "2b5cc94af131b2a56e552b8c",
  "core_fingerprint": "0356ece6648346c2",
  "result": "PASS",
