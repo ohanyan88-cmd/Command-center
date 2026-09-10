@@ -60,6 +60,8 @@ def certify(core, overlay, root=ROOT, d=HERE, registry=None, check_git=True):
         if c.get("sha256") is None: fp.append(f"{sid} SOURCE_MISSING")
         elif c["sha256"] != s["sha256"]: fp.append(f"{sid} SOURCE_CHANGED")
     ok("source_fingerprints_current", fp)
+    try: ok("extraction_invariants", bb.invariant_checks(root) if not fp else ["skipped: sources changed/missing"])
+    except Exception as e: ok("extraction_invariants", [f"{type(e).__name__}: {e}"])
     cf = bb.fingerprint(core)
     ok("core_fingerprint_matches", [] if cf == core["sources"]["meta"]["core_fingerprint"] else [f"core fingerprint {cf} ≠ stamped {core['sources']['meta']['core_fingerprint']}"])
     if overlay:

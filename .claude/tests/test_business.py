@@ -245,6 +245,52 @@ class B08_RealModel(unittest.TestCase):
         for name in ("schema_valid", "provenance_complete", "sensitive_boundary_clean", "no_history_contamination", "ownership_constraints", "conflicts_explicit", "unknowns_explicit", "playbook_references", "kpi_references", "process_references", "source_fingerprints_current", "no_restricted_in_core", "versioned_core_clean", "git_boundary_hooks_installed"):
             self.assertIn(name, rec["checks"]); self.assertTrue(rec["checks"][name]["pass"], name)
         self.assertEqual(rec["core_fingerprint"], business.load()["sources"]["meta"]["core_fingerprint"])
+    @covers(BQ, "source_verification", kinds=("unit", "failure", "failure_injection"))
+    def test_extraction_invariants_green_and_tamper_detected(self):
+        import build_business_model as bb, bm_sources
+        self.assertEqual(bb.invariant_checks(ROOT), [])
+        self.assertEqual(set(bm_sources.EXTRACTION_INVARIANTS) & {s["source_id"] for s in bm_sources.SOURCES if s["currency"] == "CURRENT"}, {s["source_id"] for s in bm_sources.SOURCES if s["currency"] == "CURRENT"} - {"S12", "S13"})
+        # tampered copy of the workspace: strategy doc replaced by an empty docx, task register truncated → invariants must fail, fingerprint alone would not
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="biztamper_"))
+        for s in bm_sources.SOURCES:
+            src = ROOT / s["path"]
+            if src.exists(): (tmp / s["path"]).parent.mkdir(parents=True, exist_ok=True); shutil.copy(src, tmp / s["path"])
+        import docx; d = docx.Document(); d.add_paragraph("empty"); d.save(tmp / "01_Active/Sales/Sales-strategy-2026-09-09.docx")
+        (tmp / "01_Active/Operations/Open-questions.md").write_text("# nothing\n", encoding="utf-8")
+        probs = bb.invariant_checks(tmp)
+        self.assertTrue(any(x.startswith("S03") for x in probs), probs); self.assertTrue(any(x.startswith("S10") for x in probs), probs)
+        with self.assertRaises(bb.BuildError) as cm: bb.build(root=tmp)
+        self.assertEqual(cm.exception.stage, "EXTRACTION_MISMATCH")
+        # model missing an expected primitive → fail
+        inv = {"S01": {"model_has": ["K-DOES-NOT-EXIST"]}}
+        self.assertTrue(any("K-DOES-NOT-EXIST" in x for x in bb.invariant_checks(ROOT, inv)))
+    @covers(BQ, "data_sensitivity_awareness", "completion_verification", kinds=("unit", "failure", "failure_injection", "completion"))
+    def test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key(self):
+        import overlay_backup as ob
+        if not (shutil.which("gpg") or shutil.which("gpg2")): self.skipTest("gpg not available")
+        if not ob.OVERLAY_JSON.exists(): self.skipTest("overlay absent")
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="ovbk_test_")); key = tmp / "k" / "test.key"; out = tmp / "backups"
+        old = {k: os.environ.get(k) for k in ("COMMAND_CENTER_BACKUP_KEY", "COMMAND_CENTER_BACKUP_DIR")}
+        os.environ["COMMAND_CENTER_BACKUP_KEY"] = str(key); os.environ["COMMAND_CENTER_BACKUP_DIR"] = str(out); importlib.reload(ob)
+        try:
+            arc, side, man = ob.backup()
+            self.assertTrue(arc.exists() and arc.suffix == ".gpg"); self.assertNotIn(b"OVERLAY_DATA", arc.read_bytes()); self.assertNotIn(b"PERSONS", arc.read_bytes())   # ciphertext, not plaintext
+            self.assertEqual(man["overlay_fingerprint"], business.load()["_overlay"]["meta"]["overlay_fingerprint"]); self.assertIn("overlay/ov_people.py", man["files"]); self.assertIn("overlay.json", man["files"])
+            self.assertFalse(str(arc).startswith(str(ROOT))); self.assertFalse(str(key).startswith(str(ROOT)))          # outside the repository
+            self.assertEqual(ob.verify(arc)["manifest_sha256"], man["manifest_sha256"])
+            rep = ob.drill(arc); self.assertEqual(rep["result"], "PASS", rep); self.assertTrue(rep["plaintext_removed"]); self.assertTrue(rep.get("fingerprint_matches_production"))
+            key.write_bytes(b"wrong-key-wrong-key-wrong-key-wrong-key\n")
+            with self.assertRaises(ob.BackupError) as cm: ob.verify(arc)
+            self.assertIn("decryption FAILED", str(cm.exception))
+            key.unlink()
+            with self.assertRaises(ob.BackupError) as cm: ob.verify(arc)
+            self.assertIn("key missing", str(cm.exception))
+            with self.assertRaises(ob.BackupError): ob.restore(arc, ROOT / ".claude" / "business" / "overlay")           # never into the repo without --force
+        finally:
+            for k, v in old.items():
+                if v is None: os.environ.pop(k, None)
+                else: os.environ[k] = v
+            importlib.reload(ob); business.load(force=True); shutil.rmtree(tmp, ignore_errors=True)
     @covers(BQ, "churn_analysis", "backlog_management", kinds=("unit", "routing"))
     def test_real_queries(self):
         self.assertEqual(executors.business_query({"query": "Which process handles a failed installation?"})["process_id"], "P-OPS-01")

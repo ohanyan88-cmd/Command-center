@@ -15,10 +15,12 @@
   "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
   "test_boundary.S03_GitStagingBoundary.test_workspace_repository_index_is_clean",
   "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_skills.T07_VerificationAudit.test_completion_verification"
  ],
  "failure_tests": [
   "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
   "test_failclosed.F01_EveryBlockedCode.test_DISABLED_SKILL",
   "test_failclosed.F01_EveryBlockedCode.test_MISSING_INPUT",
@@ -32,6 +34,7 @@
   "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
   "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
   "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_enforcement.E01_PromptCapture.test_ignore_skill_system_is_flagged_adversarial",
   "test_enforcement.E02_DirectExecutionBypass.test_adversarial_prompt_cannot_get_maintenance",
   "test_enforcement.E02_DirectExecutionBypass.test_direct_engine_import_denied",
@@ -75,6 +78,7 @@
   "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
   "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
   "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_enforcement.E05_FailClosedOnEngineFailure.test_engine_unavailable_denies_state_tools",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
@@ -86,6 +90,7 @@
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
  "completion_verification": [
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_skills.T07_VerificationAudit.test_completion_verification"
  ],
  "concurrency_tests": [],
@@ -129,7 +134,7 @@
   "test_enforcement.E06_MaintenanceRoutingBoundary.test_system_prompt_with_business_words_is_not_routed_to_sales"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T22:35:01",
+ "certified_at": "2026-09-10T23:00:06",
  "fingerprint": "14668c74428af2df0d1a1a0a",
  "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",

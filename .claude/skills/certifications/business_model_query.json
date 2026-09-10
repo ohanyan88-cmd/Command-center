@@ -24,7 +24,9 @@
   "test_business.B07_SkillIntegration.test_conflict_and_approval_rule_unknown_surface_not_guess",
   "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
   "test_business.B08_RealModel.test_certification_gate_passes_and_covers_all_checks",
+  "test_business.B08_RealModel.test_extraction_invariants_green_and_tamper_detected",
   "test_business.B08_RealModel.test_missing_source_fails_build_explicitly",
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_business.B08_RealModel.test_real_model_certified_current_and_gaps_present",
   "test_business.B08_RealModel.test_real_queries",
   "test_business.B08_RealModel.test_rebuild_is_reproducible"
@@ -34,7 +36,9 @@
   "test_business.B02_CoreOverlaySeparation.test_restricted_data_rejected_from_core_by_schema",
   "test_business.B03_OverlayAbsent.test_unknown_person_behaviour_without_overlay",
   "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
-  "test_business.B08_RealModel.test_missing_source_fails_build_explicitly"
+  "test_business.B08_RealModel.test_extraction_invariants_green_and_tamper_detected",
+  "test_business.B08_RealModel.test_missing_source_fails_build_explicitly",
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key"
  ],
  "hardening_cases": [
   "test_business.B02_CoreOverlaySeparation.test_core_has_no_compensation_or_names_and_overlay_merges_at_runtime",
@@ -44,6 +48,8 @@
   "test_business.B04_SchemaAndStaleness.test_uncertified_model_fails_closed",
   "test_business.B07_SkillIntegration.test_conflict_and_approval_rule_unknown_surface_not_guess",
   "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
+  "test_business.B08_RealModel.test_extraction_invariants_green_and_tamper_detected",
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
  "adversarial": [
@@ -56,7 +62,9 @@
   "test_business.B04_SchemaAndStaleness.test_missing_source_detected",
   "test_business.B04_SchemaAndStaleness.test_source_fingerprint_change_makes_model_stale_and_fails_closed",
   "test_business.B04_SchemaAndStaleness.test_uncertified_model_fails_closed",
-  "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing"
+  "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
+  "test_business.B08_RealModel.test_extraction_invariants_green_and_tamper_detected",
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key"
  ],
  "authority_tests": [
   "test_business.B05_TargetsAndPromotion.test_promotion_rules_and_observations_never_touch_core",
@@ -64,7 +72,8 @@
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
  "completion_verification": [
-  "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution"
+  "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key"
  ],
  "concurrency_tests": [],
  "enforcement_tests": [],
@@ -81,7 +90,7 @@
   "test_business.B08_RealModel.test_real_queries"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T22:35:01",
+ "certified_at": "2026-09-10T23:00:06",
  "fingerprint": "f0b4c5f5b3208d9eb958cab2",
  "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",

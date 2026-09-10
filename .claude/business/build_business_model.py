@@ -53,9 +53,71 @@ def snapshot(root=ROOT):
 def snapshot_id(snap):
     return hashlib.sha256(json.dumps({k: v.get("sha256") for k, v in sorted(snap.items())}, sort_keys=True).encode()).hexdigest()[:24]
 
+def _model_ids():
+    ids = set()
+    ids |= {k["kpi_id"] for k in bm_kpis.KPIS} | {t["target_id"] for t in bm_targets.TARGETS} | {x["process_id"] for x in bm_processes.PROCESSES}
+    ids |= {o["id"] for o in bm_governance.OWNERSHIP} | {r["routine_id"] for r in bm_governance.ROUTINES} | {g["gap_id"] for g in bm_governance.GAPS}
+    ids |= {c["id"] for c in bm_company.CONFLICTS} | {u["id"] for u in bm_company.CRITICAL_UNKNOWNS} | {pb["playbook_id"] for pb in bm_playbooks.PLAYBOOKS}
+    return ids
+
+def _docx_text(p):
+    """Text + headings from a .docx via its XML (robust to documents python-docx cannot style-resolve)."""
+    import zipfile, xml.etree.ElementTree as ET
+    ns = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+    with zipfile.ZipFile(p) as z: root = ET.fromstring(z.read("word/document.xml"))
+    parts, heads = [], []
+    for par in root.iter("{%s}p" % ns["w"]):
+        txt = "".join(t.text or "" for t in par.iter("{%s}t" % ns["w"])).strip()
+        if not txt: continue
+        parts.append(txt)
+        st = par.find("w:pPr/w:pStyle", ns)
+        if st is not None and str(st.get("{%s}val" % ns["w"], "")).lower().startswith("heading"): heads.append(txt)
+    return "\n".join(parts), heads
+
+def invariant_checks(root=ROOT, invariants=None):
+    """Per-source extraction invariants (bm_sources.EXTRACTION_INVARIANTS): the document must still contain the primitives the
+    model was extracted from AND the model must still carry the ids that source supports. A fingerprint alone proves nothing."""
+    import re as _re
+    inv = bm_sources.EXTRACTION_INVARIANTS if invariants is None else invariants
+    src = {s["source_id"]: s for s in bm_sources.SOURCES}; ids = _model_ids(); p = []
+    for sid, rules in inv.items():
+        s = src.get(sid)
+        if not s or s["currency"] != "CURRENT": continue
+        path = root / s["path"]
+        if not path.exists(): p.append(f"{sid}: SOURCE_MISSING for invariants"); continue
+        for mid in rules.get("model_has", []):
+            if mid not in ids: p.append(f"{sid}: model lacks expected primitive {mid}")
+        try:
+            if "min_size" in rules and path.stat().st_size < rules["min_size"]: p.append(f"{sid}: file smaller than {rules['min_size']} bytes (implausibly empty)")
+            if rules.get("xlsx_sheets") or rules.get("xlsx_min_rows"):
+                import openpyxl
+                wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+                for sh in rules.get("xlsx_sheets", []):
+                    if sh not in wb.sheetnames: p.append(f"{sid}: sheet {sh!r} missing")
+                for sh, n in rules.get("xlsx_min_rows", {}).items():
+                    if sh in wb.sheetnames:
+                        rows = sum(1 for r in wb[sh].iter_rows(values_only=True) if any(v not in (None, "") for v in r))
+                        if rows < n: p.append(f"{sid}: sheet {sh!r} has {rows} non-empty rows < {n}")
+                wb.close()
+            if rules.get("docx_headings") or rules.get("docx_text_contains"):
+                text, heads = _docx_text(path)
+                for h in rules.get("docx_headings", []):
+                    if h not in heads: p.append(f"{sid}: heading {h!r} missing")
+                for t in rules.get("docx_text_contains", []):
+                    if t not in text: p.append(f"{sid}: text {t!r} missing")
+            if rules.get("text_contains") or rules.get("md_regex_min"):
+                text = path.read_text(encoding="utf-8", errors="replace")
+                for t in rules.get("text_contains", []):
+                    if t not in text: p.append(f"{sid}: text {t!r} missing")
+                for rx, n in rules.get("md_regex_min", {}).items():
+                    c = len(_re.findall(rx, text, flags=_re.M))
+                    if c < n: p.append(f"{sid}: pattern {rx!r} found {c} < {n}")
+        except Exception as e: p.append(f"{sid}: invariant check error {type(e).__name__}: {e}")
+    return p
+
 def extraction_checks(root=ROOT):
     """Cross-check the encoded model against the real documents — the model may not drift from its sources unnoticed."""
-    p = []
+    p = invariant_checks(root)
     # S01: KPI sheet weights per role must equal bm_kpis.ROLE_KPIS
     try:
         import openpyxl
@@ -78,11 +140,9 @@ def extraction_checks(root=ROOT):
         wb.close()
     except FileNotFoundError: p.append("S01 missing for extraction check")
     except Exception as e: p.append(f"S01 extraction error: {type(e).__name__}: {e}")
-    # S02: JD card titles (Ծածկագիր rows) must match role titles for codes 1.1–4.2
+    # S02: JD card titles (Heading 2 of each card) must match role titles for codes 1.1–4.2
     try:
-        import docx
-        d = docx.Document(root / "01_Active/People/Job-descriptions-v1.1-2026-09-05.docx")
-        heads = [par.text.strip() for par in d.paragraphs if par.style.name.startswith("Heading 2") and par.text.strip()]
+        text, heads = _docx_text(root / "01_Active/People/Job-descriptions-v1.1-2026-09-05.docx")
         model_titles = [r["title"] for r in bm_company.ROLES if re.match(r"^\d+\.\d+$", r["code"])]
         cards = [h for h in heads if h in model_titles]
         if len(cards) != len(model_titles): p.append(f"S02 JD cards matching the model {len(cards)} vs model roles {len(model_titles)}")

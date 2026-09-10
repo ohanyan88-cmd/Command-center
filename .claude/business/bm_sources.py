@@ -3,6 +3,26 @@
 REFERENCE_APPROVED > ACTIVE_DRAFT/PROPOSAL/REGISTER > EVIDENCE (raw) > HISTORICAL. Two CURRENT sources that disagree = CONFLICT
 (recorded in bm_company.CONFLICTS, never silently resolved). HISTORICAL never overrides CURRENT."""
 
+# EXTRACTION INVARIANTS — a fingerprint alone never proves extraction. For every CURRENT decision-relevant source the builder
+# verifies (a) the document still contains the primitives the model was extracted from and (b) the model still carries the
+# ids that source supports. Any failure = EXTRACTION_MISMATCH → build/certification fail.
+#   docx_headings ⊇ / docx_text_contains / xlsx_sheets ⊇ / xlsx_min_rows / md_regex_min / text_contains / min_size ·  model_has (ids)
+EXTRACTION_INVARIANTS = {
+ "S01": {"xlsx_sheets": ["Ամփոփ պատկեր", "Կառուցվածք և աշխատավարձ", "Մոդելներ և պարտադիր վճարներ", "KPI"], "model_has": ["K-NEW", "K-D2D-PKG", "TG-D2D-PKG", "TG-BONUS-TIERS", "P-MGMT-03", "OW-DEC-STAFF"], "role_kpi_weights_match": True},
+ "S02": {"docx_headings": ["Վաճառքի ղեկավար", "Բիլինգի և եկամտի ղեկավար (+Համադրում/Աուդիտ)", "L & R մասնագետ", "NOC, Մոնիտորինգի և Backup մասնագետ"], "docx_text_contains": ["Ծածկագիր", "Էսկալացնում է", "Որոշում է ինքնուրույն"], "model_has": ["P-OPS-01", "P-OPS-02", "P-OPS-03", "P-CS-01", "P-CS-02", "P-BILL-01", "P-RET-01", "OW-ESC-TECH", "TG-SLA-INCIDENT-CLASSIFY"], "jd_cards_match_roles": True},
+ "S03": {"docx_text_contains": ["ՎԱՃԱՌՔԻ ԿԱՐՃԱԺԱՄԿԵՏ", "ԿԱՆԳՆԵՑՄԱՆ ԿԱՆՈՆՆԵՐ", "Արմավիր", "D2D"], "model_has": ["P-SALES-02", "P-SALES-03", "P-MGMT-02", "TG-NEW-BASELINE", "TG-NEW-PHASE1", "TG-TELE-PKG", "TG-PENETRATION", "TG-DISCOUNT-FLOOR", "K-PENETRATION"]},
+ "S04": {"docx_text_contains": ["Roadmap", "Reporting cadence", "KPI Dictionary", "Revenue leakage", "Promise-to-pay"], "model_has": ["P-BILL-03", "P-BILL-04", "P-BILL-06", "K-LEAK", "K-OVERDUE", "K-RECOVERY", "RT-BILLING", "C01"]},
+ "S05": {"xlsx_sheets": ["Provenance", "Save list"], "xlsx_min_rows": {"Save list": 10}, "model_has": ["K-CHURN-RISK", "P-RET-01"]},
+ "S06": {"min_size": 20000, "model_has": ["K-CHURN-RISK"]},
+ "S07": {"text_contains": ["WhatsApp Chat Export", "Revenue Assurance", "Roadmap"], "md_regex_min": {"\\[\\d{1,2}:\\d{2} (AM|PM)\\]": 100}, "model_has": ["C02", "C03", "U01", "U02", "OW-DEC-STRATEGY", "OW-DEC-STAFF"]},
+ "S08": {"text_contains": ["WhatsApp Chat Export", "churn"], "md_regex_min": {"\\[\\d{1,2}:\\d{2} (AM|PM)\\]": 20}, "model_has": ["C02", "C03", "P-RET-01"]},
+ "S09": {"xlsx_sheets": ["ԱՌԱՋԱԴՐԱՆՔՆԵՐ"], "xlsx_min_rows": {"ԱՌԱՋԱԴՐԱՆՔՆԵՐ": 20}, "model_has": ["K-TASK-OVERDUE", "P-MGMT-01", "OW-KPI-TASKS"]},
+ "S10": {"md_regex_min": {"^\\*\\*\\d+\\.\\*\\*": 20}, "model_has": ["U03", "U04", "U05"]},
+ "S11": {"xlsx_sheets": ["Գրաֆիկ"], "text_contains_any_of_paths": [], "model_has": ["OW-PRJ-RA", "OW-PRJ-RECON", "C01"]},
+ "S14": {"text_contains": ["## Բաց", "Bitrix24"], "model_has": ["GAP-17", "U09"]},
+ "S15": {"text_contains": ["DEPUTY", "DAILY BRIEF", "MANAGEMENT RHYTHM", "AUTHORITY BOUNDARY"], "md_regex_min": {"^# ": 40}, "model_has": ["RT-DAILY", "RT-WEEKLY", "RT-MONTHLY", "P-MGMT-01", "OW-KPI-TASKS"]},
+}
+
 AUTHORITY_RANK = {"REFERENCE_APPROVED": 5, "CHARTER": 5, "ACTIVE_REGISTER": 4, "ACTIVE_DRAFT": 3, "PROPOSAL": 3, "EVIDENCE": 2, "HISTORICAL": 1}
 
 SOURCES = [
