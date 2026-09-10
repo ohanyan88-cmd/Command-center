@@ -6,11 +6,13 @@
  "computed_maturity": "L4",
  "tests": [
   "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
+  "test_integrations.I05_Bitrix24.test_normalized_deals_and_identity",
   "test_skills.T05_Execution.test_unknown_data_behavior",
   "test_skills.T08_MultiSkill.test_run_plan_with_supplied_data_partially_executes"
  ],
  "failure_tests": [
   "test_failclosed.F02_NeverMisrepresented.test_partial_preserves_completed_evidence_and_marks_incomplete",
+  "test_integrations.I05_Bitrix24.test_error_mapping_matrix",
   "test_skills.T03_Gate.test_fail_closed_no_data",
   "test_skills.T05_Execution.test_invalid_data",
   "test_skills.T05_Execution.test_unknown_data_behavior",
@@ -19,14 +21,16 @@
  "hardening_cases": [
   "test_hardening.H04_AdversarialInputs.test_large_dataset_completes",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
-  "test_hardening.H05_ChainFailureInjection.test_partial_execution_is_explicit_not_silent"
+  "test_hardening.H05_ChainFailureInjection.test_partial_execution_is_explicit_not_silent",
+  "test_integrations.I05_Bitrix24.test_error_mapping_matrix"
  ],
  "adversarial": [
   "test_hardening.H04_AdversarialInputs.test_large_dataset_completes",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
  "failure_injection": [
-  "test_hardening.H05_ChainFailureInjection.test_partial_execution_is_explicit_not_silent"
+  "test_hardening.H05_ChainFailureInjection.test_partial_execution_is_explicit_not_silent",
+  "test_integrations.I05_Bitrix24.test_error_mapping_matrix"
  ],
  "authority_tests": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
@@ -39,6 +43,7 @@
  "enforcement_tests": [],
  "evals": [
   "eval:b_why_sales_down",
+  "eval:f_live_sales_query",
   "eval:sales_decline",
   "eval:sales_decline_with_data"
  ],
@@ -48,9 +53,9 @@
   "test_skills.T02_Router.test_chain_sales_decline"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T23:00:06",
- "fingerprint": "0035c37311e37b93398ec4f8",
- "core_fingerprint": "981554765ee40e5b",
+ "certified_at": "2026-09-11T00:53:42",
+ "fingerprint": "953b676cb9870e447d784cbc",
+ "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -61,7 +66,8 @@
   "test_workspace",
   "test_runtime",
   "test_business",
-  "test_boundary"
+  "test_boundary",
+  "test_integrations"
  ],
  "audit_infrastructure": true
 }

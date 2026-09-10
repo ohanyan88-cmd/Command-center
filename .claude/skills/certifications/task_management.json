@@ -5,6 +5,7 @@
  "declared_maturity": "L4",
  "computed_maturity": "L4",
  "tests": [
+  "test_integrations.I07_HealthAndTasks.test_task_register_real_read_records_real_health",
   "test_skills.T05_Execution.test_task_management",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -17,6 +18,7 @@
   "test_failclosed.F01_EveryBlockedCode.test_STALE_SOURCE",
   "test_failclosed.F01_EveryBlockedCode.test_VERIFICATION_FAILED",
   "test_failclosed.F02_NeverMisrepresented.test_blocked_never_carries_result_data_as_success",
+  "test_integrations.I07_HealthAndTasks.test_schema_drift_and_missing_file_fail_closed",
   "test_skills.T05_Execution.test_missing_source_blocks_before_execution"
  ],
  "hardening_cases": [
@@ -32,7 +34,8 @@
   "test_hardening.H04_AdversarialInputs.test_secret_in_nested_input_redacted",
   "test_hardening.H05_ChainFailureInjection.test_completion_verification_failure_is_not_success",
   "test_hardening.H05_ChainFailureInjection.test_interrupted_chain_preserves_prior_steps_and_audits",
-  "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success"
+  "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success",
+  "test_integrations.I07_HealthAndTasks.test_schema_drift_and_missing_file_fail_closed"
  ],
  "adversarial": [
   "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
@@ -49,7 +52,8 @@
   "test_hardening.H03_StateHardening.test_repeated_execution_distinct_ids_both_audited",
   "test_hardening.H05_ChainFailureInjection.test_completion_verification_failure_is_not_success",
   "test_hardening.H05_ChainFailureInjection.test_interrupted_chain_preserves_prior_steps_and_audits",
-  "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success"
+  "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success",
+  "test_integrations.I07_HealthAndTasks.test_schema_drift_and_missing_file_fail_closed"
  ],
  "authority_tests": [
   "test_failclosed.F01_EveryBlockedCode.test_APPROVAL_REQUIRED",
@@ -58,6 +62,7 @@
   "test_skills.T04_Authority.test_approval_required_external_then_token"
  ],
  "completion_verification": [
+  "test_integrations.I07_HealthAndTasks.test_task_register_real_read_records_real_health",
   "test_skills.T05_Execution.test_task_management",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -72,9 +77,9 @@
   "test_skills.T02_Router.test_dependency_order"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T23:00:06",
- "fingerprint": "6e3ff93522a5343202084f85",
- "core_fingerprint": "981554765ee40e5b",
+ "certified_at": "2026-09-11T00:53:42",
+ "fingerprint": "7cb4726f8f2c53195f811c4f",
+ "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -85,7 +90,8 @@
   "test_workspace",
   "test_runtime",
   "test_business",
-  "test_boundary"
+  "test_boundary",
+  "test_integrations"
  ],
  "audit_infrastructure": false
 }

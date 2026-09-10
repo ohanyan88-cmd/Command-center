@@ -20,6 +20,9 @@ desktop.ini
 .claude/business/*.json
 .claude/business/Business-model.md
 
+# ── Integration layer: code + fixed reader ARE versioned; generated certification/cache files are local only ──
+.claude/integrations/*.json
+
 # ── Runtime state (hardened store, audit mirror, tickets, quarantine) — never versioned ──
 .claude/state/
 .claude/audit/

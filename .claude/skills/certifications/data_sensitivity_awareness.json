@@ -3,7 +3,7 @@
  "skill_version": "1.2.0",
  "maturity_level": "L2",
  "declared_maturity": "L2",
- "computed_maturity": "L2",
+ "computed_maturity": "L4",
  "tests": [
   "test_boundary.S01_Classification.test_classes_defined_and_not_one_bucket",
   "test_boundary.S01_Classification.test_path_rules_classify_overlay_and_generated_as_non_versionable",
@@ -16,6 +16,11 @@
   "test_boundary.S03_GitStagingBoundary.test_workspace_repository_index_is_clean",
   "test_business.B02_CoreOverlaySeparation.test_core_has_no_compensation_or_names_and_overlay_merges_at_runtime",
   "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
+  "test_integrations.I01_Registry.test_outlook_reader_is_pinned_and_has_no_write_member",
+  "test_integrations.I06_Secrets.test_secret_never_leaks_into_envelope_health_cache_or_audit",
+  "test_integrations.I06_Secrets.test_secrets_live_outside_git_and_repo_carries_none",
+  "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
+  "test_integrations.I12_AuditAndPrivacy.test_cache_is_minimal_and_in_state_dir",
   "test_skills.T04_Authority.test_sensitivity"
  ],
  "failure_tests": [
@@ -30,7 +35,10 @@
   "test_business.B02_CoreOverlaySeparation.test_core_has_no_compensation_or_names_and_overlay_merges_at_runtime",
   "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
-  "test_hardening.H04_AdversarialInputs.test_secret_in_nested_input_redacted"
+  "test_hardening.H04_AdversarialInputs.test_secret_in_nested_input_redacted",
+  "test_integrations.I01_Registry.test_outlook_reader_is_pinned_and_has_no_write_member",
+  "test_integrations.I06_Secrets.test_secret_never_leaks_into_envelope_health_cache_or_audit",
+  "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify"
  ],
  "adversarial": [
   "test_boundary.S02_ContentDetection.test_salary_and_subscriber_leakage_detected",
@@ -38,28 +46,35 @@
   "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
   "test_business.B02_CoreOverlaySeparation.test_core_has_no_compensation_or_names_and_overlay_merges_at_runtime",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
-  "test_hardening.H04_AdversarialInputs.test_secret_in_nested_input_redacted"
+  "test_hardening.H04_AdversarialInputs.test_secret_in_nested_input_redacted",
+  "test_integrations.I01_Registry.test_outlook_reader_is_pinned_and_has_no_write_member",
+  "test_integrations.I06_Secrets.test_secret_never_leaks_into_envelope_health_cache_or_audit"
  ],
  "failure_injection": [
   "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
   "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
-  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key"
+  "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
+  "test_integrations.I06_Secrets.test_secret_never_leaks_into_envelope_health_cache_or_audit",
+  "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify"
  ],
  "authority_tests": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
  "completion_verification": [
   "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
+  "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
   "test_skills.T04_Authority.test_sensitivity"
  ],
  "concurrency_tests": [],
  "enforcement_tests": [],
- "evals": [],
+ "evals": [
+  "eval:f_email_no_permanent_fact"
+ ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-10T23:00:06",
- "fingerprint": "97ab196cb069fa19a3c8ad5d",
- "core_fingerprint": "981554765ee40e5b",
+ "certified_at": "2026-09-11T00:53:42",
+ "fingerprint": "646863972ee58b592b38490b",
+ "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -70,7 +85,8 @@
   "test_workspace",
   "test_runtime",
   "test_business",
-  "test_boundary"
+  "test_boundary",
+  "test_integrations"
  ],
- "audit_infrastructure": false
+ "audit_infrastructure": true
 }

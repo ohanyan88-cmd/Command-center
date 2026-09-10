@@ -21,6 +21,7 @@ EXTRACTION_INVARIANTS = {
  "S11": {"xlsx_sheets": ["Գրաֆիկ"], "text_contains_any_of_paths": [], "model_has": ["OW-PRJ-RA", "OW-PRJ-RECON", "C01"]},
  "S14": {"text_contains": ["## Բաց", "Bitrix24"], "model_has": ["GAP-17", "U09"]},
  "S15": {"text_contains": ["DEPUTY", "DAILY BRIEF", "MANAGEMENT RHYTHM", "AUTHORITY BOUNDARY"], "md_regex_min": {"^# ": 40}, "model_has": ["RT-DAILY", "RT-WEEKLY", "RT-MONTHLY", "P-MGMT-01", "OW-KPI-TASKS"]},
+ "S16": {"text_contains": ["INT-TASKS", "INT-OL-CAL", "INT-OL-MAIL", "INT-B24", "INT-MB", "FACT_AUTHORITY", "\"write_ops\": []"], "model_has": ["U04", "U09"]},
 }
 
 AUTHORITY_RANK = {"REFERENCE_APPROVED": 5, "CHARTER": 5, "ACTIVE_REGISTER": 4, "ACTIVE_DRAFT": 3, "PROPOSAL": 3, "EVIDENCE": 2, "HISTORICAL": 1}
@@ -78,4 +79,7 @@ SOURCES = [
  {"source_id": "S15", "path": ".claude/docs/Job-description.md", "title": "Deputy — Job Description & Operating Charter (53 sections): how Gev wants information, rhythm, authority",
   "domain": "MANAGEMENT", "status": "APPROVED 2026-09-10", "effective_date": "2026-09-10", "date": "2026-09-10",
   "owner": "Gev", "source_type": "md", "authority": "CHARTER", "currency": "CURRENT", "conflicts": [], "notes": "Executive output format, P1–P4 prioritization, daily/weekly/monthly rhythm, interruption rules."},
+ {"source_id": "S16", "path": ".claude/integrations/registry.py", "title": "Deputy Integration Registry — declared live sources (READ-ONLY), authority per fact type, certification states",
+  "domain": "MANAGEMENT", "status": "ACTIVE — Mission 4 (2026-09-11)", "effective_date": "2026-09-11", "date": "2026-09-11",
+  "owner": "Gev / Deputy", "source_type": "py", "authority": "ACTIVE_REGISTER", "currency": "CURRENT", "conflicts": [], "notes": "Which systems Deputy can read and how much each is trusted (FACT_AUTHORITY tiers). A registry entry is a declaration; only certify_integrations.py evidence (certification.json, local) makes a source CONNECTED/VERIFIED_READ."},
 ]

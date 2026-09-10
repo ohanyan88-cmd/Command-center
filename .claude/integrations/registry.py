@@ -1,0 +1,101 @@
+# -*- coding: utf-8 -*-
+"""INTEGRATION REGISTRY — every external/live source Deputy may READ, declared before it is trusted.
+A connected system is an UNTRUSTED data source until certified (certify_integrations.py): DECLARED → CONFIGURED → CONNECTED →
+VERIFIED_READ → RELIABLE_READ. Authority is CONFIGURED here (FACT_AUTHORITY), never assumed: "live" does not mean "correct".
+Mission 4: write_ops is empty for every integration by construction; adapters expose fixed read operations only."""
+import pathlib
+HERE = pathlib.Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+
+REQUIRED_FIELDS = ("integration_id", "system", "purpose", "auth", "data_accessible", "classification", "authority", "freshness", "owner_role",
+                   "read_ops", "write_ops", "availability", "failure_behavior", "adapter", "critical", "expected_identity", "unblock")
+
+# Integrity pin of the fixed read-only Outlook reader (sha256 of outlook_read.ps1). The adapter refuses a modified reader.
+OUTLOOK_READER_SHA256 = "9494203c5b60877c2b060204e6473cbe68c7fe65a65126f7747f263cf857ea30"
+
+_NO_FRESHNESS_RULE = {"max_age_seconds": None, "cache_ttl_seconds": 300, "rule": "UNDEFINED — the Business Operating Model defines no acceptable age for this data; freshness is reported (retrieved_at, LIVE/CACHED/STALE), never judged"}
+
+INTEGRATIONS = {
+ "INT-TASKS": {
+  "integration_id": "INT-TASKS", "system": "Command-center task register (Tasks.xlsx)", "purpose": "Canonical open/overdue/due-today/waiting/blocked tasks with owner, deadline, status, comment (completion evidence).",
+  "auth": {"mechanism": "local workspace file access", "secrets": []}, "data_accessible": ["tasks (id, title, status, owner, due, comment)"], "classification": "CONFIDENTIAL",
+  "authority": {"rank": 4, "name": "ACTIVE_REGISTER", "business_source": "S09", "note": "Tasks.xlsx remains canonical for task status unless the Business Model says otherwise"},
+  "freshness": {"max_age_seconds": 14 * 24 * 3600, "cache_ttl_seconds": 30, "rule": "skill registry source_policy: tracker older than 14 days → STALE_SOURCE (acknowledged, not silent)"},
+  "owner_role": "Վաճառքի և գործառնական ղեկավար (Gev) — hand-edited register", "read_ops": {"tasks.list": {"kind": "task", "params": ["open_only", "status", "owner"]}}, "write_ops": [],
+  "availability": "whenever the workspace is mounted", "failure_behavior": "file missing → UNAVAILABLE; header drift → SCHEMA_CHANGED (fail closed, no partial parse)",
+  "adapter": "adapter_tasks", "critical": True, "expected_identity": {"path": "Tasks.xlsx", "sheet": "ԱՌԱՋԱԴՐԱՆՔՆԵՐ"}, "unblock": None},
+ "INT-OL-CAL": {
+  "integration_id": "INT-OL-CAL", "system": "Outlook desktop calendar (MAPI, signed-in Windows profile)", "purpose": "Today's and upcoming meetings: time, title, participants, location, description preview, online link — for the Daily Brief, meeting preparation, deadline awareness and schedule conflicts.",
+  "auth": {"mechanism": "Outlook desktop session of the signed-in Windows user, read through the fixed PowerShell reader outlook_read.ps1 (integrity-pinned); no token, no password handled by Deputy", "secrets": []},
+  "data_accessible": ["calendar items of the default calendar (all stores enumerated by probe)"], "classification": "CONFIDENTIAL",
+  "authority": {"rank": 4, "name": "LIVE_SYSTEM", "business_source": None, "note": "authoritative for meeting time/participants ONLY as configured in FACT_AUTHORITY"},
+  "freshness": dict(_NO_FRESHNESS_RULE), "owner_role": "Gev (mailbox owner)", "read_ops": {"calendar.events": {"kind": "meeting", "params": ["from", "to", "limit"]}}, "write_ops": [],
+  "availability": "only while classic Outlook is running on this PC in the same Windows session", "failure_behavior": "Outlook not reachable → UNAVAILABLE (last successful read reported); reader modified → READ_ONLY_VIOLATION; wrong mailbox → WRONG_TENANT; pwsh missing → TOOL_UNAVAILABLE",
+  "adapter": "adapter_outlook", "critical": True, "expected_identity": {"mailbox_domain": "housenet.am"}, "unblock": "classic Outlook running and signed in as the owner on this PC (New Outlook has no MAPI/COM surface)"},
+ "INT-OL-MAIL": {
+  "integration_id": "INT-OL-MAIL", "system": "Outlook desktop mailbox (MAPI, signed-in Windows profile)", "purpose": "Read/search permitted mail (Inbox, Sent): unanswered requests, commitments, waiting-for, decisions requested, follow-ups, escalations, meeting context — extracted as CANDIDATE_OPEN_LOOP, never as permanent truth.",
+  "auth": {"mechanism": "same Outlook session as INT-OL-CAL via outlook_read.ps1 (read-only; never marks read, moves, deletes or sends)", "secrets": []},
+  "data_accessible": ["message headers + short body preview (≤600 chars); no attachments; folders Inbox/Sent"], "classification": "CONFIDENTIAL",
+  "authority": {"rank": 2, "name": "EVIDENCE", "business_source": None, "note": "mail is evidence of a request/promise — below the task register and below live systems of record"},
+  "freshness": dict(_NO_FRESHNESS_RULE), "owner_role": "Gev (mailbox owner)", "read_ops": {"mail.list": {"kind": "message", "params": ["folder", "since", "limit", "unread_only"]}, "mail.search": {"kind": "message", "params": ["query", "since", "limit", "folder"]}}, "write_ops": [],
+  "availability": "as INT-OL-CAL", "failure_behavior": "as INT-OL-CAL; body previews are never persisted outside the short-lived cache in .claude/state",
+  "adapter": "adapter_outlook", "critical": False, "expected_identity": {"mailbox_domain": "housenet.am"}, "unblock": "as INT-OL-CAL"},
+ "INT-B24": {
+  "integration_id": "INT-B24", "system": "Bitrix24 CRM (REST)", "purpose": "Leads, deals, stages, owners, CRM tasks and activities — the system where the real sales pipeline and operational tasks live (SYS-B24).",
+  "auth": {"mechanism": "inbound webhook (per-user REST code) or OAuth app token with READ scopes (crm, task, user); GET-only client with a fixed method allowlist", "secrets": ["webhook_url"]},
+  "data_accessible": ["crm.deal.list/fields", "crm.lead.list", "crm.status.list (stages)", "crm.activity.list", "tasks.task.list", "user.get", "profile"], "classification": "CONFIDENTIAL",
+  "authority": {"rank": 4, "name": "LIVE_SYSTEM_OF_RECORD", "business_source": "SYS-B24 (S03/S04/S07/S14)", "note": "system of record for deal stage and CRM tasks; NOT for activations/billing status (MikroBill)"},
+  "freshness": dict(_NO_FRESHNESS_RULE), "owner_role": "UNKNOWN (Bitrix24 admin — Business Model: SYS-B24 owner UNKNOWN)",
+  "read_ops": {"crm.deals": {"kind": "deal", "params": ["filter", "select", "limit"]}, "crm.leads": {"kind": "lead", "params": ["filter", "select", "limit"]}, "crm.stages": {"kind": "stage", "params": ["entity_id"]}, "crm.activities": {"kind": "activity", "params": ["filter", "limit"]},
+               "tasks.list": {"kind": "b24task", "params": ["filter", "limit"]}, "users": {"kind": "user", "params": ["filter"]}, "identity": {"kind": "identity", "params": []}}, "write_ops": [],
+  "availability": "portal reachable over HTTPS with a valid read-scoped token", "failure_behavior": "no token → NOT_CONFIGURED; expired/invalid token → AUTH_FAILED; insufficient scope → PERMISSION_DENIED; QUERY_LIMIT_EXCEEDED → RATE_LIMITED (DEGRADED); 5xx/network → UNAVAILABLE; non-JSON → MALFORMED_RESPONSE; missing 'result' → SCHEMA_CHANGED; paged 'next' → partial=True; portal host ≠ configured → WRONG_TENANT",
+  "adapter": "adapter_bitrix24", "critical": False, "expected_identity": {"portal_domain": "UNKNOWN until configured (config key portal_domain)"},
+  "unblock": "Gev (or the Bitrix24 admin) creates an INBOUND WEBHOOK with read permissions only (CRM, Tasks, Users) and stores it OUTSIDE Git: ~/.command-center/integrations/INT-B24.json {\"webhook_url\": \"https://<portal>.bitrix24.<tld>/rest/<user>/<code>/\", \"portal_domain\": \"<portal>.bitrix24.<tld>\"}; then python .claude/integrations/integration.py certify"},
+ "INT-MB": {
+  "integration_id": "INT-MB", "system": "MikroBill billing", "purpose": "Subscriber/customer counts, activations, disconnects, tariffs, statuses, balances/revenue, service state, churn indicators — the source of truth for billing (S11).",
+  "auth": {"mechanism": "UNKNOWN — no API/DB interface inventoried yet (Open-questions #7, U04)", "secrets": ["dsn_or_api_url", "token_or_password"]}, "data_accessible": ["UNKNOWN until the interface is inventoried"], "classification": "CONFIDENTIAL",
+  "authority": {"rank": 5, "name": "SOURCE_OF_TRUTH_BILLING", "business_source": "SYS-MB (S04/S07/S11)", "note": "Gev's position 2026-09-09: MikroBill = source of truth for billing facts"},
+  "freshness": dict(_NO_FRESHNESS_RULE), "owner_role": "Բիլինգի և եկամտի ղեկավար (4.1) — person DERIVED @P2", "read_ops": {}, "write_ops": [],
+  "availability": "UNKNOWN", "failure_behavior": "every query → NOT_CONFIGURED with the exact requirement; no field is mapped until verified",
+  "adapter": "adapter_mikrobill", "critical": False, "expected_identity": None,
+  "unblock": "Billing head (role 4.1) / @P1 provides: (1) the interface (read-only DB user with a dedicated read-only role/replica, OR documented REST API + read token), (2) the field/status dictionary (incl. the 8 subscriber statuses, U08), (3) written authorization for Deputy read access; then an adapter with verified field mapping is added and certified"},
+}
+
+# Not registered on purpose (Mission 4 §3 F): PBX, HouseNet Portal, network monitoring (NetXMS/Zabbix), churn scoring — only after A–E
+# or when trivially available and high-value. Listed so the gap is explicit, not forgotten.
+DEFERRED = {"SYS-PBX": "call logs/recordings — owner UNKNOWN, no interface known", "SYS-PORTAL": "integration bridge — @P4/@P1's team, no read access granted",
+            "SYS-NET": "NetXMS/Zabbix outages — NOC specialist (2.13) → CTO, no read access granted", "SYS-CHURN": "weekly save-list — file export only (S05), already a business-model source"}
+
+# FACT AUTHORITY — explicit precedence per fact type. Tiers are ordered lists; sources in the SAME tier that disagree → SOURCE_CONFLICT
+# (never merged); a higher tier wins over a lower tier while every observation is kept. Missing fact type → AUTHORITY_UNDEFINED (no guess).
+FACT_AUTHORITY = {
+ "meeting_time":         {"tiers": [["INT-OL-CAL"], ["INT-TASKS"], ["INT-OL-MAIL"], ["S07", "S08"]], "src": ["S15"], "note": "live calendar > task register note > mail mention > old chat note"},
+ "meeting_participants": {"tiers": [["INT-OL-CAL"], ["INT-OL-MAIL"]], "src": ["S15"]},
+ "task_status":          {"tiers": [["INT-TASKS"], ["INT-B24"], ["INT-OL-MAIL"]], "src": ["S09", "S14"], "note": "canonical register > CRM task > mail mentioning the task (U09: B24 tasks not in the register = gap, not a conflict)"},
+ "task_deadline":        {"tiers": [["INT-TASKS"], ["INT-OL-CAL"], ["INT-OL-MAIL"]], "src": ["S09"]},
+ "deal_stage":           {"tiers": [["INT-B24"], ["INT-OL-MAIL"]], "src": ["S03", "S14"]},
+ "activation":           {"tiers": [["INT-MB"], ["INT-B24"]], "src": ["S01", "S11"], "note": "sale = ACTIVATED deal (S01); billing confirms activation (S11); CRM stage is the leading signal only"},
+ "subscriber_status":    {"tiers": [["INT-MB"], ["INT-B24"], ["S05"]], "src": ["S04", "S07", "S11"], "note": "MikroBill = source of truth; churn save-list (S05) is a derived historical export"},
+ "commitment":           {"tiers": [["INT-TASKS"], ["INT-OL-MAIL"]], "src": ["S15"], "note": "a promise seen in mail is a CANDIDATE until Gev confirms it into the register/commitment store"},
+}
+
+def get(integration_id): return INTEGRATIONS.get(integration_id)
+def ids(): return list(INTEGRATIONS)
+def critical_ids(): return [k for k, v in INTEGRATIONS.items() if v["critical"]]
+
+def declaration_problems():
+    p = []
+    for iid, spec in INTEGRATIONS.items():
+        for f in REQUIRED_FIELDS:
+            if f not in spec: p.append(f"{iid}: field {f} missing")
+        if spec.get("write_ops"): p.append(f"{iid}: write_ops must be empty in Mission 4")
+        if spec.get("integration_id") != iid: p.append(f"{iid}: id mismatch")
+        for op, o in (spec.get("read_ops") or {}).items():
+            if "kind" not in o or "params" not in o: p.append(f"{iid}: read op {op} lacks kind/params")
+        if spec.get("classification") not in ("PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"): p.append(f"{iid}: bad classification")
+        if not isinstance(spec.get("freshness", {}).get("rule"), str): p.append(f"{iid}: freshness rule text missing")
+    for ft, fa in FACT_AUTHORITY.items():
+        for tier in fa["tiers"]:
+            for s in tier:
+                if s.startswith("INT-") and s not in INTEGRATIONS: p.append(f"fact_authority {ft}: unknown integration {s}")
+    return p

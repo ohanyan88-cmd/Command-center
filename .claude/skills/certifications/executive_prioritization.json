@@ -5,6 +5,7 @@
  "declared_maturity": "L3",
  "computed_maturity": "L4",
  "tests": [
+  "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
   "test_skills.T05_Execution.test_executive_prioritization",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -32,6 +33,7 @@
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
  "completion_verification": [
+  "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
   "test_skills.T05_Execution.test_executive_prioritization",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -41,6 +43,7 @@
  ],
  "evals": [
   "eval:daily_brief",
+  "eval:f_daily_brief_live",
   "eval:overdue_action"
  ],
  "routing_evals": [
@@ -48,9 +51,9 @@
   "test_skills.T02_Router.test_trigger_resolution"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T23:00:06",
- "fingerprint": "0124695c11ffb0272d98e54f",
- "core_fingerprint": "981554765ee40e5b",
+ "certified_at": "2026-09-11T00:53:42",
+ "fingerprint": "fac0333fe25d205e633997eb",
+ "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -61,7 +64,8 @@
   "test_workspace",
   "test_runtime",
   "test_business",
-  "test_boundary"
+  "test_boundary",
+  "test_integrations"
  ],
  "audit_infrastructure": false
 }

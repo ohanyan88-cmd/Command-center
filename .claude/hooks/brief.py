@@ -76,6 +76,17 @@ try:
             for x in b["decisions_pending"]: print(f"       {x['id']}. {x['task'][:52]}  ·  {x['owner']}")
         if b["no_deadline"]: print(f"\n  ⚠  Ժամկետ չունեցող բաց կետ՝ {len(b['no_deadline'])} — ժամկետ դիր")
         if not (b["overdue"] or b["deadlines_today"]): print("\n  ✓ Ժամկետանց կամ այսօրվա բաց կետ չկա")
+        # LIVE (Mission 4, read-only): meetings · mail candidates · risks · preparation · integration health — nothing shown as current unless read now
+        lvb = b.get("live") or {}
+        for s in b.get("sections", []):
+            items = [i for i in s["items"] if i.get("kind") in ("meeting", "email")] if s["id"] in ("TODAY", "OVERDUE", "WAITING_FOR", "DECISIONS") else s["items"]
+            if not items: continue
+            print(f"\n  ▶ {s['title']} ({s['id']}) — {len(items)}")
+            for i in items[:8]: print(f"       {i['text'][:110]}")
+            if s.get("note"): print(f"       ({s['note']})")
+        for l in lvb.get("integration_health", []): print(f"  🔌 {l}")
+        if lvb.get("available") is False: print(f"  🔌 live layer unavailable — {lvb.get('reason')}")
+        for g in b.get("data_gaps", [])[:2]: print(f"  ∅ {g}")
         c = engine.run_skill(reg, "commitment_memory", {}, intent="session-start brief", selection_reason="SessionStart hook", ticket_id=t["ticket_id"])
         cm = c.get("result", {}).get("commitments", []) if c["status"] == "EXECUTED" else []
         due_soon = [x for x in cm if x.get("due") and x["due"] <= (TODAY + datetime.timedelta(days=3)).isoformat()]

@@ -429,6 +429,15 @@ def run_skill(reg, skill_id, inputs=None, *, intent="", action_level="ANALYZE", 
     except Exception as e:
         return done("FAILED", validated=False, error=f"{type(e).__name__}: {e}")
 
+def _lctx(sid, reg):
+    """Live-source status for a gate-blocked Sales/Operations step: which integration could answer and where it stands (READ-ONLY layer)."""
+    s = reg["_index"].get(sid) or {}; dom = str(s.get("domain", ""))
+    if not (dom.startswith("B_") or dom.startswith("C_")): return None
+    try:
+        import executors
+        return executors._live_sources("operations" if dom.startswith("C_") else "sales")
+    except Exception: return None
+
 def _bctx(sid, plan, inputs):
     """Business context for a step that the gate blocked before execution — the BLOCKED answer still names the playbook, KPIs, data and owner."""
     try:
@@ -460,7 +469,7 @@ def _run_plan_impl(reg, plan, inputs=None, *, action_level="ANALYZE", approval_t
         return out
     if g["status"] == "BLOCKED":
         for sid in plan.get("chain", []):
-            out["steps"].append({"status": "BLOCKED", "skill": sid, "blocked": [b for b in g["blocked"] if b["skill"] == sid], "business_context": _bctx(sid, plan, inputs)})
+            out["steps"].append({"status": "BLOCKED", "skill": sid, "blocked": [b for b in g["blocked"] if b["skill"] == sid], "business_context": _bctx(sid, plan, inputs), "live_sources": _lctx(sid, reg)})
         return finish("BLOCKED")
     for sid in plan["chain"]:
         if sid in g["runnable"] or sid in g["assisted"]:
@@ -479,7 +488,7 @@ def _run_plan_impl(reg, plan, inputs=None, *, action_level="ANALYZE", approval_t
             if r["status"] == "FAILED": return finish("FAILED")
             if r["status"] == "VERIFICATION_FAILED": return finish("VERIFICATION_FAILED")
         else:
-            out["steps"].append({"status": "BLOCKED", "skill": sid, "blocked": [b for b in g["blocked"] if b["skill"] == sid], "business_context": _bctx(sid, plan, inputs)})
+            out["steps"].append({"status": "BLOCKED", "skill": sid, "blocked": [b for b in g["blocked"] if b["skill"] == sid], "business_context": _bctx(sid, plan, inputs), "live_sources": _lctx(sid, reg)})
     if any(st["status"] not in SUCCESS_STATUSES for st in out["steps"]) or g["blocked"]:
         return finish("PARTIAL" if any(st["status"] in SUCCESS_STATUSES for st in out["steps"]) else "BLOCKED")
     return finish("OK")

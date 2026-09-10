@@ -50,6 +50,16 @@ def snapshot(root=ROOT):
         else: snap[s["source_id"]] = {"path": s["path"], "sha256": None, "size": None, "mtime": None, "currency": s["currency"], "authority": s["authority"], "missing": True}
     return snap
 
+def _live_sources():
+    """Live-source hierarchy from the integration registry (S16): declared integrations + FACT_AUTHORITY tiers. Declarations only —
+    connection state lives in .claude/integrations/certification.json (local evidence), never in the versioned core."""
+    try:
+        sys.path.insert(0, str(ROOT / ".claude" / "integrations")); import registry as ir
+        return {"integrations": {k: {"system": v["system"], "authority": v["authority"], "classification": v["classification"], "read_ops": sorted(v["read_ops"]), "write_ops": [], "critical": v["critical"], "owner_role": v["owner_role"]} for k, v in ir.INTEGRATIONS.items()},
+                "fact_authority": ir.FACT_AUTHORITY, "deferred": ir.DEFERRED, "src": ["S16"]}
+    except Exception as e:
+        return {"integrations": {}, "fact_authority": {}, "deferred": {}, "src": ["S16"], "error": f"{type(e).__name__}: {e}"}
+
 def snapshot_id(snap):
     return hashlib.sha256(json.dumps({k: v.get("sha256") for k, v in sorted(snap.items())}, sort_keys=True).encode()).hexdigest()[:24]
 
@@ -268,7 +278,7 @@ def build_core(snap):
     m = meta(snap)
     kpis = derive_kpi_targets([dict(k) for k in bm_kpis.KPIS], bm_targets.TARGETS)
     core = {
-     "sources": {"meta": dict(m), "authority_rank": bm_sources.AUTHORITY_RANK, "sources": bm_sources.SOURCES, "source_snapshot": snap},
+     "sources": {"meta": dict(m), "authority_rank": bm_sources.AUTHORITY_RANK, "sources": bm_sources.SOURCES, "source_snapshot": snap, "live_sources": _live_sources()},
      "business_model": {"meta": dict(m), "company": bm_company.COMPANY, "functions": bm_company.FUNCTIONS, "roles": bm_company.ROLES, "principals": bm_company.PRINCIPALS, "systems": bm_company.SYSTEMS,
                         "sales": bm_company.SALES_MODEL, "operations": bm_company.OPERATIONS_MODEL, "people_model": bm_company.PEOPLE_MODEL, "conflicts": bm_company.CONFLICTS, "critical_unknowns": bm_company.CRITICAL_UNKNOWNS},
      "processes": {"meta": dict(m), "flow_vocabulary": ["TRIGGER", "INPUT", "ACTION", "OWNER", "HANDOFF", "CONTROL", "OUTPUT", "VERIFY"], "processes": bm_processes.PROCESSES},

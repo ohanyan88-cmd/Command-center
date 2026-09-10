@@ -3,7 +3,7 @@
  "skill_version": "1.2.0",
  "maturity_level": "L1",
  "declared_maturity": "L1",
- "computed_maturity": "L2",
+ "computed_maturity": "L3",
  "tests": [
   "test_skills.T05_Execution.test_unknown_data_behavior"
  ],
@@ -25,12 +25,14 @@
  ],
  "concurrency_tests": [],
  "enforcement_tests": [],
- "evals": [],
+ "evals": [
+  "eval:f_live_ops_query"
+ ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-10T23:00:06",
- "fingerprint": "62db04db26fcc80e4a097ad5",
- "core_fingerprint": "981554765ee40e5b",
+ "certified_at": "2026-09-11T00:53:42",
+ "fingerprint": "9d4baedc03a31f796a5259f0",
+ "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -41,7 +43,8 @@
   "test_workspace",
   "test_runtime",
   "test_business",
-  "test_boundary"
+  "test_boundary",
+  "test_integrations"
  ],
  "audit_infrastructure": true
 }

@@ -141,7 +141,7 @@ def main(argv):
         return 0
 
     if cmd == "test":
-        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary"], cwd=str(HERE.parent / "tests"))
+        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations"], cwd=str(HERE.parent / "tests"))
     if cmd == "hardening":
         return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_hardening"], cwd=str(HERE.parent / "tests"))
     if cmd == "eval":
@@ -156,6 +156,10 @@ def main(argv):
             rc = subprocess.call([sys.executable, str(biz / "certify_business.py")], cwd=str(biz))
             if rc != 0: print("\nRELEASE STOPPED at business model certification (rc={}) — rebuild: python .claude/business/build_business_model.py".format(rc)); return rc
         else: print("\n══════ BUSINESS MODEL ══════\nnot built on this machine (BUSINESS_CONTEXT_MISSING) — release continues; business queries stay BLOCKED")
+        # INTEGRATION CERTIFICATION (Mission 4): evidence-based states, structural read-only proof, leak check — real reads where configured
+        print("\n══════ INTEGRATION CERTIFICATION ══════")
+        rc = subprocess.call([sys.executable, str(HERE.parent / "integrations" / "certify_integrations.py")], cwd=str(HERE.parent / "integrations"))
+        if rc != 0: print("\nRELEASE STOPPED at integration certification (rc={}) — see .claude/integrations/certification.json".format(rc)); return rc
         for step, args in (("workspace", [str(HERE.parent / "policy" / "validate_workspace.py")]), ("build", [str(HERE / "build_registry.py")]), ("certify", [str(HERE / "certify.py")]),
                            ("validate", [str(HERE / "skill.py"), "validate"]), ("eval", [str(HERE.parent / "tests" / "evals.py")])):
             print(f"\n══════ {step.upper()} ══════")

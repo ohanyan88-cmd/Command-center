@@ -121,6 +121,56 @@ def _date(v):
         except ValueError: return None
     return None
 
+
+# ───────────────────────── live information layer (READ-ONLY, Mission 4) ─────────────────────────
+INTEGRATIONS_DIR = ROOT / ".claude" / "integrations"
+def _int_mod(name):
+    import sys, importlib
+    if str(INTEGRATIONS_DIR) not in sys.path: sys.path.insert(0, str(INTEGRATIONS_DIR))
+    return importlib.import_module(name)
+
+def _live(inputs, horizon_days=3):
+    """Live context (calendar + mail + integration health) through the integration layer. Never raises, never fabricates:
+    an unavailable integration is reported with its last successful read; a supplied live_context (tests/evals) is used as-is."""
+    if isinstance(inputs.get("live_context"), dict): return inputs["live_context"]
+    if inputs.get("no_live"): return {"available": False, "reason": "live context disabled by input", "health_lines": [], "unavailable": [], "critical_unavailable": []}
+    try:
+        ctx = _int_mod("layer").brief_context(_today(inputs), horizon_days=horizon_days); ctx["available"] = True; return ctx
+    except Exception as e:
+        return {"available": False, "reason": f"integration layer unavailable: {type(e).__name__}: {e}", "health_lines": [], "unavailable": [], "critical_unavailable": []}
+
+def _live_task_rows(inputs):
+    return [{"id": t["id"], "title": t["task"], "owner": t["owner"], "due": t["due"].isoformat() if t["due"] else None, "status": t["status"]} for t in _tasks(inputs) if t["open"]]
+
+def _meetings(lv, today):
+    cal = lv.get("calendar") or {}
+    if cal.get("status") != "OK": return [], [], []
+    ms = sorted(cal.get("records", []), key=lambda m: m.get("start") or ""); t = today.isoformat()
+    m_today = [m for m in ms if (m.get("start") or "")[:10] == t]; m_up = [m for m in ms if (m.get("start") or "")[:10] > t]
+    conflicts = []
+    for i, a in enumerate(m_today):
+        for b in m_today[i + 1:]:
+            if a.get("end") and b.get("start") and b["start"] < a["end"] and not (a.get("all_day") or b.get("all_day")):
+                conflicts.append({"a": a["title"], "b": b["title"], "overlap_from": b["start"], "until": min(a["end"], b.get("end") or a["end"])})
+    return m_today, m_up, conflicts
+
+def _email_candidates(lv, inputs, today):
+    mail = lv.get("mail") or {}
+    if mail.get("status") != "OK": return []
+    rc = _int_mod("reconcile")
+    heads = (mail.get("identity") or {}).get("addresses") or []
+    return rc.open_loop_candidates(mail.get("records", []), tasks=_live_task_rows(inputs), commitments=commitment_memory({})["commitments"], decisions=decision_memory({})["decisions"], today=today, head_addresses=heads)
+
+def _live_sources(kind):
+    try: return _int_mod("layer").live_source_status((kind,))[kind]
+    except Exception as e: return [{"integration_id": "?", "certification": "UNKNOWN", "health": "UNAVAILABLE", "reason": f"{type(e).__name__}: {e}"}]
+
+def _live_ok(sources, exclude=("INT-TASKS",)):
+    return [s for s in sources if s.get("certification") in ("VERIFIED_READ", "RELIABLE_READ") and s.get("health") in ("AVAILABLE", "DEGRADED") and s.get("integration_id") not in exclude]
+
+def _sec_meeting(m):
+    return {"kind": "meeting", "text": f"{(m.get('start') or '')[11:16]} {m.get('title', '')} ({m.get('participant_count', 0)} մասնակից)" + (f" · {m['location']}" if m.get("location") else ""), "record_id": m.get("record_id")}
+
 # ───────────────────────── source of truth ─────────────────────────
 def load_tasks(path=None):
     import openpyxl
@@ -229,18 +279,64 @@ def executive_prioritization(inputs, skill=None, reg=None):
     return {"status": "EXECUTED", "ranked": ranked, "p1_count": sum(r["P"]=="P1" for r in ranked)}
 
 def daily_briefing(inputs, skill=None, reg=None):
+    """Deputy Daily Brief = task register (canonical) + Business Operating Model + LIVE context through the integration layer
+    (calendar, mail candidates, integration health). Sections are emitted only when non-empty; an unavailable critical
+    integration is reported explicitly with its last successful read — never silently omitted, never shown as current data."""
     today = _today(inputs)
     dl = deadline_management(inputs); wf = waiting_for_tracking(inputs); pr = executive_prioritization(inputs)
     b = dl["buckets"]
     head_actions = [r for r in pr["ranked"] if r["P"] == "P1" and not _counterpart(r["owner"])[1]]
     decisions = [r for r in pr["ranked"] if r["owner"].isupper()]
+    bc = _bc(inputs); lv = _live(inputs)
+    m_today, m_up, conflicts = _meetings(lv, today)
+    cands = _email_candidates(lv, inputs, today)
+    act = [c for c in cands if c["class"] in ("ACTION", "DECISION", "DELEGATE") and not c["duplicate_of"]]
+    dec_mail = [c for c in act if c["class"] == "DECISION"]
+    cm = commitment_memory({})["commitments"]; cm_due = [x for x in cm if x.get("due") and x["due"] <= (today + datetime.timedelta(days=3)).isoformat()]
+    prep = []
+    if m_today or m_up:
+        rc = _int_mod("reconcile"); rows = _live_task_rows(inputs); dm = decision_memory({})["decisions"]
+        for m in (m_today + m_up)[:5]:
+            pk = rc.meeting_pack(m, rows, cm, dm, bool(bc.get("available")))
+            prep.append({"meeting": m.get("title"), "start": m.get("start"), "participants": m.get("participant_count", 0), "context_found": pk["context_found"], "missing": pk["missing_preparation"][:3], "agenda": pk["recommended_agenda"][:3]})
+    risks = []
+    for iid in lv.get("critical_unavailable", []): risks.append({"kind": "INTEGRATION_DOWN", "text": next((l for l in lv.get("health_lines", []) if l.startswith(iid)), f"{iid} unavailable")})
+    if lv.get("available") is False and lv.get("reason"): risks.append({"kind": "INTEGRATION_LAYER_DOWN", "text": lv["reason"]})
+    if conflicts: risks.append({"kind": "SCHEDULE_CONFLICT", "text": f"{len(conflicts)} overlapping meeting(s) today", "detail": conflicts})
+    if len(b["overdue"]) >= 3: risks.append({"kind": "OVERDUE_PILEUP", "text": f"{len(b['overdue'])} overdue items"})
+    for c in bc.get("conflicts", []): risks.append({"kind": "SOURCE_CONFLICT", "text": f"{c['id']} {c['topic']} — {c.get('resolution_required', '')}"})
+    live_sales = _live_sources("sales"); live_ops = _live_sources("operations"); sales_ok = _live_ok(live_sales); ops_ok = _live_ok(live_ops)
+    sections = []
+    def sec(sid, title, items, note=None):
+        if items: sections.append({"id": sid, "title": title, "items": items, **({"note": note} if note else {})})
+    sec("TODAY", "ԱՅՍՕՐ", [_sec_meeting(m) for m in m_today]
+        + [{"kind": "deadline", "text": f"{x['id']}. {x['task'][:60]} · {x.get('owner', '')}", "id": x["id"]} for x in b["today"]]
+        + [{"kind": "head_action", "text": f"{x['id']}. {x['task'][:60]} — {x['why']}", "id": x["id"]} for x in head_actions[:5]])
+    sec("OVERDUE", "ԺԱՄԿԵՏԱՆՑ", [{"kind": "task", "text": f"{x['id']}. [{x.get('due')}] {x['task'][:60]} · {x.get('owner', '')}", "id": x["id"]} for x in b["overdue"]]
+        + [{"kind": "commitment", "text": f"[{x['due']}] {x['text'][:60]}", "op_id": x.get("op_id")} for x in cm_due])
+    sec("WAITING_FOR", "ՍՊԱՍՈՒՄ ԵՄ", [{"kind": "task", "text": f"{w['id']}. {w['from']} · {w['task'][:50]} [{w.get('expected_by') or '—'}]", "id": w["id"]} for w in wf["waiting_for"]]
+        + [{"kind": "email", "text": f"✉ {c['counterpart']}: {str(c['subject'])[:60]} ({c['class']}, {c['age_days']}d)", "candidate_id": c["candidate_id"], "class": c["class"]} for c in act if c["class"] != "DECISION"],
+        note="✉ = CANDIDATE_OPEN_LOOP from mail — not a task until Gev confirms")
+    sec("SALES", "ՎԱՃԱՌՔ", [{"kind": "live", "text": f"{s['integration_id']} {s['health']} — live signal available (query it)"} for s in sales_ok])
+    sec("OPERATIONS", "ԳՈՐԾԱՌՆՈՒԹՅՈՒՆ", [{"kind": "live", "text": f"{s['integration_id']} {s['health']} — live signal available (query it)"} for s in ops_ok])
+    sec("DECISIONS", "ՈՐՈՇՈՒՄՆԵՐ", [{"kind": "task", "text": f"{x['id']}. {x['task'][:60]} · {x['owner']}", "id": x["id"]} for x in decisions]
+        + [{"kind": "email", "text": f"✉ {c['counterpart']}: {str(c['subject'])[:60]}", "candidate_id": c["candidate_id"], "class": "DECISION"} for c in dec_mail]
+        + [{"kind": "business", "text": f"{c['id']} {c['topic']}"} for c in bc.get("conflicts", [])])
+    sec("RISKS", "ՌԻՍԿԵՐ", risks)
+    sec("PREPARATION", "ՊԱՏՐԱՍՏՈՒԹՅՈՒՆ", [{"kind": "meeting", "text": f"{p['meeting']} ({(p['start'] or '')[5:16]}): " + ("; ".join(p["missing"]) if p["missing"] else "context ready"), "agenda": p["agenda"]} for p in prep])
     brief = {"status": "EXECUTED", "date": today.isoformat(), "weekday": HY[today.weekday()],
              "top_priorities": pr["ranked"][:5], "head_actions": head_actions[:5], "decisions_pending": decisions,
              "deadlines_today": b["today"], "overdue": b["overdue"], "tomorrow": b["tomorrow"],
              "waiting_for": wf["waiting_for"], "no_deadline": b["no_deadline"],
-             "counts": dl["counts"], "source": XLSX.name,
-             "data_gaps": ["sales KPIs: UNKNOWN (no live feed)", "ops KPIs: UNKNOWN (no live feed)"] + _bc(inputs).get("routine_missing_data", []),
-             "business_alerts": {"pending_decisions": [c["id"] for c in _bc(inputs).get("conflicts", [])], "gaps": _bc(inputs).get("gaps", [])}, "business_context": _bc_brief(inputs)}
+             "counts": dl["counts"], "source": XLSX.name, "sections": sections,
+             "live": {"available": bool(lv.get("available")), "mode": lv.get("mode"), "meetings_today": m_today, "meetings_upcoming": m_up[:5], "schedule_conflicts": conflicts,
+                      "email_candidates": act, "email_candidates_total": len(cands), "integration_health": lv.get("health_lines", []), "unavailable": lv.get("unavailable", []),
+                      "critical_unavailable": lv.get("critical_unavailable", []), "reason": lv.get("reason"), "sales_sources": live_sales, "operations_sources": live_ops},
+             "preparation": prep, "risks": risks,
+             "data_gaps": ([f"sales: no VERIFIED live source ({', '.join(str(s.get('integration_id')) + '=' + str(s.get('certification')) for s in live_sales)})"] if not sales_ok else [])
+                          + ([f"operations: no VERIFIED live source beyond the task register ({', '.join(str(s.get('integration_id')) + '=' + str(s.get('certification')) for s in live_ops if s.get('integration_id') != 'INT-TASKS')})"] if not ops_ok else [])
+                          + bc.get("routine_missing_data", []),
+             "business_alerts": {"pending_decisions": [c["id"] for c in bc.get("conflicts", [])], "gaps": bc.get("gaps", [])}, "business_context": _bc_brief(inputs)}
     return brief
 
 def end_of_day_control(inputs, skill=None, reg=None):
@@ -255,7 +351,8 @@ def weekly_review(inputs, skill=None, reg=None):
     dl = deadline_management(inputs)
     b = _bc(inputs)
     return {"status": "ASSISTED", "actions_overdue": dl["buckets"]["overdue"], "open_count": sum(dl["counts"].values()),
-            "sales": "UNKNOWN — no sales data source", "operations": "UNKNOWN — no ops data source",
+            "sales": "UNKNOWN — no VERIFIED live sales source: " + ", ".join(f"{s.get('integration_id')}={s.get('certification')}" for s in _live_sources("sales")),
+            "operations": "UNKNOWN — no VERIFIED live operations source beyond the task register: " + ", ".join(f"{s.get('integration_id')}={s.get('certification')}" for s in _live_sources("operations") if s.get("integration_id") != "INT-TASKS"),
             "sections": b.get("routine_sections", []), "missing_sources": b.get("routine_missing_data", []), "pending_decisions": [c["id"] + " " + c["topic"] for c in b.get("conflicts", [])],
             "note": "Skeleton only; sales/ops sections require supplied datasets.", "business_context": _bc_brief(inputs)}
 
@@ -264,8 +361,18 @@ def meeting_preparation(inputs, skill=None, reg=None):
     dl = deadline_management(inputs); wf = waiting_for_tracking(inputs); pr = executive_prioritization(inputs)
     topic = _norm(inputs.get("topic", inputs["meeting"]))
     related = [r for r in pr["ranked"] if any(w in _norm(r["task"]) for w in topic.split() if len(w) > 3)]
-    return {"status": "EXECUTED", "meeting": inputs["meeting"], "purpose": inputs.get("purpose", "UNKNOWN — supply"),
-            "participants": inputs.get("participants", "UNKNOWN — supply"),
+    # LIVE calendar (INT-OL-CAL, read-only): find the meeting in the next 14 days and assemble the pack with provenance
+    lv = _live(inputs, horizon_days=14); m_today, m_up, _ = _meetings(lv, _today(inputs)); found = None
+    for m in m_today + m_up:
+        if set(w for w in topic.split() if len(w) > 3) & set(_norm(m.get("title", "")).split()): found = m; break
+    cal = {"found": bool(found), "source": "INT-OL-CAL", "health": next((l for l in lv.get("health_lines", []) if l.startswith("INT-OL-CAL")), lv.get("reason"))}
+    if found:
+        pk = _int_mod("reconcile").meeting_pack(found, _live_task_rows(inputs), commitment_memory({})["commitments"], decision_memory({})["decisions"], bool(_bc(inputs).get("available")))
+        cal.update({k: pk[k] for k in ("meeting", "participants", "purpose", "related_tasks", "related_tasks_uncertain", "previous_commitments", "relevant_decisions", "kpis", "processes", "missing_preparation", "recommended_agenda", "recommended_questions", "context_found", "note")})
+    else: cal["note"] = "meeting not found in the live calendar (today + 14 days) — time and participants UNKNOWN unless supplied"
+    live_names = ", ".join(p.get("name", "") for p in (found or {}).get("participants", []) if p.get("name")) if found else ""
+    return {"status": "EXECUTED", "meeting": inputs["meeting"], "purpose": inputs.get("purpose") or (cal.get("purpose") if found else None) or "UNKNOWN — supply",
+            "participants": inputs.get("participants") or live_names or "UNKNOWN — supply", "when": (found or {}).get("start"), "calendar": cal,
             "previous_decisions": decision_memory({}, None, None)["decisions"][-5:],
             "open_actions": related or pr["ranked"][:5], "overdue": dl["buckets"]["overdue"],
             "waiting_for": wf["waiting_for"], "decisions_required": [r for r in pr["ranked"] if r["owner"].isupper()],
@@ -481,9 +588,13 @@ def audit_logging(inputs, skill=None, reg=None):
 def open_loops(inputs, skill=None, reg=None):
     dl = deadline_management(inputs); wf = waiting_for_tracking(inputs); cm = commitment_memory({}); dm = decision_memory({})
     pending = [t for t in _tasks(inputs) if t["open"] and t["owner"].isupper()]
+    lv = _live(inputs); cands = _email_candidates(lv, inputs, _today(inputs))
     return {"status": "EXECUTED", "open_tasks": sum(dl["counts"].values()), "overdue": dl["buckets"]["overdue"],
             "waiting_for": wf["waiting_for"], "open_commitments": cm["commitments"],
-            "decisions_pending": [_ser(t) for t in pending], "decisions_logged": len(dm["decisions"])}
+            "decisions_pending": [_ser(t) for t in pending], "decisions_logged": len(dm["decisions"]),
+            "email_candidates": [c for c in cands if c["class"] in ("ACTION", "DECISION", "DELEGATE", "MONITOR")], "email_candidates_total": len(cands),
+            "email_source": next((l for l in lv.get("health_lines", []) if l.startswith("INT-OL-MAIL")), lv.get("reason") or "INT-OL-MAIL not read"),
+            "note": "email_candidates are CANDIDATE_OPEN_LOOP (evidence from mail) — none is recorded as a commitment or task automatically"}
 
 def memory_retrieval(inputs, skill=None, reg=None):
     q = _norm(inputs.get("query", inputs.get("context", ""))); hits = []
@@ -516,8 +627,13 @@ def document_extraction(inputs, skill=None, reg=None):
 def analysis_on_supplied_data(inputs, skill=None, reg=None):
     key = next((k for k in ("sales_data","ops_data","dataset","performance_data") if k in inputs), None)
     if not key or not inputs[key]:
-        return {"status": "BLOCKED", "code": "MISSING_INPUT", "reason": f"{skill['skill_id'] if skill else 'analysis'}: no dataset supplied; this runtime has no live feed",
-                "label": "UNKNOWN", "business_context": _bc_brief(inputs)}
+        kind = "operations" if str((skill or {}).get("domain", "")).startswith("C_") else "sales"
+        srcs = _live_sources(kind); ok = _live_ok(srcs); bc = _bc_brief(inputs)
+        return {"status": "BLOCKED", "code": "MISSING_INPUT" if not ok else "MISSING_INPUT", "reason": f"{skill['skill_id'] if skill else 'analysis'}: no dataset supplied and no VERIFIED live {kind} source is connected ({', '.join(str(s.get('integration_id')) + '=' + str(s.get('certification')) for s in srcs)})",
+                "label": "UNKNOWN", "live_sources": srcs,
+                "answer": {"LIVE_DATA": "none — no VERIFIED live source for this question", "BUSINESS_MODEL": {"kpis": bc.get("kpis", []), "playbook": bc.get("playbook"), "owner": bc.get("owner"), "required_data": bc.get("required_data", [])},
+                           "DERIVED_ANALYSIS": None, "UNKNOWN": ["actuals", "target variance (no actuals; targets only from targets.json)", "trend"]},
+                "unblock": [s.get("unblock") for s in srcs if s.get("unblock")], "business_context": bc}
     data = inputs[key]
     if not isinstance(data, list) or not all(isinstance(r, dict) for r in data):
         return {"status": "BLOCKED", "code": "INVALID_DATA", "reason": "dataset must be a list of dict rows"}
@@ -617,7 +733,7 @@ def validate_output(skill_id, result):
     checks = {
         "executive_prioritization": lambda r: all(x.get("P") in ("P1","P2","P3","P4") for x in r.get("ranked", [])) and r.get("p1_count", 0) <= 5,
         "deadline_management": lambda r: set(r.get("buckets", {})) == {"overdue","today","tomorrow","upcoming","no_deadline"},
-        "daily_briefing": lambda r: all(k in r for k in ("top_priorities","overdue","deadlines_today","waiting_for","counts")),
+        "daily_briefing": lambda r: all(k in r for k in ("top_priorities","overdue","deadlines_today","waiting_for","counts","sections","live")) and all(s.get("items") for s in r.get("sections", [])) and (r["live"].get("available") is False or not (set(r["live"].get("critical_unavailable", [])) - {x["text"].split(" ")[0] for x in r.get("risks", []) if x.get("kind") == "INTEGRATION_DOWN"})),
         "task_management": lambda r: "tasks" in r or "task" in r,
         "commitment_tracking": lambda r: "op_id" in r and "scheduler_available" in r,
         "reminder_intelligence": lambda r: r.get("scheduler_available") is False and "plan" in r,
