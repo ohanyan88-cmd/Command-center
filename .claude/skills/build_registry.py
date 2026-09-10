@@ -10,9 +10,10 @@ Maturity here is a DECLARED TARGET only. certify.py computes the ACHIEVED level 
 and writes it back; engine.validate_registry() rejects any L3+ skill whose per-skill certification is missing,
 failed, or stale (fingerprint mismatch after a contract/implementation change).
 """
-import json, pathlib, datetime
+import json, pathlib, datetime, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "runtime")); import python_runtime; python_runtime.ensure()        # deterministic project interpreter (<root>/.venv)
 TODAY = datetime.date.today().isoformat()
 
 AUTHORITY = ["READ", "ANALYZE", "RECOMMEND", "DRAFT", "CREATE_INTERNAL_TASK",

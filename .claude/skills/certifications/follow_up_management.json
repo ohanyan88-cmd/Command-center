@@ -41,9 +41,9 @@
   "eval:r_broken_promise"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:54:36",
- "fingerprint": "a0c852c8d77c9526c750c291",
- "core_fingerprint": "4e7ce8b910119b3d",
+ "certified_at": "2026-09-10T16:38:32",
+ "fingerprint": "59afb01f4e340379e3f1c623",
+ "core_fingerprint": "0356ece6648346c2",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -51,7 +51,8 @@
   "test_failclosed",
   "test_hardening",
   "test_enforcement",
-  "test_workspace"
+  "test_workspace",
+  "test_runtime"
  ],
  "audit_infrastructure": false
 }

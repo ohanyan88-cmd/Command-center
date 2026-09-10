@@ -11,6 +11,7 @@ Fail-closed: a corrupt/missing policy denies every mutating tool. WORKSPACE_ROOT
 import sys, json, os, re, pathlib
 ROOT = pathlib.Path(os.environ.get("WORKSPACE_ROOT") or pathlib.Path(__file__).resolve().parent.parent.parent)
 POLICY_DIR = pathlib.Path(__file__).resolve().parent.parent / "policy"
+sys.path.insert(0, str(POLICY_DIR.parent / "runtime")); import python_runtime; python_runtime.ensure(auto_bootstrap=False)   # project interpreter only (hook.sh bootstraps)
 sys.path.insert(0, str(POLICY_DIR))
 try: sys.stdout.reconfigure(encoding="utf-8")
 except Exception: pass

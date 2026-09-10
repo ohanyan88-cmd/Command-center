@@ -6,6 +6,7 @@ Tasks.xlsx read only if the engine is unavailable — and says so."""
 import os, sys, io, datetime, pathlib, json
 sys.stdout.reconfigure(encoding="utf-8")
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent          # Command-center/ (workspace root)
+sys.path.insert(0, str(ROOT / ".claude" / "runtime")); import python_runtime; python_runtime.ensure(auto_bootstrap=False)   # project interpreter only (hook.sh bootstraps)
 sys.path.insert(0, str(ROOT / ".claude" / "skills")); sys.path.insert(0, str(ROOT / ".claude" / "policy"))
 TODAY = datetime.date.today()
 HY = ["երկուշաբթի","երեքշաբթի","չորեքշաբթի","հինգշաբթի","ուրբաթ","շաբաթ","կիրակի"]

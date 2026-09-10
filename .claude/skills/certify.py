@@ -17,10 +17,11 @@ import sys, json, io, pathlib, datetime, unittest, importlib
 sys.stdout.reconfigure(encoding="utf-8")
 HERE = pathlib.Path(__file__).resolve().parent
 TESTS = HERE.parent / "tests"
+sys.path.insert(0, str(HERE.parent / "runtime")); import python_runtime; python_runtime.ensure()        # deterministic project interpreter (<root>/.venv)
 sys.path.insert(0, str(HERE)); sys.path.insert(0, str(TESTS))
 import engine
 
-SUITES = ["test_skills", "test_store", "test_failclosed", "test_hardening", "test_enforcement", "test_workspace"]
+SUITES = ["test_skills", "test_store", "test_failclosed", "test_hardening", "test_enforcement", "test_workspace", "test_runtime"]
 KIND_FIELD = {"unit": "tests", "failure": "failure_tests", "adversarial": "hardening_cases", "failure_injection": "hardening_cases",
               "authority": "authority_tests", "completion": "completion_verification", "concurrency": "concurrency_tests",
               "enforcement": "enforcement_tests", "routing": "routing_evals"}
@@ -74,12 +75,12 @@ def main():
             for k in t["kinds"]:
                 evidence[sid][KIND_FIELD[k]].append(t["id"])
                 if k in ("adversarial", "failure_injection"): evidence[sid][k].append(t["id"])
-    for kind in ("scenarios", "routing", "bypass"):
+    for kind in ("scenarios", "routing", "bypass", "boundary"):
         for r in ev_res[kind]:
             for sid in r.get("skills", []):
                 if sid not in evidence: continue
                 if not r["pass"]: evidence[sid]["any_failed"] = True; evidence[sid]["failed_tests"].append(f"eval:{r['name']}"); continue
-                (evidence[sid]["routing_evals"] if kind == "routing" else evidence[sid]["evals"]).append(f"eval:{r['name']}")
+                (evidence[sid]["routing_evals"] if kind in ("routing", "boundary") else evidence[sid]["evals"]).append(f"eval:{r['name']}")
     stamp = datetime.datetime.now().isoformat(timespec="seconds"); core = engine.core_fingerprint()
     engine.CERT_DIR.mkdir(exist_ok=True)
     for stale in engine.CERT_DIR.glob("*.json"):

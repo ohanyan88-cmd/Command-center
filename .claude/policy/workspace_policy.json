@@ -1,5 +1,5 @@
 {
-  "policy_version": "1.1.0",
+  "policy_version": "1.2.0",
   "workspace_name": "Command-center",
   "identity": {
     "name": "Deputy",
@@ -42,7 +42,7 @@
 
   "reserved_technical_names": {
     "root_files": ["CLAUDE.md", "README.md", ".gitignore", ".gitattributes", "desktop.ini"],
-    "root_dirs": [".claude", ".git"],
+    "root_dirs": [".claude", ".git", ".venv"],
     "anywhere_files": [".gitkeep"],
     "note": "desktop.ini is a Windows-generated system file; .git/.gitignore/.gitattributes are version-control files."
   },
@@ -50,7 +50,7 @@
   "root": {
     "allowed_files": ["CLAUDE.md", "README.md", "Tasks.xlsx", "Journal.md", "Actions.md", ".gitignore", ".gitattributes", "desktop.ini"],
     "required_files": ["CLAUDE.md", "README.md", "Tasks.xlsx", "Journal.md", "Actions.md"],
-    "allowed_dirs": ["00_Inbox", "01_Active", "02_Reference", "03_Completed", "04_Sources", "05_Archive", ".claude", ".git"],
+    "allowed_dirs": ["00_Inbox", "01_Active", "02_Reference", "03_Completed", "04_Sources", "05_Archive", ".claude", ".git", ".venv"],
     "required_dirs": ["00_Inbox", "01_Active", "02_Reference", "03_Completed", "04_Sources", "05_Archive", ".claude"],
     "unknown_entries": "fail"
   },
@@ -89,7 +89,7 @@
                    "subdirs": "controlled", "allowed_content": ["anything superseded, kept for history"], "forbidden_content": ["the live task register", "runtime state"],
                    "allowed_extensions": "*", "naming_rule": "business-or-technical", "retention_rule": "never deleted; never edited"},
     ".claude": {"kind": "agent-runtime-root", "purpose": "Deputy runtime: settings, hooks, docs, policy, skills, tools, tests, state, audit.", "canonical": true, "required": true,
-                "subdirs": "fixed", "fixed_subdirs": ["hooks", "docs", "policy", "skills", "tools", "tests", "state", "audit"], "allowed_files": ["settings.json", "settings.local.json"], "naming_rule": "technical"},
+                "subdirs": "fixed", "fixed_subdirs": ["hooks", "docs", "policy", "skills", "tools", "tests", "state", "audit", "runtime"], "allowed_files": ["settings.json", "settings.local.json"], "naming_rule": "technical"},
     ".claude/hooks":  {"kind": "hooks", "purpose": "Lifecycle and enforcement hooks (brief, skill gate, workspace guard).", "required": true, "allowed_extensions": ["py"], "naming_rule": "python_module", "required_files": ["brief.py", "gate.py", "workspace_guard.py"], "subdirs": "forbidden", "generated_ok": ["__pycache__"]},
     ".claude/docs":   {"kind": "docs", "purpose": "Durable agent documentation (role, job description, audits).", "required": true, "allowed_extensions": ["md"], "naming_rule": "business", "required_files": ["Role.md", "Job-description.md"], "subdirs": "forbidden"},
     ".claude/policy": {"kind": "policy", "purpose": "Machine-readable workspace governance + validator.", "required": true, "allowed_extensions": ["json", "py"], "naming_rule": "technical", "required_files": ["workspace_policy.json", "validate_workspace.py"], "subdirs": "forbidden", "generated_ok": ["__pycache__"]},
@@ -98,20 +98,21 @@
                        "forbidden_content": ["test_*.py", "evals.py", "state", "audit", "*.jsonl", "*.db", "raw sources"], "forbidden_globs": ["test_*.py", "evals.py", "*.jsonl", "*.db", "state", "audit"]},
     ".claude/tools":  {"kind": "tools", "purpose": "Operational helper programs that are tools rather than skills.", "required": true, "allowed_extensions": ["py", "md"], "naming_rule": "python_module", "subdirs": "forbidden", "generated_ok": ["__pycache__"]},
     ".claude/tests":  {"kind": "tests", "purpose": "Tests and behavioral evaluations.", "required": true, "allowed_extensions": ["py"], "naming_rule": "python_module", "required_files": ["test_skills.py", "test_hardening.py", "test_workspace.py", "evals.py"], "subdirs": "forbidden", "generated_ok": ["__pycache__"]},
+    ".claude/runtime": {"kind": "python-runtime-contract", "purpose": "Deterministic project interpreter: .venv bootstrap + hook launcher (python_runtime.py, hook.sh) and the pinned dependency manifest (requirements.txt) with its lock (requirements.lock). Every hook, CLI, test, eval and release runs under <root>/.venv, never the PATH python.", "required": true, "allowed_extensions": ["py", "sh", "txt", "lock", "md"], "naming_rule": "technical", "required_files": ["python_runtime.py", "hook.sh", "requirements.txt", "requirements.lock"], "subdirs": "forbidden", "generated_ok": ["__pycache__"]},
     ".claude/state":  {"kind": "runtime-state", "purpose": "Runtime state only (SQLite store, journal, quarantine, migrated legacy).", "required": true, "allowed_extensions": "*", "naming_rule": "generated", "subdirs": "controlled"},
     ".claude/audit":  {"kind": "audit", "purpose": "Runtime/audit evidence only.", "required": true, "allowed_extensions": ["jsonl"], "naming_rule": "generated", "required_files": ["skill_audit.jsonl"], "subdirs": "forbidden"}
   },
 
   "generated_exclusions": {
-    "ignored_dir_names": ["__pycache__", ".git"],
+    "ignored_dir_names": ["__pycache__", ".git", ".venv"],
     "ignored_file_globs": ["*.pyc", "desktop.ini", "Thumbs.db", ".DS_Store", "~$*"],
-    "pycache_allowed_under": [".claude/hooks", ".claude/policy", ".claude/skills", ".claude/tools", ".claude/tests"],
+    "pycache_allowed_under": [".claude/hooks", ".claude/policy", ".claude/skills", ".claude/tools", ".claude/tests", ".claude/runtime"],
     "garbage_globs": ["*.tmp", "*.bak", "*~", "*.orig", "*.swp", "nul", "*.log"]
   },
 
   "semantics": {
     "source_markers": {"patterns": ["^chat\\.txt$", "^chat\\.md$", "WhatsApp", "\\.zip$", "^Screenshot", "^IMG[-_]", "\\.jpe?g$", "\\.png$"], "must_live_under": "04_Sources", "note": "raw evidence classified by name/kind may only live in 04_Sources (or 05_Archive)"},
-    "code_markers": {"patterns": ["\\.py$", "\\.bat$", "\\.ps1$", "\\.sh$", "\\.js$"], "must_live_under": [".claude/hooks", ".claude/policy", ".claude/skills", ".claude/tools", ".claude/tests", "05_Archive"]},
+    "code_markers": {"patterns": ["\\.py$", "\\.bat$", "\\.ps1$", "\\.sh$", "\\.js$"], "must_live_under": [".claude/hooks", ".claude/policy", ".claude/skills", ".claude/tools", ".claude/tests", ".claude/runtime", "05_Archive"]},
     "runtime_markers": {"patterns": ["\\.db$", "\\.jsonl$", "-wal$", "-shm$"], "must_live_under": [".claude/state", ".claude/audit", "05_Archive"]},
     "test_markers": {"patterns": ["^test_.*\\.py$", "^evals\\.py$"], "must_live_under": [".claude/tests"]},
     "reference_vs_completed": "02_Reference holds artifacts that are still authoritative; 03_Completed holds finished deliverables that are no longer truth. Mechanically checkable part: names signalling draft/copy are forbidden in both; the same base document may not exist in both.",

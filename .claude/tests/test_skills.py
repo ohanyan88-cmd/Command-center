@@ -369,5 +369,31 @@ class T08_MultiSkill(unittest.TestCase):
         self.assertIn("Decisions", engine.run_skill(REG, "executive_summarization", {"content": "x", "kind": "meeting"})["result"]["draft"])
         self.assertEqual(engine.run_skill(REG, "executive_summarization", {"content": "x", "kind": "poem"})["status"], "BLOCKED")
 
+class T02b_DomainBoundary(unittest.TestCase):
+    """SYSTEM/maintenance intents (agent runtime, Skill System, hooks, workspace policy, tests, repository, configuration,
+    architecture, state/audit infrastructure) must never route to business skills because of overlapping words ('pipeline')."""
+    SYSTEM = ["fix the skill execution pipeline", "audit the deployment pipeline", "inspect the runtime pipeline",
+              "fix the gate hook so it runs from any cwd", "update the workspace policy for .venv", "rename the github repository and update the remote origin",
+              "add regression tests for routing", "refactor the sqlite state store", "the architecture of the agent runtime needs a config file",
+              "run the release suite and the evals", "ուղղիր հմտությունների համակարգի hook-ը"]
+    BUSINESS = [("change the sales pipeline analysis", "pipeline_management"), ("our sales pipeline is falling", "pipeline_management"),
+                ("Deals are not moving, pipeline is stuck", "pipeline_management"), ("remind me friday about the network maintenance window", "commitment_tracking"),
+                ("վաճառքի փայփլայնը ընկնում է", "pipeline_management")]
+    @covers("pipeline_management", "data_analysis", "audit_logging", kinds=("routing",))
+    def test_system_intents_route_no_business_skill(self):
+        for s in self.SYSTEM:
+            p = engine.resolve(REG, s); self.assertEqual(p["domain"], "SYSTEM", s); self.assertEqual(p["status"], "UNRESOLVED", s); self.assertEqual(p["chain"], [], s)
+            self.assertTrue(p["system_terms"], s); self.assertTrue(engine.classify_prompt(s)["maintenance"], s)
+    @covers("pipeline_management", "commitment_tracking", kinds=("routing",))
+    def test_business_intents_with_overlapping_words_still_route(self):
+        for s, sid in self.BUSINESS:
+            p = engine.resolve(REG, s); self.assertEqual(p["domain"], "BUSINESS", s); self.assertEqual(p["status"], "RESOLVED", s); self.assertIn(sid, p["chain"], s)
+            self.assertFalse(engine.classify_prompt(s)["maintenance"], s)
+    @covers("pipeline_management", kinds=("routing", "failure"))
+    def test_system_intent_stays_fail_closed(self):
+        p = engine.resolve(REG, "fix the skill execution pipeline"); g = engine.gate(REG, p, {}, action_level="ANALYZE")
+        self.assertEqual(g["status"], "BLOCKED"); self.assertTrue(any(b["code"] == "MISSING_SKILL" for b in g["blocked"]))
+        self.assertNotIn(engine.run_plan(REG, p, {})["status"], ("OK", "PARTIAL"))
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

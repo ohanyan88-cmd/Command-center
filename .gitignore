@@ -11,6 +11,9 @@ Journal.md
 Actions.md
 desktop.ini
 
+# ── Project Python runtime (rebuilt from .claude/runtime/requirements.lock) — never versioned ──
+.venv/
+
 # ── Runtime state (hardened store, audit mirror, tickets, quarantine) — never versioned ──
 .claude/state/
 .claude/audit/

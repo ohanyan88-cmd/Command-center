@@ -43,12 +43,13 @@
  "routing_evals": [
   "eval:r_sales_down",
   "eval:r_sales_down_hy",
-  "test_skills.T02_Router.test_chain_sales_decline"
+  "test_skills.T02_Router.test_chain_sales_decline",
+  "test_skills.T02b_DomainBoundary.test_system_intents_route_no_business_skill"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:54:36",
- "fingerprint": "53e2be5cb60b4a0850af322a",
- "core_fingerprint": "4e7ce8b910119b3d",
+ "certified_at": "2026-09-10T16:38:32",
+ "fingerprint": "0a2ccba5ae0a1b1dd821b243",
+ "core_fingerprint": "0356ece6648346c2",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -56,7 +57,8 @@
   "test_failclosed",
   "test_hardening",
   "test_enforcement",
-  "test_workspace"
+  "test_workspace",
+  "test_runtime"
  ],
  "audit_infrastructure": true
 }

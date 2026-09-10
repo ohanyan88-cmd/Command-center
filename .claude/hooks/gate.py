@@ -13,6 +13,7 @@ Fail-closed: if the engine cannot be imported, state-changing tools are denied.
 """
 import sys, json, os, re, pathlib, datetime
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(ROOT / ".claude" / "runtime")); import python_runtime; python_runtime.ensure(auto_bootstrap=False)   # project interpreter only (hook.sh bootstraps)
 SKILLS = ROOT / ".claude" / "skills"
 sys.path.insert(0, str(SKILLS))
 try: sys.stdout.reconfigure(encoding="utf-8"); sys.stderr.reconfigure(encoding="utf-8")
@@ -23,10 +24,10 @@ READ_ONLY_TOOLS = {"Read","Glob","Grep","LS","WebFetch","WebSearch","ToolSearch"
                    "Skill","Agent","SendMessage","ScheduleWakeup","ReportFindings","SendUserFile","PushNotification","CronList","CronDelete","CronCreate",
                    "EnterWorktree","ExitWorktree","DesignSync","Workflow","Artifact"}
 STATE_TOOLS = {"Write","Edit","MultiEdit","NotebookEdit","Bash","PowerShell","Monitor"}      # Monitor runs shell commands too
-PROTECTED = re.compile(r"(\.claude[/\\](settings(\.local)?\.json|hooks[/\\]|policy[/\\]|tests[/\\]|state[/\\]|audit[/\\]"
+PROTECTED = re.compile(r"(\.claude[/\\](settings(\.local)?\.json|hooks[/\\]|policy[/\\]|tests[/\\]|state[/\\]|audit[/\\]|runtime[/\\]"
                        r"|skills[/\\](engine|store|certify|skill|executors|build_registry)\.py|skills[/\\](registry\.json|certifications))|(^|[/\\])CLAUDE\.md)", re.I)
 GOVERNED_CMD = re.compile(r"skill\.py\s+(resolve|plan|run|ticket|declare|maintenance|audit|status|validate|test|hardening|eval|certify|release|build|store|certs|enforcement)\b")
-GOVERNED_ONLY = re.compile(r"^\s*(cd\s+(\"[^\"]*\"|'[^']*'|\S+)\s*&&\s*)?python(3)?(\.exe)?\s+\S*skill\.py\s+"
+GOVERNED_ONLY = re.compile(r"^\s*(cd\s+(\"[^\"]*\"|'[^']*'|\S+)\s*&&\s*)?(\S*[/\\])?python(3)?(\.exe)?\s+\S*skill\.py\s+"
                            r"(resolve|plan|run|ticket|declare|maintenance|audit|status|validate|test|hardening|eval|certify|release|build|store|certs|enforcement)\b"
                            r"(?P<args>[^;&|<>]*)(?P<pipe>\|[^;&|<>]*)?\s*$")
 TEST_CMD = re.compile(r"(python(3)?(\.exe)?\s+(-m\s+unittest|.*(test_[a-z_]+|evals)\.py))")
@@ -60,7 +61,7 @@ def _cmd_is_read_only(cmd):
         if not seg: continue
         toks = seg.split()
         head = toks[0].lower().strip("\"'")
-        head = os.path.basename(head)
+        head = os.path.basename(head); head = head[:-4] if head.endswith(".exe") else head       # .venv/Scripts/python.exe → python
         if head not in READ_ONLY_HEAD: return False
         if head == "git" and (len(toks) < 2 or toks[1] not in READ_ONLY_GIT): return False
         if head == "gh" and (len(toks) < 2 or toks[1] not in READ_ONLY_GH or " -X " in seg or "--method" in seg or (toks[1] == "pr" and len(toks) > 2 and toks[2] in ("create","merge","close","comment","edit","review"))): return False
@@ -100,6 +101,10 @@ def on_prompt(data, engine, reg):
         if res.get("required_inputs"): lines.append(f"   required inputs: {res['required_inputs']}")
         lines.append(f"   → EXECUTE via: python .claude/skills/skill.py plan --ticket {t['ticket_id']} \"<intent>\" '{{json inputs}}'   (or: run --ticket {t['ticket_id']} <skill> '{{...}}')")
         lines.append("   → State-changing tools (Write/Edit/Bash writes) are DENIED until a governed execution exists on this ticket. BLOCKED = report the codes to Գև; never narrate completion.")
+    elif res.get("domain") == "SYSTEM":
+        lines.append(f"   🔧 SYSTEM/MAINTENANCE intent ({', '.join(res.get('system_terms', [])[:4])}) → business Sales/Operations skills are NOT routed. "
+                     f"State-changing work needs an audited path: skill.py maintenance --ticket {t['ticket_id']} (protected enforcement files) "
+                     f"or skill.py declare --ticket {t['ticket_id']} \"<reason>\" — until then state tools are DENIED (fail closed).")
     else:
         if res.get("tool_requirements"): lines.append(f"   requires tools not integrated: {res['tool_requirements']} → TOOL_UNAVAILABLE (say so; do not simulate)")
         lines.append(f"   no skill resolved{' (prompt looks executable)' if t.get('executable') else ''}. Refine: skill.py resolve --ticket {t['ticket_id']} \"<clearer intent>\"; "

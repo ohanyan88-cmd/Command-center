@@ -180,5 +180,23 @@ class E05_FailClosedOnEngineFailure(unittest.TestCase):
         d = pre(h, "Write", file_path="C:/tmp/x.md", content="x"); self.assertEqual(d["decision"], "deny"); self.assertIn("fail closed", d["reason"])
         self.assertIsNone(pre(h, "Read", file_path="C:/tmp/x.md")["decision"])
 
+class E06_MaintenanceRoutingBoundary(unittest.TestCase):
+    @covers(*GOV, "pipeline_management", kinds=("enforcement", "routing"))
+    def test_system_prompt_with_business_words_is_not_routed_to_sales(self):
+        h = HookHarness(); r = h.hook("UserPromptSubmit", user_prompt="fix the skill execution pipeline")
+        self.assertIn("SYSTEM/MAINTENANCE", r["out"]); self.assertNotIn("pipeline_management", r["out"])
+        t = h.ticket(); self.assertEqual(t["resolution"]["status"], "UNRESOLVED"); self.assertEqual(t["resolution"]["domain"], "SYSTEM")
+        self.assertEqual(t["resolution"]["chain"], []); self.assertTrue(t["maintenance"]); self.assertFalse(t["adversarial"])
+        self.assertEqual(pre(h, "Edit", file_path=str(HERE.parent / "skills" / "engine.py"))["decision"], "deny")      # fail-closed until the grant
+        self.assertEqual(pre(h, "Write", file_path="C:/tmp/x.md", content="x")["decision"], "deny")
+        rc, o = h.cli("maintenance", "--ticket", t["ticket_id"]); self.assertEqual(rc, 0)
+        self.assertIsNone(pre(h, "Edit", file_path=str(HERE.parent / "skills" / "engine.py"))["decision"])
+    @covers("pipeline_management", kinds=("enforcement", "routing"))
+    def test_business_prompt_still_routes_to_sales_and_cannot_unlock_maintenance(self):
+        h = HookHarness(); r = h.hook("UserPromptSubmit", user_prompt="our sales pipeline is falling")
+        t = h.ticket(); self.assertEqual(t["resolution"]["domain"], "BUSINESS"); self.assertIn("pipeline_management", t["resolution"]["chain"]); self.assertFalse(t["maintenance"])
+        self.assertEqual(pre(h, "Write", file_path="C:/tmp/x.md", content="x")["decision"], "deny")
+        rc, o = h.cli("maintenance", "--ticket", t["ticket_id"]); self.assertEqual(rc, 2); self.assertIn("REFUSED", o)
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

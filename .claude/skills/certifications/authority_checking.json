@@ -32,7 +32,11 @@
   "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
   "test_hardening.H04_AdversarialInputs.test_forged_token_still_bounded_by_max_action",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
-  "test_hardening.H04_AdversarialInputs.test_prompt_injection_cannot_escalate_authority"
+  "test_hardening.H04_AdversarialInputs.test_prompt_injection_cannot_escalate_authority",
+  "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
+  "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
+  "test_runtime.R03_FailClosedWhenRuntimeBroken.test_entry_point_outside_venv_fails_closed_without_bootstrap",
+  "test_runtime.R03_FailClosedWhenRuntimeBroken.test_state_tools_denied_repair_allowed_prompt_and_stop_continue"
  ],
  "adversarial": [
   "test_enforcement.E01_PromptCapture.test_ignore_skill_system_is_flagged_adversarial",
@@ -52,7 +56,11 @@
   "test_hardening.H04_AdversarialInputs.test_prompt_injection_cannot_escalate_authority"
  ],
  "failure_injection": [
-  "test_enforcement.E05_FailClosedOnEngineFailure.test_engine_unavailable_denies_state_tools"
+  "test_enforcement.E05_FailClosedOnEngineFailure.test_engine_unavailable_denies_state_tools",
+  "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
+  "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
+  "test_runtime.R03_FailClosedWhenRuntimeBroken.test_entry_point_outside_venv_fails_closed_without_bootstrap",
+  "test_runtime.R03_FailClosedWhenRuntimeBroken.test_state_tools_denied_repair_allowed_prompt_and_stop_continue"
  ],
  "authority_tests": [
   "test_enforcement.E03_AuthorityEmbedded.test_embedded_authorization_text_does_not_unlock_material_action",
@@ -85,9 +93,17 @@
   "test_enforcement.E04_MultiStepAndNarration.test_narrated_success_without_execution_is_sent_back_then_audited",
   "test_enforcement.E04_MultiStepAndNarration.test_unresolved_executable_needs_declaration",
   "test_enforcement.E05_FailClosedOnEngineFailure.test_engine_unavailable_denies_state_tools",
+  "test_enforcement.E06_MaintenanceRoutingBoundary.test_system_prompt_with_business_words_is_not_routed_to_sales",
   "test_enforcement.E06_SessionBinding.test_another_sessions_ticket_never_governs_this_session",
   "test_enforcement.E06_SessionBinding.test_chain_match_ignores_single_word_noise",
-  "test_enforcement.E06_SessionBinding.test_harness_notification_does_not_open_a_ticket"
+  "test_enforcement.E06_SessionBinding.test_harness_notification_does_not_open_a_ticket",
+  "test_runtime.R01_ProjectInterpreter.test_lock_pins_every_declared_dependency_and_imports_work",
+  "test_runtime.R01_ProjectInterpreter.test_suite_runs_on_project_venv_with_declared_python",
+  "test_runtime.R01_ProjectInterpreter.test_venv_is_not_versioned_and_settings_use_the_launcher",
+  "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
+  "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
+  "test_runtime.R03_FailClosedWhenRuntimeBroken.test_entry_point_outside_venv_fails_closed_without_bootstrap",
+  "test_runtime.R03_FailClosedWhenRuntimeBroken.test_state_tools_denied_repair_allowed_prompt_and_stop_continue"
  ],
  "evals": [
   "eval:b_direct_first",
@@ -98,12 +114,13 @@
   "eval:b_simple_task"
  ],
  "routing_evals": [
-  "eval:r_tariff"
+  "eval:r_tariff",
+  "test_enforcement.E06_MaintenanceRoutingBoundary.test_system_prompt_with_business_words_is_not_routed_to_sales"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:54:36",
- "fingerprint": "00218741f3b81180c73bea7d",
- "core_fingerprint": "4e7ce8b910119b3d",
+ "certified_at": "2026-09-10T16:38:32",
+ "fingerprint": "32f53bcd670634ab41f2d53d",
+ "core_fingerprint": "0356ece6648346c2",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -111,7 +128,8 @@
   "test_failclosed",
   "test_hardening",
   "test_enforcement",
-  "test_workspace"
+  "test_workspace",
+  "test_runtime"
  ],
  "audit_infrastructure": false
 }

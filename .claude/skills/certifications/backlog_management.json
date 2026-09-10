@@ -26,9 +26,9 @@
   "eval:r_backlog"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:54:36",
- "fingerprint": "8255acb2ed1a538d2401d847",
- "core_fingerprint": "4e7ce8b910119b3d",
+ "certified_at": "2026-09-10T16:38:32",
+ "fingerprint": "87160281dfc58f7da6b83ef3",
+ "core_fingerprint": "0356ece6648346c2",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -36,7 +36,8 @@
   "test_failclosed",
   "test_hardening",
   "test_enforcement",
-  "test_workspace"
+  "test_workspace",
+  "test_runtime"
  ],
  "audit_infrastructure": true
 }

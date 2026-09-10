@@ -33,6 +33,9 @@ python .claude/skills/skill.py declare --ticket <id> "<պատճառ>"           
 ```
 Ticket-ի id-ն տրվում է hook-ի ներարկած համատեքստում (`⛔ SKILL GATE · ticket …`)։
 
+- **Python runtime՝ դետերմինիստիկ.** hook-երը, `skill.py`-ը, թեստերը, eval-ները և release-ը միշտ աշխատում են `<root>/.venv`-ով (`.claude/runtime/`՝ shim + launcher + manifest + lock). PATH-ի `python`-ը վարքի վրա չի ազդում։
+- **Համակարգային (maintenance) մտադրությունները** (agent runtime, Skill System, hooks, workspace policy, tests, repo, config, architecture, state/audit) **բիզնես հմտությունների չեն ուղղորդվում**՝ նույնիսկ «pipeline»/«audit» բառերով. ticket-ը UNRESOLVED · domain SYSTEM է, ճանապարհը՝ `maintenance`/`declare`։
+
 Կանոնները (խախտելը = կեղծիք)՝
 - **BLOCKED նշանակում է կանգ։** 12 կոդ՝ MISSING_SKILL · DISABLED_SKILL · MISSING_INPUT · TOOL_UNAVAILABLE · NOT_OPERATIONAL · AUTHORITY_EXCEEDED · APPROVAL_REQUIRED · INVALID_SOURCE · STALE_SOURCE · CONFLICTING_SOURCE · VALIDATION_FAILED · VERIFICATION_FAILED։ Ասում ես Գև-ին կոնկրետ ինչն է պակաս, չես ձևացնում։
 - **L0/L1 = ոչ գործառնական։** Վաճառքի/գործառնական/անձնակազմի վերլուծությունները տվյալ չունեն այս միջավայրում → առանց Գև-ի տրված dataset-ի պատասխանում են BLOCKED։ Թիվ չես հորինում։

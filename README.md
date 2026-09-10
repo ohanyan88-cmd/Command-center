@@ -56,3 +56,5 @@ HouseNet ՍՊԸ · ամեն աշխատանքային օրը սկսվում է ա
 | Release/certify | `skill.py release` = workspace validation → build → certify (բոլոր suite-երը, ներառյալ `test_workspace`) → validate → eval |
 
 Հրամաններ՝ `python .claude/policy/validate_workspace.py` · `python .claude/skills/skill.py release` · `python .claude/skills/skill.py status`։
+
+Python runtime՝ դետերմինիստիկ. ամեն hook, CLI, test, eval և release աշխատում է `<root>/.venv`-ով (`.claude/runtime/` — `python_runtime.py` shim, `hook.sh` launcher, `requirements.txt` manifest + `requirements.lock`), PATH-ի `python`-ը դեր չունի։ `.venv`-ը git-ում չէ. վերակառուցում՝ `py -3 .claude/runtime/python_runtime.py bootstrap`։

@@ -186,6 +186,44 @@ def resolve_alias(reg, skill_id):
     if skill_id in reg["_index"]: return skill_id
     return reg["_alias"].get(skill_id, skill_id)
 
+# ───────────────────────── domain boundary: SYSTEM/MAINTENANCE intents never route to business skills ─────────────────────────
+# Requests about the agent runtime, Skill System, hooks, workspace policy, tests, repository, configuration, architecture or
+# state/audit infrastructure are NOT business Sales/Operations work, even when they contain overlapping words ('pipeline',
+# 'audit', 'analysis'). They resolve UNRESOLVED (domain SYSTEM) → fail closed: state tools stay denied until an audited
+# `skill.py maintenance` (protected files, only if the USER asked) or `skill.py declare` path exists. Bare business words
+# ('pipeline', 'audit', 'test the tariff', 'network maintenance') are deliberately NOT system terms.
+SYSTEM_PATTERNS = [
+    # agent runtime / Skill System / enforcement machinery
+    r"skill[ _-]?(system|execution|graph|gate|registry|engine|resolver|chain|routing|pipeline|certif)", r"skill\.py", r"engine\.py", r"store\.py", r"executors?\.py",
+    r"build_registry", r"evals?\.py", r"test_[a-z_]+\.py", r"python_runtime", r"hook\.sh", r"\bhooks?\b", r"\bgate\b", r"\bresolver\b", r"\bregistry\b", r"\bcertif",
+    r"\benforcement\b", r"\bhardening\b", r"\bfail[- ]?closed\b", r"\bagent runtime\b", r"\bruntime\b", r"\bdeputy'?s? (code|runtime|hooks?|engine)\b",
+    r"(system|skill|hook|gate|runtime|agent|deputy) maintenance", r"maintenance (grant|mode|intent|routing|request)",
+    r"(skill|intent|prompt|maintenance) routing", r"routing (boundary|defect|fix|correction|logic|eval)",
+    # workspace policy / configuration / architecture
+    r"workspace[ _-]?(policy|guard|contract|validat)", r"validate_workspace", r"settings(\.local)?\.json", r"claude\.md", r"\.gitignore", r"\.claude[/\\]",
+    r"\bconfig\b", r"configuration (file|of the (agent|deputy|hook|skill|gate|runtime|workspace|repo))", r"\barchitecture\b",
+    # tests / evals / release
+    r"\b(unit|regression|store|enforcement|hardening|workspace|routing|integration) tests?\b", r"\btests\b", r"\btest (suite|file|coverage)\b", r"\bevals?\b", r"\brelease suite\b", r"\bunittest\b",
+    # repository / git
+    r"\bgit\b", r"\bgithub\b", r"\brepo(sitory)?\b", r"\bbranch (main|master)\b", r"\bgit commit\b", r"\bcommits? (the |these |all |my |our )?(changes|files|fix|work|code)\b", r"\bpull request\b", r"\bremote origin\b",
+    # interpreter / dependencies / deployment / code
+    r"\binterpreter\b", r"\bpython\b", r"\bvenv\b", r"\bvirtual ?env", r"\bpip\b", r"\bdependenc(y|ies)\b", r"\brequirements\.(txt|lock)\b",
+    r"\bdeployment pipeline\b", r"\bdeploy(ment)? (of |the )?(agent|hook|skill|runtime|code|release|system)\b", r"\bci/?cd\b", r"\bcodebase\b", r"\brefactor", r"\btraceback\b", r"\bstack ?trace\b",
+    # state / audit infrastructure
+    r"\bsqlite\b", r"\bstate (store|dir|db|directory)\b", r"skill_state", r"skill_audit", r"\baudit (store|mirror|infrastructure|jsonl|db)\b", r"\baudit log (store|infrastructure|table)\b",
+    # Armenian
+    r"հմտությունների համակարգ", r"հուկ", r"դարպաս", r"թեստ", r"ռեպոզիտոր", r"վկայագ", r"կոդը", r"կոնֆիգ", r"ինտերպրետ", r"հմտության (կոդ|ուղղորդ)",
+]
+_SYSTEM_RX = [re.compile(p) for p in SYSTEM_PATTERNS]
+
+def system_terms(text):
+    """Matched system-domain terms in a normalized intent (empty list = business domain)."""
+    t = _norm(text); hits = []
+    for rx in _SYSTEM_RX:
+        m = rx.search(t)
+        if m and m.group(0) not in hits: hits.append(m.group(0))
+    return hits
+
 def resolve(reg, intent):
     """USER INTENT → minimum complete skill graph.
     1. Longest matching chain trigger selects a curated chain (prevents under-routing).
@@ -194,6 +232,12 @@ def resolve(reg, intent):
     3. Tool intents attach tool requirements (fail closed at the gate: TOOL_UNAVAILABLE) instead of routing to fake tool-skills.
     4. Dependencies are added in topological order."""
     text = _norm(intent); idx = reg["_index"]
+    sysm = system_terms(text)          # 0. domain boundary — system/maintenance work is never business-skill work
+    if sysm:
+        return {"intent": intent, "primary": None, "supporting": [], "chain": [], "status": "UNRESOLVED", "domain": "SYSTEM", "system_terms": sysm,
+                "reasons": [f"SYSTEM/MAINTENANCE intent (matched {sysm[:4]}): business Sales/Operations skills are not routed for agent-runtime / Skill System / hooks / "
+                            f"workspace-policy / tests / repository / configuration / architecture / state-audit work; governed path = skill.py maintenance (protected files) or declare (audited)"],
+                "tool_requirements": []}
     reasons, chain_name, best = [], None, 0
     for name, trigs in reg.get("chain_triggers", {}).items():
         for t in trigs:
@@ -214,13 +258,13 @@ def resolve(reg, intent):
     for tool in tool_req: reasons.append(f"tool '{tool}' required via tool_intents")
     if not selected:
         return {"intent": intent, "primary": None, "supporting": [], "chain": [], "reasons": reasons or ["no trigger matched"],
-                "status": "UNRESOLVED", "tool_requirements": tool_req}
+                "status": "UNRESOLVED", "domain": "BUSINESS", "tool_requirements": tool_req}
     primary = selected[0]
     try: ordered = topo_order(reg, selected)
     except SkillError as e:
-        return {"intent": intent, "primary": primary, "supporting": selected[1:], "chain": [], "reasons": [str(e)], "status": "BLOCKED"}
+        return {"intent": intent, "primary": primary, "supporting": selected[1:], "chain": [], "reasons": [str(e)], "status": "BLOCKED", "domain": "BUSINESS"}
     return {"intent": intent, "primary": primary, "supporting": [s for s in selected[1:]], "chain": ordered,
-            "explicit": selected, "chain_name": chain_name, "reasons": reasons, "status": "RESOLVED",
+            "explicit": selected, "chain_name": chain_name, "reasons": reasons, "status": "RESOLVED", "domain": "BUSINESS",
             "required_tools": sorted({t for sid in ordered for t in idx[sid]["required_tools"]}),
             "tool_requirements": tool_req,
             "required_inputs": sorted({i for sid in ordered for i in idx[sid]["required_inputs"]}),
@@ -438,7 +482,7 @@ def classify_prompt(text):
     t = _norm(text)
     return {"adversarial": any(re.search(p, t) for p in BYPASS_PATTERNS),
             "executable": any(re.search(p, t) for p in EXECUTABLE_PATTERNS),
-            "maintenance": any(re.search(p, t) for p in MAINTENANCE_PATTERNS)}
+            "maintenance": any(re.search(p, t) for p in MAINTENANCE_PATTERNS) or bool(system_terms(t))}
 
 def open_ticket(reg, prompt, session_id="", source="UserPromptSubmit", inputs=None):
     """INTENT CAPTURE + SKILL RESOLUTION + gate verdict, persisted. Returns the ticket dict."""
@@ -448,7 +492,7 @@ def open_ticket(reg, prompt, session_id="", source="UserPromptSubmit", inputs=No
     tid = uuid.uuid4().hex[:10]
     ticket = {"ticket_id": tid, "session_id": session_id, "source": source, "created": _now(), "status": "OPEN", "agent": identity()["name"],
               "prompt_excerpt": prompt[:300], "prompt_sha": hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16],
-              "resolution": {"status": plan["status"], "primary": plan.get("primary"), "chain": plan.get("chain", []), "chain_name": plan.get("chain_name"),
+              "resolution": {"status": plan["status"], "primary": plan.get("primary"), "chain": plan.get("chain", []), "chain_name": plan.get("chain_name"), "domain": plan.get("domain", "BUSINESS"), "system_terms": plan.get("system_terms", []),
                              "required_inputs": plan.get("required_inputs", []), "tool_requirements": plan.get("tool_requirements", []), "reasons": plan.get("reasons", [])},
               "gate": {"status": g["status"], "blocked": g["blocked"], "runnable": g["runnable"], "assisted": g["assisted"]},
               "governed": plan["status"] == "RESOLVED", "adversarial": cls["adversarial"], "executable": cls["executable"], "maintenance": cls["maintenance"],
@@ -486,7 +530,7 @@ def refine_ticket(reg, ticket_id, intent, inputs=None):
     t = get_ticket(ticket_id)
     if not t: raise SkillError(f"ticket {ticket_id} not found")
     plan = resolve(reg, intent); g = gate(reg, plan, inputs or {}, action_level="ANALYZE")
-    t["resolution"] = {"status": plan["status"], "primary": plan.get("primary"), "chain": plan.get("chain", []), "chain_name": plan.get("chain_name"),
+    t["resolution"] = {"status": plan["status"], "primary": plan.get("primary"), "chain": plan.get("chain", []), "chain_name": plan.get("chain_name"), "domain": plan.get("domain", "BUSINESS"), "system_terms": plan.get("system_terms", []),
                        "required_inputs": plan.get("required_inputs", []), "tool_requirements": plan.get("tool_requirements", []), "reasons": plan.get("reasons", []),
                        "refined_intent": intent[:300]}
     t["gate"] = {"status": g["status"], "blocked": g["blocked"], "runnable": g["runnable"], "assisted": g["assisted"]}

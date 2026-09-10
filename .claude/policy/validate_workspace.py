@@ -13,6 +13,7 @@ except Exception: pass
 HERE = pathlib.Path(__file__).resolve().parent
 DEFAULT_ROOT = HERE.parent.parent
 POLICY_PATH = HERE / "workspace_policy.json"
+sys.path.insert(0, str(HERE.parent / "runtime")); import python_runtime; python_runtime.ensure()        # deterministic project interpreter (<root>/.venv)
 
 class PolicyError(Exception): pass
 
@@ -292,8 +293,12 @@ def check_identity(root, pol):
             for ev, groups in cfg.get("hooks", {}).items():
                 for g in groups:
                     for h in g.get("hooks", []):
-                        m = re.search(r"\.claude/[\w/.-]+\.py", h.get("command", ""))
-                        if m and not (root / m.group(0)).exists(): problems.append(f"settings.json: {ev} hook references missing script {m.group(0)}")
+                        cmd = h.get("command", "")
+                        for ref in re.findall(r"\.claude/[\w/.-]+\.(?:py|sh)", cmd):
+                            if not (root / ref).exists(): problems.append(f"settings.json: {ev} hook references missing script {ref}")
+                        if ".claude/runtime/hook.sh" not in cmd: problems.append(f"settings.json: {ev} hook must run through .claude/runtime/hook.sh (project interpreter, not PATH python)")
+                        for name in re.findall(r"hook\.sh\"?\s+([\w.-]+\.py)", cmd):
+                            if not (root / ".claude" / "hooks" / name).exists(): problems.append(f"settings.json: {ev} hook references missing script .claude/hooks/{name}")
         except json.JSONDecodeError: problems.append("settings.json: invalid JSON")
     return problems
 

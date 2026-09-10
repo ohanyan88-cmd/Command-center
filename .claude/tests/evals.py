@@ -8,6 +8,7 @@
 Exit code 1 if any eval fails. `run_all()` returns structured results for certify.py (per-skill eval evidence)."""
 import sys, json, pathlib, tempfile
 sys.stdout.reconfigure(encoding="utf-8")
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "runtime")); import python_runtime; python_runtime.ensure()        # deterministic project interpreter (<root>/.venv)
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent)); sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "skills"))
 import engine, executors, store
 
@@ -71,6 +72,24 @@ ROUTING = [
  ("r_who_owes_hy", "Ով է ինձ պարտք հիմա, ումից եմ սպասում", {"waiting_for_tracking"}, {"task_management","follow_up_management","deadline_management","open_loop_memory"}),
  ("r_attention", "Which three problems need my attention today?", {"executive_prioritization"}, {"task_management","deadline_management","daily_briefing"}),
  ("r_email_tool", "send email to arman about the report", {"management_communication"}, set()),
+]
+
+# ───────────── D. domain boundary: SYSTEM/maintenance intents never route to business skills (overlapping words) ─────────────
+BOUNDARY = [
+ ("d_fix_skill_pipeline",       "fix the skill execution pipeline",                          "SYSTEM",   set()),
+ ("d_audit_deploy_pipeline",    "audit the deployment pipeline",                             "SYSTEM",   set()),
+ ("d_change_sales_pipeline",    "change the sales pipeline analysis",                        "BUSINESS", {"pipeline_management"}),
+ ("d_inspect_runtime_pipeline", "inspect the runtime pipeline",                              "SYSTEM",   set()),
+ ("d_sales_pipeline_falling",   "our sales pipeline is falling",                             "BUSINESS", {"pipeline_management"}),
+ ("d_hook_cwd",                 "fix the gate hook so it runs from any cwd",                 "SYSTEM",   set()),
+ ("d_repo_rename",              "rename the github repository and update the remote origin", "SYSTEM",   set()),
+ ("d_policy_venv",              "update the workspace policy to allow .venv",                "SYSTEM",   set()),
+ ("d_routing_tests",            "add regression tests for maintenance routing",              "SYSTEM",   set()),
+ ("d_state_audit_infra",        "check the sqlite state store and the audit mirror",         "SYSTEM",   set()),
+ ("d_deals_stuck",              "Deals are not moving, pipeline is stuck",                   "BUSINESS", {"pipeline_management"}),
+ ("d_network_maintenance",      "remind me friday about the network maintenance window",    "BUSINESS", {"commitment_tracking"}),
+ ("d_hy_system",                "ուղղիր հմտությունների համակարգի hook-ը",                     "SYSTEM",   set()),
+ ("d_hy_business",              "վաճառքի փայփլայնը ընկնում է",                                "BUSINESS", {"pipeline_management"}),
 ]
 
 # ───────────── C. bypass attempts against the real hook ─────────────
@@ -152,6 +171,18 @@ def run_routing(name, intent, required, allowed_extra):
     if name == "r_email_tool" and "email" not in plan.get("tool_requirements", []): fails.append("tool requirement email not attached")
     return fails, plan
 
+def run_boundary(name, intent, domain, required):
+    plan = engine.resolve(REG, intent); cls = engine.classify_prompt(intent); fails = []
+    if plan.get("domain") != domain: fails.append(f"domain {plan.get('domain')} != {domain}")
+    if domain == "SYSTEM":
+        if plan["status"] != "UNRESOLVED" or plan.get("chain"): fails.append(f"business skills routed for a system intent: {plan.get('chain')}")
+        if not cls["maintenance"]: fails.append("maintenance flag not set for a system intent")
+    else:
+        if plan["status"] != "RESOLVED": fails.append("business intent UNRESOLVED")
+        missing = required - set(plan.get("chain", []))
+        if missing: fails.append(f"UNDER-routing: missing {sorted(missing)}")
+    return fails, plan
+
 def run_bypass(name, prompt, tool, tool_input, expect):
     from test_enforcement import HookHarness
     h = HookHarness(); h.hook("UserPromptSubmit", user_prompt=prompt)
@@ -163,7 +194,7 @@ def run_bypass(name, prompt, tool, tool_input, expect):
     return fails, t
 
 def run_all():
-    results = {"scenarios": [], "routing": [], "bypass": []}
+    results = {"scenarios": [], "routing": [], "bypass": [], "boundary": []}
     for sc in SCENARIOS:
         fails, notes, plan, r = run_scenario(sc)
         skills = sorted(set(plan.get("chain", [])) & set(sc.get("must_run", []) + sc.get("must_select", [])))
@@ -171,6 +202,9 @@ def run_all():
     for name, intent, req, extra in ROUTING:
         fails, plan = run_routing(name, intent, req, extra)
         results["routing"].append({"name": name, "pass": not fails, "chain": plan.get("chain", []), "fails": fails, "skills": sorted(req)})
+    for name, intent, domain, req in BOUNDARY:
+        fails, plan = run_boundary(name, intent, domain, req)
+        results["boundary"].append({"name": name, "pass": not fails, "domain": plan.get("domain"), "chain": plan.get("chain", []), "fails": fails, "skills": sorted(req) or ["pipeline_management"]})
     for name, prompt, tool, inp, expect in BYPASS:
         fails, t = run_bypass(name, prompt, tool, inp, expect)
         results["bypass"].append({"name": name, "pass": not fails, "fails": fails, "skills": ["authority_checking","approval_management","audit_logging","completion_verification"]})
@@ -186,11 +220,15 @@ def main():
     for r in res["routing"]:
         total += 1; passed += r["pass"]
         print(f"{r['name']:28} {'PASS' if r['pass'] else 'FAIL':6} {r['chain']}{(' ✗ ' + '; '.join(r['fails'])) if r['fails'] else ''}")
+    print("-" * 110); print(f"{'boundary eval':28} {'result':6} {'domain':9} chain / failures"); print("-" * 110)
+    for r in res["boundary"]:
+        total += 1; passed += r["pass"]
+        print(f"{r['name']:28} {'PASS' if r['pass'] else 'FAIL':6} {str(r['domain']):9} {r['chain']}{(' ✗ ' + '; '.join(r['fails'])) if r['fails'] else ''}")
     print("-" * 110); print(f"{'bypass eval':28} {'result':6} failures"); print("-" * 110)
     for r in res["bypass"]:
         total += 1; passed += r["pass"]
         print(f"{r['name']:28} {'PASS' if r['pass'] else 'FAIL':6} {'; '.join(r['fails'])}")
-    print("-" * 110); print(f"EVALS: {passed}/{total} passed  (scenarios {len(res['scenarios'])} · routing {len(res['routing'])} · bypass {len(res['bypass'])})")
+    print("-" * 110); print(f"EVALS: {passed}/{total} passed  (scenarios {len(res['scenarios'])} · routing {len(res['routing'])} · boundary {len(res['boundary'])} · bypass {len(res['bypass'])})")
     return 0 if passed == total else 1
 
 if __name__ == "__main__":
