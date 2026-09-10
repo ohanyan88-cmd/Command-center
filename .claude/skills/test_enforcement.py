@@ -154,6 +154,24 @@ class E04_MultiStepAndNarration(unittest.TestCase):
         self.assertIsNone(pre(h, "Bash", command="mv a.docx b.docx")["decision"])
         self.assertEqual(pre(h, "Edit", file_path=str(HERE / "engine.py"))["decision"], "deny")   # protected stays locked
 
+class E06_SessionBinding(unittest.TestCase):
+    @covers(*GOV, kinds=("enforcement",))
+    def test_harness_notification_does_not_open_a_ticket(self):
+        h = HookHarness(); r = h.hook("UserPromptSubmit", user_prompt="[SYSTEM NOTIFICATION - NOT USER INPUT]\n<task-notification>done</task-notification>")
+        self.assertEqual(r["rc"], 0); self.assertIsNone(h.ticket())
+    @covers(*GOV, kinds=("enforcement", "adversarial"))
+    def test_another_sessions_ticket_never_governs_this_session(self):
+        h = HookHarness(); other = HookHarness(); other.state = h.state; other.env = h.env; other.session = "other-session"
+        other.hook("UserPromptSubmit", user_prompt="remind me friday to call arman")
+        rc, _ = other.cli("plan", "remind me friday", json.dumps({"text": "call arman", "item": "call arman", "due": "2026-09-12"}))   # executed on the OTHER session
+        self.assertEqual(rc, 0)
+        d = pre(h, "Write", file_path="C:/tmp/x.md", content="x"); self.assertEqual(d["decision"], "deny")   # this session has no ticket → still denied
+    @covers(*GOV, kinds=("enforcement",))
+    def test_chain_match_ignores_single_word_noise(self):
+        import engine as eng
+        reg = eng.load_registry(); p = eng.resolve(reg, "Remind me next Monday to review the retention flow")
+        self.assertEqual(p["chain"], ["commitment_tracking", "reminder_intelligence"])
+
 class E05_FailClosedOnEngineFailure(unittest.TestCase):
     @covers(*GOV, kinds=("enforcement", "failure_injection"))
     def test_engine_unavailable_denies_state_tools(self):

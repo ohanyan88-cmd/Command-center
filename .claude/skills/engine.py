@@ -173,9 +173,11 @@ def _hit(trigger, text):
     if not t: return False
     return re.search(r"(?:^|(?<=[^\w]))" + re.escape(t), text) is not None
 
-def _specific(trigger):
+def _specific(trigger, chain_matched=False):
+    """With a curated chain already selected, only multi-word triggers may add skills (single words like 'retention' inside
+    'retention flow' are noise); without a chain, a single specific word (≥7 chars) may route."""
     t = _norm(trigger)
-    return len(t.split()) >= 2 or len(t) >= 7
+    return len(t.split()) >= 2 or (not chain_matched and len(t) >= 7)
 
 def resolve_alias(reg, skill_id):
     """Retired id → survivor (or '<tool:x>' marker). Active ids pass through."""
@@ -204,7 +206,7 @@ def resolve(reg, intent):
         if any(_hit(a, text) for a in s["anti_triggers"]): continue
         hit = [t for t in s["triggers"] if _hit(t, text)]
         if not hit or s["skill_id"] in selected: continue
-        if chain_name and not any(_specific(t) for t in hit): continue
+        if chain_name and not any(_specific(t, chain_matched=True) for t in hit): continue
         selected.append(s["skill_id"]); reasons.append(f"{s['skill_id']} via {hit[0]!r}")
     tool_req = sorted({tool for tool, trigs in reg.get("tool_intents", {}).items() if any(_hit(t, text) for t in trigs)})
     for tool in tool_req: reasons.append(f"tool '{tool}' required via tool_intents")
@@ -445,9 +447,13 @@ def get_ticket(ticket_id):
     return _store().get("tickets", ticket_id)
 
 def current_ticket(session_id=None):
+    """Latest OPEN ticket. session_id=None → any session (CLI convenience); '' or 'manual' → session-less CLI tickets only."""
     st = _store()
-    rows = st.list("tickets", where="status='OPEN'" + (" AND session_id=?" if session_id else ""), args=(session_id,) if session_id else (), order="updated_at DESC, rowid DESC", limit=1)
+    rows = st.list("tickets", where="status='OPEN'" + (" AND session_id=?" if session_id is not None else ""), args=(session_id,) if session_id is not None else (), order="updated_at DESC, rowid DESC", limit=1)
     return rows[0] if rows else None
+
+def cli_session_id():
+    return _os.environ.get("CLAUDE_CODE_SESSION_ID") or "manual"
 
 def save_ticket(ticket):
     _store().upsert("tickets", ticket["ticket_id"], ticket, extra_cols={"session_id": ticket.get("session_id"), "status": ticket.get("status")})

@@ -30,7 +30,7 @@ def _opt(rest, flag):
 def _ticket_id(rest):
     tid = _opt(rest, "--ticket")
     if tid: return tid
-    t = engine.current_ticket()
+    t = engine.current_ticket(engine.cli_session_id()) or engine.current_ticket("manual") or engine.current_ticket()
     return t["ticket_id"] if t else None
 
 def _levels(inputs):
@@ -77,7 +77,7 @@ def main(argv):
     if cmd == "ticket":
         sub = rest[0] if rest else "current"
         if sub == "open":
-            t = engine.open_ticket(reg, " ".join(rest[1:]), session_id="manual", source="MANUAL"); print(_j(t)); return 0
+            t = engine.open_ticket(reg, " ".join(rest[1:]), session_id=engine.cli_session_id(), source="MANUAL"); print(_j(t)); return 0
         if sub == "show":
             t = engine.get_ticket(rest[1]) if len(rest) > 1 else engine.current_ticket(); print(_j(t)); return 0 if t else 2
         if sub == "current":

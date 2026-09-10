@@ -61,7 +61,10 @@ def _cmd_is_read_only(cmd):
         if head not in READ_ONLY_HEAD: return False
         if head == "git" and (len(toks) < 2 or toks[1] not in READ_ONLY_GIT): return False
         if head == "gh" and (len(toks) < 2 or toks[1] not in READ_ONLY_GH or " -X " in seg or "--method" in seg or (toks[1] == "pr" and len(toks) > 2 and toks[2] in ("create","merge","close","comment","edit","review"))): return False
-        if head in ("python","python3","py") and not re.search(r"(--version|-V\b|-c\s+[\"']?\s*print|-c\s+[\"']import\s+(sys|json|os|re|pathlib)|skill\.py\s+(resolve|status|audit|validate|certs|ticket\s+(show|current)|store\s+check|enforcement))", seg): return False
+        if head in ("python","python3","py"):
+            m = re.search(r"-c\s+([\"'])(.*)\1\s*$", seg)
+            inline_ok = bool(m) and m.group(2).strip().startswith("print(") and not re.search(r"(import|open\(|os\.|write|remove|unlink|shutil|subprocess|exec|eval|;)", m.group(2))
+            if not (inline_ok or re.search(r"(--version|-V\b|skill\.py\s+(resolve|status|audit|validate|certs|ticket\s+(show|current)|store\s+check|enforcement))", seg)): return False
         if head == "sed" and "-n" not in toks: return False
         if head in ("curl","wget") and re.search(r"(-X\s*(POST|PUT|DELETE|PATCH)|--data|-d\s|-F\s|-o\s|-O\b)", seg): return False
         if head in ("echo","printf") and ">" in seg: return False
@@ -74,14 +77,17 @@ def _paths_of(tool, inp):
     if tool in ("Write","Edit","MultiEdit","NotebookEdit"): return [str(inp.get("file_path") or inp.get("notebook_path") or "")]
     return []
 
+NOTIFICATION = re.compile(r"(\[SYSTEM NOTIFICATION|<task-notification>|<system-reminder>|^\s*\[harness)", re.I)
+
 def _ticket(engine, session_id):
+    """Session-bound: the session's own OPEN ticket; otherwise only a CLI-opened ticket without a session (never another session's)."""
     t = engine.current_ticket(session_id) if session_id else None
-    return t or engine.current_ticket(None)
+    return t or engine.current_ticket("manual") or engine.current_ticket("")
 
 # ───────────────────────── events ─────────────────────────
 def on_prompt(data, engine, reg):
     prompt = data.get("user_prompt") or data.get("prompt") or ""
-    if not prompt.strip(): out(None, 0)
+    if not prompt.strip() or NOTIFICATION.search(prompt[:200]): out(None, 0)      # harness notifications are not user intents
     t = engine.open_ticket(reg, prompt, session_id=data.get("session_id", ""), source="UserPromptSubmit")
     res, g = t["resolution"], t["gate"]
     lines = [f"⛔ SKILL GATE · ticket {t['ticket_id']} · resolution {res['status']}" + (f" · chain '{res['chain_name']}'" if res.get("chain_name") else "")]

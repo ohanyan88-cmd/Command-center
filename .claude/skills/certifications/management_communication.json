@@ -33,9 +33,9 @@
   "eval:r_send_finance"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:12:27",
- "fingerprint": "5bb9bb1b58bb096fd75f151f",
- "core_fingerprint": "ad2f7cc2b20d1f40",
+ "certified_at": "2026-09-10T14:19:45",
+ "fingerprint": "9ef1861dd4f6b3d5b5424c79",
+ "core_fingerprint": "9facad3d7be30d0b",
  "result": "PASS",
  "suites": [
   "test_skills",

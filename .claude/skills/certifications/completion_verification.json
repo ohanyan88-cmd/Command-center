@@ -25,6 +25,7 @@
   "test_enforcement.E04_MultiStepAndNarration.test_blocked_execution_cannot_be_narrated_as_success",
   "test_enforcement.E04_MultiStepAndNarration.test_narrated_success_without_execution_is_sent_back_then_audited",
   "test_enforcement.E05_FailClosedOnEngineFailure.test_engine_unavailable_denies_state_tools",
+  "test_enforcement.E06_SessionBinding.test_another_sessions_ticket_never_governs_this_session",
   "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
   "test_hardening.H04_AdversarialInputs.test_bad_user_input_types",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
@@ -40,6 +41,7 @@
   "test_enforcement.E02_DirectExecutionBypass.test_state_tool_before_resolution_denied",
   "test_enforcement.E04_MultiStepAndNarration.test_blocked_execution_cannot_be_narrated_as_success",
   "test_enforcement.E04_MultiStepAndNarration.test_narrated_success_without_execution_is_sent_back_then_audited",
+  "test_enforcement.E06_SessionBinding.test_another_sessions_ticket_never_governs_this_session",
   "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
   "test_hardening.H04_AdversarialInputs.test_bad_user_input_types",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
@@ -71,7 +73,10 @@
   "test_enforcement.E04_MultiStepAndNarration.test_governed_execution_then_stop_is_clean",
   "test_enforcement.E04_MultiStepAndNarration.test_narrated_success_without_execution_is_sent_back_then_audited",
   "test_enforcement.E04_MultiStepAndNarration.test_unresolved_executable_needs_declaration",
-  "test_enforcement.E05_FailClosedOnEngineFailure.test_engine_unavailable_denies_state_tools"
+  "test_enforcement.E05_FailClosedOnEngineFailure.test_engine_unavailable_denies_state_tools",
+  "test_enforcement.E06_SessionBinding.test_another_sessions_ticket_never_governs_this_session",
+  "test_enforcement.E06_SessionBinding.test_chain_match_ignores_single_word_noise",
+  "test_enforcement.E06_SessionBinding.test_harness_notification_does_not_open_a_ticket"
  ],
  "evals": [
   "eval:b_direct_first",
@@ -84,9 +89,9 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-10T14:12:27",
- "fingerprint": "26a924a7707d55c1b927e7c7",
- "core_fingerprint": "ad2f7cc2b20d1f40",
+ "certified_at": "2026-09-10T14:19:45",
+ "fingerprint": "48ee4bd58afa29c9e1407388",
+ "core_fingerprint": "9facad3d7be30d0b",
  "result": "PASS",
  "suites": [
   "test_skills",
