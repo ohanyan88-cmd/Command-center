@@ -47,9 +47,9 @@
   "test_skills.T02b_DomainBoundary.test_system_intents_route_no_business_skill"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:57:03",
- "fingerprint": "0a2ccba5ae0a1b1dd821b243",
- "core_fingerprint": "0356ece6648346c2",
+ "certified_at": "2026-09-10T22:35:01",
+ "fingerprint": "da643650996581b3ecf08f02",
+ "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -58,7 +58,9 @@
   "test_hardening",
   "test_enforcement",
   "test_workspace",
-  "test_runtime"
+  "test_runtime",
+  "test_business",
+  "test_boundary"
  ],
  "audit_infrastructure": true
 }

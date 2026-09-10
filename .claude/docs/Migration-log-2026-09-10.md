@@ -13,15 +13,15 @@
 | `03_Ավարտված/Հաստիքացուցակ_2026-09-07.xlsx` | `02_Reference/People/Staffing-plan-2026-09-07.xlsx` | approved staffing plan, still authoritative → Reference | MOVED_EARLIER |
 | `01_Ընթացիկ/Գրաֆիկ_2026-09-09.xlsx` | `03_Completed/Delivery-schedule-2026-09-09.xlsx` | generated schedule sent 2026-09-09 — finished deliverable | MOVED_EARLIER |
 | `01_Ընթացիկ/Գրաֆիկ_2026-09-09_WhatsApp.txt` | `03_Completed/Delivery-schedule-whatsapp-2026-09-09.txt` | WhatsApp text of the sent schedule | MOVED_EARLIER |
-| `04_WhatsApp/Բնօրինակներ/2026-09-09_Gadukyan` | `04_Sources/Whatsapp/Gadukyan-2026-09-09` | original WhatsApp export | MOVED_EARLIER |
-| `04_WhatsApp/Բնօրինակներ/2026-09-09_Gadukyan_ցերեկ` | `04_Sources/Whatsapp/Gadukyan-2026-09-09-afternoon` | second export the same day (ցերեկ = afternoon) | MOVED_EARLIER |
+| `04_WhatsApp/Բնօրինակներ/2026-09-09_@P1` | `04_Sources/Whatsapp/@P1-2026-09-09` | original WhatsApp export | MOVED_EARLIER |
+| `04_WhatsApp/Բնօրինակներ/2026-09-09_@P1_ցերեկ` | `04_Sources/Whatsapp/@P1-2026-09-09-afternoon` | second export the same day (ցերեկ = afternoon) | MOVED_EARLIER |
 | `01_Ընթացիկ/WhatsApp Image 2026-09-09 at 12.47.22.jpeg` | `04_Sources/Screenshots/Churn-risk-signals-2026-09-09.jpeg` | Journal: churn-risk signal list image → raw screenshot | MOVED_EARLIER |
 | `02_Արխիվ/2026-09-09_սևագրեր/run.py` | `05_Archive/Drafts-2026-09-09/run.py` | legacy updater | MOVED_EARLIER |
 | `02_Արխիվ/2026-09-09_սևագրեր/ԱՌԱՋԱԴՐԱՆՔՆԵՐ_8թերթ_ավտոմատ_հին.xlsx` | `05_Archive/Drafts-2026-09-09/Task-workbook-8-sheet-2026-09-09.xlsx` | old 8-sheet task workbook | MOVED_EARLIER |
-| `02_Արխիվ/2026-09-09_սևագրեր/ԳԱԴՈՒԿՅԱՆԻ_ՊԱՀԱՆՋՆԵՐԸ.md` | `05_Archive/Drafts-2026-09-09/Gadukyan-requirements-2026-09-09.md` | draft requirements | MOVED_EARLIER |
+| `02_Արխիվ/2026-09-09_սևագրեր/ԳԱԴՈՒԿՅԱՆԻ_ՊԱՀԱՆՋՆԵՐԸ.md` | `05_Archive/Drafts-2026-09-09/@P1-requirements-2026-09-09.md` | draft requirements | MOVED_EARLIER |
 | `02_Արխիվ/2026-09-09_սևագրեր/ԳՐԱՖԻԿԻ_ՀԱՐՑԵՐ.md` | `05_Archive/Drafts-2026-09-09/Schedule-questions-2026-09-09.md` | answered schedule questions | MOVED_EARLIER |
 | `02_Արխիվ/2026-09-09_սևագրեր/ԹԱՐՄԱՑՆԵԼ.bat` | `05_Archive/Drafts-2026-09-09/update.bat` | legacy one-click updater | MOVED_EARLIER |
-| `02_Արխիվ/ԳԱԴՈՒԿՅԱՆԻ_ՊԱՀԱՆՋՆԵՐԸ_քո-լրացրածը_2026-09-09.xlsx` | `05_Archive/Drafts-2026-09-09/Gadukyan-requirements-annotated-2026-09-09.xlsx` | annotated requirements workbook, superseded by Tasks.xlsx | MOVED_EARLIER |
+| `02_Արխիվ/ԳԱԴՈՒԿՅԱՆԻ_ՊԱՀԱՆՋՆԵՐԸ_քո-լրացրածը_2026-09-09.xlsx` | `05_Archive/Drafts-2026-09-09/@P1-requirements-annotated-2026-09-09.xlsx` | annotated requirements workbook, superseded by Tasks.xlsx | MOVED_EARLIER |
 | `02_Արխիվ/2026-09-10_skill_registry_v1/registry_132_2026-09-10.json` | `05_Archive/Skill-registry-v1-2026-09-10/registry_132_2026-09-10.json` | pre-audit registry | MOVED_EARLIER |
 | `04_WhatsApp/README.md` | `05_Archive/Legacy-whatsapp-2026-09-09/Whatsapp-readme-2026-09-09.md` | superseded 8-sheet workflow description | MOVED_EARLIER |
 | `04_WhatsApp/ՕԳՆԱԿԱՆ_դերը.md` | `.claude/docs/Role.md` | role card | MOVED_EARLIER |

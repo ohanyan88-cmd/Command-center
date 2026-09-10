@@ -5,6 +5,7 @@
  "declared_maturity": "L2",
  "computed_maturity": "L3",
  "tests": [
+  "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
   "test_skills.T05_Execution.test_decision_support",
   "test_skills.T08_MultiSkill.test_run_plan_with_supplied_data_partially_executes"
  ],
@@ -24,11 +25,14 @@
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
  "completion_verification": [
+  "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
   "test_skills.T05_Execution.test_decision_support"
  ],
  "concurrency_tests": [],
  "enforcement_tests": [],
  "evals": [
+  "eval:b_change_tariff",
+  "eval:b_why_sales_down",
   "eval:head_decision",
   "eval:sales_decline",
   "eval:sales_decline_with_data"
@@ -40,9 +44,9 @@
   "test_skills.T02_Router.test_chain_sales_decline"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:57:03",
- "fingerprint": "fbcba6e549d339bf5f06a422",
- "core_fingerprint": "0356ece6648346c2",
+ "certified_at": "2026-09-10T22:35:01",
+ "fingerprint": "d956800fbe3d08688d67cdb6",
+ "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -51,7 +55,9 @@
   "test_hardening",
   "test_enforcement",
   "test_workspace",
-  "test_runtime"
+  "test_runtime",
+  "test_business",
+  "test_boundary"
  ],
  "audit_infrastructure": false
 }

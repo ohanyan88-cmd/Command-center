@@ -59,7 +59,7 @@ put(s, 1, DATE_C, LASTC, "ՕՐՎԱ ՊԱՏԿԵՐ", size=19, bold=True, color=NAVY
 s.row_dimensions[2].height = 18
 put(s, 2, DATE_C, LASTC,
     f"{TODAY.strftime('%Y-%m-%d')}, {HY[TODAY.weekday()]}   ·   "
-    f"Գադուկյանի առաջադրանքները   ·   թվերը ինքնաշխատ են",
+    f"@P1-ի առաջադրանքները   ·   թվերը ինքնաշխատ են",
     size=9.5, color=MUTED)
 paint_s(3, STRIPE, 3, LASTC, NAVY); s.row_dimensions[3].height = 3
 s.row_dimensions[4].height = 14
@@ -220,7 +220,7 @@ ws.merge_cells(start_row=END + 2, start_column=2, end_row=END + 2, end_column=8)
 
 wb.active = 0
 out = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "05_Archive",
-                   f"Gadukyan-requirements-{TODAY.strftime('%Y-%m-%d')}.xlsx")   # LEGACY output: superseded by Tasks.xlsx (05_Archive keeps history)
+                   f"@P1-requirements-{TODAY.strftime('%Y-%m-%d')}.xlsx")   # LEGACY output: superseded by Tasks.xlsx (05_Archive keeps history)
 wb.save(out)
 print(f"{os.path.basename(out)}  ·  {len(DEMANDS)} կետ  ·  "
       f"բաց՝ {len(opened)}  ·  փակված՝ {len(done)}")

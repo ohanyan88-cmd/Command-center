@@ -5,20 +5,42 @@
  "declared_maturity": "L2",
  "computed_maturity": "L2",
  "tests": [
+  "test_boundary.S01_Classification.test_classes_defined_and_not_one_bucket",
+  "test_boundary.S01_Classification.test_path_rules_classify_overlay_and_generated_as_non_versionable",
+  "test_boundary.S02_ContentDetection.test_real_core_files_are_clean",
+  "test_boundary.S02_ContentDetection.test_safe_core_content_allowed",
+  "test_boundary.S02_ContentDetection.test_salary_and_subscriber_leakage_detected",
+  "test_boundary.S02_ContentDetection.test_secrets_detected",
+  "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
+  "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
+  "test_boundary.S03_GitStagingBoundary.test_workspace_repository_index_is_clean",
+  "test_business.B02_CoreOverlaySeparation.test_core_has_no_compensation_or_names_and_overlay_merges_at_runtime",
   "test_skills.T04_Authority.test_sensitivity"
  ],
  "failure_tests": [
   "test_skills.T04_Authority.test_sensitivity"
  ],
  "hardening_cases": [
+  "test_boundary.S02_ContentDetection.test_salary_and_subscriber_leakage_detected",
+  "test_boundary.S02_ContentDetection.test_secrets_detected",
+  "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
+  "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
+  "test_business.B02_CoreOverlaySeparation.test_core_has_no_compensation_or_names_and_overlay_merges_at_runtime",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
   "test_hardening.H04_AdversarialInputs.test_secret_in_nested_input_redacted"
  ],
  "adversarial": [
+  "test_boundary.S02_ContentDetection.test_salary_and_subscriber_leakage_detected",
+  "test_boundary.S02_ContentDetection.test_secrets_detected",
+  "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
+  "test_business.B02_CoreOverlaySeparation.test_core_has_no_compensation_or_names_and_overlay_merges_at_runtime",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
   "test_hardening.H04_AdversarialInputs.test_secret_in_nested_input_redacted"
  ],
- "failure_injection": [],
+ "failure_injection": [
+  "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
+  "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed"
+ ],
  "authority_tests": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
@@ -30,9 +52,9 @@
  "evals": [],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:57:03",
- "fingerprint": "53ad97941a3c3686f1694dba",
- "core_fingerprint": "0356ece6648346c2",
+ "certified_at": "2026-09-10T22:35:01",
+ "fingerprint": "97ab196cb069fa19a3c8ad5d",
+ "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -41,7 +63,9 @@
   "test_hardening",
   "test_enforcement",
   "test_workspace",
-  "test_runtime"
+  "test_runtime",
+  "test_business",
+  "test_boundary"
  ],
  "audit_infrastructure": false
 }

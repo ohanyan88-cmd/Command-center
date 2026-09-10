@@ -33,7 +33,7 @@ class W01_Tree(unittest.TestCase):
     def test_valid_clean_tree_passes(self):
         d = clean_tree(); self.assertEqual(problems(d), [])
         (d / "01_Active/Sales/Sales-strategy-v1.1-2026-09-10.docx").write_bytes(b""); (d / "02_Reference/People/Staffing-plan-2026-09-07.xlsx").write_bytes(b"")
-        (d / "04_Sources/Whatsapp/Gadukyan-2026-09-09").mkdir(); (d / "04_Sources/Whatsapp/Gadukyan-2026-09-09/chat.txt").write_text("", encoding="utf-8")
+        (d / "04_Sources/Whatsapp/Principal-2026-09-09").mkdir(); (d / "04_Sources/Whatsapp/Principal-2026-09-09/chat.txt").write_text("", encoding="utf-8")
         (d / "05_Archive/Drafts-2026-09-09").mkdir(); (d / "05_Archive/Drafts-2026-09-09/run.py").write_text("", encoding="utf-8")
         self.assertEqual(problems(d), [])
     def test_unknown_root_file_fails(self):
@@ -58,8 +58,8 @@ class W01_Tree(unittest.TestCase):
         d = clean_tree(); (d / "01_Active/Sales/Sales-strategy.DOCX").write_bytes(b""); self.assertTrue(any("Sales-strategy.DOCX" in p for p in problems(d)))
         (d / "02_Reference/Sales/Sales-plan-2026-09-10.py").write_text("", encoding="utf-8"); self.assertTrue(any("Sales-plan-2026-09-10.py" in p for p in problems(d)))
     def test_raw_whatsapp_source_in_active_fails(self):
-        d = clean_tree(); (d / "01_Active/Operations/chat.txt").write_text("", encoding="utf-8"); (d / "01_Active/Sales/Gadukyan.zip").write_bytes(b"")
-        pr = problems(d); self.assertTrue(any("chat.txt" in p and "04_Sources" in p for p in pr)); self.assertTrue(any("Gadukyan.zip" in p for p in pr))
+        d = clean_tree(); (d / "01_Active/Operations/chat.txt").write_text("", encoding="utf-8"); (d / "01_Active/Sales/Principal.zip").write_bytes(b"")
+        pr = problems(d); self.assertTrue(any("chat.txt" in p and "04_Sources" in p for p in pr)); self.assertTrue(any("Principal.zip" in p for p in pr))
     def test_python_tool_inside_sources_fails(self):
         d = clean_tree(); (d / "04_Sources/Imports/helper.py").write_text("", encoding="utf-8"); self.assertTrue(any("helper.py" in p for p in problems(d)))
     def test_test_file_inside_skills_fails(self):

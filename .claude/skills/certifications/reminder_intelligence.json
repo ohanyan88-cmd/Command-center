@@ -37,9 +37,9 @@
   "test_skills.T02_Router.test_chain_reminder"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:57:03",
- "fingerprint": "9d36424a61c32db411e32adf",
- "core_fingerprint": "0356ece6648346c2",
+ "certified_at": "2026-09-10T22:35:01",
+ "fingerprint": "9af769b015c5f9ab7c98e6db",
+ "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -48,7 +48,9 @@
   "test_hardening",
   "test_enforcement",
   "test_workspace",
-  "test_runtime"
+  "test_runtime",
+  "test_business",
+  "test_boundary"
  ],
  "audit_infrastructure": false
 }

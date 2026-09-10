@@ -358,7 +358,7 @@ skills += [
    triggers=("summarize","summarise","ամփոփիր","tl;dr","short version","meeting summary","ժողովի ամփոփ"),
    req_in=("content",), opt_in=("kind",), tools_req=("python",), max_action="DRAFT", absorbed=("meeting_summary",),
    evals=("meeting_prep",)),
- S("management_communication","Outgoing Communication (Գև's voice)",G,"Draft outgoing messages (management, Finance, Gadukyan, follow-ups) in «Գև» voice, internal wording stripped; sending needs Head OK.",
+ S("management_communication","Outgoing Communication (Գև's voice)",G,"Draft outgoing messages (management, Finance, the company principal, follow-ups) in «Գև» voice, internal wording stripped; sending needs Head OK.",
    "Nothing leaves in the wrong voice or without OK.", maturity="L2", core=True, executor="outgoing_communication",
    triggers=("write to","գրիր","message to","send finance","send them","send him","send her","a follow-up to","follow-up message","outgoing","draft a message","reply to","email to","send email","նամակ գրիր"),
    req_in=("content",), opt_in=("kind","recipient"), tools_req=("python",), max_action="DRAFT",
@@ -389,6 +389,12 @@ skills += [
  S("open_loop_memory","Open-loop Memory",H,"All open loops: tasks + waiting + commitments + decisions pending.","Nothing left open silently.",maturity="L3",core=True,executor="open_loops",
    triggers=("open loops","what's open","anything pending","what's outstanding","բաց հարցեր"), req_in=("tasks",), sources=(XLSX,), tools_req=CORE_TOOLS,
    deps=("deadline_management","waiting_for_tracking","commitment_memory")),
+ S("business_model_query","Business Model Query",H,"Answer who-owns / which-process / which-KPI / which-playbook / who-approves / role questions from the canonical Business Operating Model (.claude/business) with source ids; conflicts and unknowns are surfaced (OWNER_UNKNOWN, KPI_DEFINITION_MISSING, PROCESS_UNDEFINED, TARGET_UNKNOWN, APPROVAL_RULE_UNKNOWN, SOURCE_CONFLICT), never invented.",
+   "Deputy answers business questions from sources, not from memory.",maturity="L3",core=True,executor="business_query",
+   triggers=("who owns","who is responsible","who is accountable","ով է պատասխանատու","ում վրա է","who handles","which process","what process","որ գործընթաց","which kpi","what kpi","որ ցուցանիշ","which metric","playbook","what do we do if","what should we do if","who should approve","who approves","ով պիտի հաստատի","who reports to","business model","org chart","this process"),
+   opt_in=("query","kind"), tools_req=("python","filesystem"),
+   validation=("unknown owner → OWNER_UNKNOWN","conflicting current sources → SOURCE_CONFLICT (never a silent pick)","every answer carries source ids"),
+   evals=("b_who_owns_churn","b_failed_install_process","b_conversion_kpi","b_backlog_playbook","b_who_approves","b_decided_process")),
 ]
 for old in ("project_context_retrieval","historical_context_retrieval","context_linking","dependency_memory"):
     retire(old,"information_retrieval","alias: same executor (memory_retrieval) over the same files")
@@ -450,6 +456,8 @@ CHAINS = {
   "daily_brief":               ["daily_briefing"],
   "cross_department_blocker":  ["waiting_for_tracking","follow_up_management","escalation_management"],
   "broken_promise":            ["follow_up_management"],
+  "weekly_sno_review":         ["weekly_executive_review","executive_summarization"],
+  "decision_about_process":    ["business_model_query","decision_memory"],
   "head_decision":             ["decision_support","risk_classification","authority_checking","approval_management"],
   "conflicting_reports":       ["source_reconciliation","confidence_handling"],
   "completed_no_evidence":     ["completion_verification"],
@@ -458,7 +466,7 @@ CHAINS = {
 CHAIN_TRIGGERS = {
   "investigate_sales_decline": ("why did sales drop","sales dropped","sales decline","վաճառք իջել","վաճառքն իջել","sales fell","why are sales down","sales are down","sales down"),
   "sales_target_missed": ("missed target","missed the target","missed the sales target","պլանը չկատար","target missed","below target","behind target"),
-  "ops_backlog_growing": ("backlog growing","backlog is growing","backlog doubled","backlog has doubled","կուտակ աճ","queue growing","backlog up"),
+  "ops_backlog_growing": ("backlog growing","backlog is growing","backlog doubled","backlog has doubled","backlog doubles","կուտակ աճ","queue growing","backlog up"),
   "employee_underperformance": ("underperform","չի աշխատում լավ","performance problem","not performing"),
   "churn_increase": ("churn increase","churn is up","չըռն աճ","more cancellations","churn up"),
   "pipeline_stagnation": ("pipeline stagn","deals not moving","deals are not moving","pipeline stuck","pipeline is stuck","stale pipeline","գործարքները չեն շարժվում"),
@@ -467,11 +475,13 @@ CHAIN_TRIGGERS = {
   "conversational_reminder": ("remind me","հիշեցրու"),
   "daily_brief": ("daily brief","morning brief","օրվա բրիֆ","good morning","առավոտյան պլան"),
   "cross_department_blocker": ("blocked by another department","cross-department","other department","բաժինը չի տալիս","stuck waiting on"),
-  "broken_promise": ("still hasn't","hasn't sent","hasn't delivered","չի ուղարկել","դեռ չի տվել"),
+  "broken_promise": ("still hasn't","hasn't sent","hasn't delivered","չի ուղարկել","դեռ չի տվել","missed his deadline","missed her deadline","missed the deadline","missed their deadline","ժամկետը բաց թողեց"),
+  "weekly_sno_review": ("weekly sales & operations review","weekly s&o review","sales & operations review","weekly sales and operations review","շաբաթական վաճառքի և գործառնական"),
+  "decision_about_process": ("decide about this process","decided about this process","decide about the process","what did we decide about this process","որոշել էինք գործընթաց"),
   "head_decision": ("need your decision","requires your approval","should we approve","decide on","should we change","should we raise","should we lower","փոխե՞նք"),
   "conflicting_reports": ("conflicting reports","reports disagree","numbers don't match","երկու տարբեր թիվ"),
   "completed_no_evidence": ("he says it's done","says it is done","ասում է արել է","claims completed","says it's done"),
-  "outgoing_message": ("send finance","send them a follow-up","send him a follow-up","send her a follow-up","write to gadukyan","գադուկյանին գրիր","message to management","a follow-up to"),
+  "outgoing_message": ("send finance","send them a follow-up","send him a follow-up","send her a follow-up","write to the principal","ղեկավարին գրիր","message to management","a follow-up to"),
 }
 
 registry = {

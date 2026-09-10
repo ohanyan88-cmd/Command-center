@@ -25,6 +25,88 @@ MATERIAL = re.compile(r"(price|pricing|սակագ|salary|comp|աշխատավար
 
 class ExecError(Exception): pass
 
+# ───────────────────────── business context helpers ─────────────────────────
+def _bc(inputs):
+    return (inputs or {}).get("business_context") or {"available": False, "gaps": ["BUSINESS_CONTEXT_MISSING"]}
+
+def _bc_brief(inputs):
+    """Compact business context for result envelopes: what the model knows, what it does not (gap codes)."""
+    b = _bc(inputs)
+    if not b.get("available"): return {"available": False, "gaps": b.get("gaps", ["BUSINESS_CONTEXT_MISSING"])}
+    return {"available": True, "playbook": b.get("playbook"), "playbook_name": b.get("playbook_name"), "kpis": b.get("kpis", []), "processes": b.get("processes", []),
+            "owner": b.get("owner", {}), "required_data": b.get("required_data", []), "sources": b.get("sources", []), "conflicts": b.get("conflicts", []), "gaps": b.get("gaps", []), "rules": b.get("rules", [])}
+
+def _bc_owner(inputs, default="UNKNOWN"):
+    o = _bc(inputs).get("owner") or {}
+    if o.get("code") in ("OWNER_UNKNOWN",) or not o.get("owner_role"): return default if not o.get("code") else f"OWNER_UNKNOWN"
+    if o.get("status") == "CONFLICT": return f"SOURCE_CONFLICT — {o.get('owner_role')}"
+    return o["owner_role"] + (f" — {o['owner_person']}" if o.get("owner_person") and o["owner_person"] != "UNKNOWN" else "")
+
+QKIND = [("owner", r"(who owns|who is responsible|who is accountable|owner of|ով է պատասխանատու|ում վրա է|who handles)"), ("approval", r"(who (should |must )?approve|who approves|ով պիտի հաստատի|approval for)"),
+         ("process", r"(which process|what process|որ գործընթաց|process (for|handles)|handles a)"), ("kpi", r"(which kpi|what kpi|which metric|what metric|որ ցուցանիշ|tells us)"),
+         ("playbook", r"(what do we do|what should we do|playbook|ինչ ենք անում)"), ("role", r"(who reports to|reports to|role of|what does .* do|պաշտոն)")]
+
+def business_query(inputs, skill=None, reg=None):
+    """Business Operating Model lookup with provenance. Fail closed: OWNER_UNKNOWN / KPI_DEFINITION_MISSING / PROCESS_UNDEFINED /
+    APPROVAL_RULE_UNKNOWN / SOURCE_CONFLICT / BUSINESS_CONTEXT_MISSING are returned as structured codes, never guessed around."""
+    import business
+    q = inputs.get("query") or inputs.get("intent") or inputs.get("text") or ""
+    if not business.available(): return {"status": "BLOCKED", "code": "BUSINESS_CONTEXT_MISSING", "reason": "business model not built (.claude/business/*.json)", "label": "UNKNOWN"}
+    if not q: return {"status": "BLOCKED", "code": "MISSING_INPUT", "reason": "query missing (who owns / which process / what kpi / playbook / who approves)"}
+    kind = inputs.get("kind") or next((k for k, rx in QKIND if re.search(rx, q, re.I)), "context")
+    mid = business.model_id()
+    if mid.get("state") in ("SOURCE_MISSING",): return {"status": "BLOCKED", "code": "SOURCE_MISSING", "reason": f"a current business source is missing: {business.model_state().get('missing')} — rebuild after restoring it", "model": mid, "label": "UNKNOWN"}
+    if not mid.get("certified"): return {"status": "BLOCKED", "code": "BUSINESS_CONTEXT_MISSING", "reason": f"business model {mid.get('model_version')} is {mid.get('state')} / uncertified — run build_business_model.py", "model": mid, "label": "UNKNOWN"}
+    def _stale(srcs):
+        st = business.stale_sources_for(srcs)
+        return ({"status": "BLOCKED", "code": "STALE_MODEL", "reason": f"sources {st['changed']} changed since the model was built — rebuild before relying on this fact", "model": mid, "label": "UNKNOWN"} if st["changed"] else None)
+    if kind in ("owner", "approval"):
+        o = business.find_owner(q)
+        if o.get("code") == "OWNER_UNKNOWN" or o.get("code") == "BUSINESS_CONTEXT_MISSING":
+            return {"status": "BLOCKED", "code": o["code"], "reason": o.get("reason", "no owner defined in any source"), "kind": kind, "query": q, "label": "UNKNOWN", "gaps": [g["gap_id"] for g in business.gaps_for(q)]}
+        e = o["entry"]; s_ = _stale(e["src"])
+        if s_: return s_
+        res = o.get("resolution", {})
+        out = {"status": "EXECUTED", "kind": kind, "query": q, "primitive": e["primitive"], "owner_role": business.render(e.get("owner_role")), "role_codes": res.get("role_codes", []),
+               "person": res.get("person") if res.get("person_status") == "PERSON_KNOWN" else "PERSON_UNKNOWN", "person_status": res.get("person_status"), "person_candidates": res.get("candidates", []),
+               "ownership_status": e["status"], "sources": e["src"], "source_status": [business.source_status(s) for s in e["src"]], "label": o["conf"], "note": business.render(e.get("note")), "model": mid}
+        if e["status"] == "CONFLICT":
+            out.update(code="SOURCE_CONFLICT", resolution="SOURCE_CONFLICT — not chosen", conflicts=[{"id": c["id"], "topic": c["topic"], "source_a": c["source_a"], "source_b": c["source_b"], "resolution_required": c["resolution_required"]} for c in o.get("conflicts", [])], label="UNKNOWN")
+        if kind == "approval":
+            if "threshold" in str(e.get("note", "")).lower() or "UNKNOWN" in str(e.get("owner_role", "")): out.update(code="APPROVAL_RULE_UNKNOWN", approval_rule="UNKNOWN — no approval matrix/thresholds defined in any source")
+            else: out["approval_rule"] = e.get("note") or "per ownership entry"
+        return out
+    if kind == "process":
+        ps = business.find_processes(q)
+        if not ps: return {"status": "BLOCKED", "code": "PROCESS_UNDEFINED", "reason": "no documented process matches", "query": q, "label": "UNKNOWN"}
+        best = ps[0]; s_ = _stale(best["src"])
+        if s_: return s_
+        out = {"status": "EXECUTED", "kind": kind, "query": q, "process_id": best["process_id"], "name": best["name"], "process_status": best["status"], "owner": business.render(best["accountable_owner"]), "model": mid,
+                             "steps": best["steps"], "sla": best["sla_deadline"], "escalation": best["escalation_condition"], "sources": best["src"], "label": best["conf"], "alternatives": [{"id": p["process_id"], "name": p["name"], "status": p["status"]} for p in ps[1:]]}
+        if best["status"].startswith("GAP"): out.update(code="PROCESS_UNDEFINED", label="UNKNOWN", note="this is a registered GAP, not an implemented process")
+        return out
+    if kind == "kpi":
+        ks = business.find_kpis(q)
+        if not ks: return {"status": "BLOCKED", "code": "KPI_DEFINITION_MISSING", "reason": "no KPI in the catalog matches", "query": q, "label": "UNKNOWN"}
+        s_ = _stale(sum((k["src"] for k in ks), []))
+        if s_: return s_
+        out = {"status": "EXECUTED", "kind": kind, "query": q, "kpis": [{"id": k["kpi_id"], "name": k["name"], "kind": k["kind"], "definition": k["definition"], "owner": k["owner"], "target": k["target"], "target_ref": k.get("target_ref"), "proposed_targets": k.get("proposed_targets", []), "thresholds": k.get("thresholds", []), "source": k["source"], "src": k["src"], "conf": k["conf"]} for k in ks], "label": "DERIVED", "model": mid}
+        if all(str(k["target"]) == "UNKNOWN" for k in ks): out.update(code="TARGET_UNKNOWN", note="KPI defined, target not — no source states a target")
+        return out
+    if kind == "playbook":
+        pb = business.playbook_for(query=q)
+        if not pb: return {"status": "BLOCKED", "code": "PROCESS_UNDEFINED", "reason": "no playbook matches this situation", "query": q, "label": "UNKNOWN"}
+        return {"status": "EXECUTED", "kind": kind, "query": q, "playbook_id": pb["playbook_id"], "name": pb["name"], "chain": pb["chain"], "required_skills": pb["required_skills"], "required_data": pb["required_data"], "model": mid,
+                "diagnostic_steps": pb["diagnostic_steps"], "questions": pb["questions_to_answer"], "owner": business.render(pb["owner"]), "escalation_threshold": pb["escalation_threshold"], "authority_boundary": pb["authority_boundary"], "flow": pb["flow"], "sources": pb["src"], "label": "CONFIRMED"}
+    if kind == "role":
+        r = business.role(q)
+        if not r: return {"status": "BLOCKED", "code": "OWNER_UNKNOWN", "reason": "no role matches", "query": q, "label": "UNKNOWN"}
+        pr = business.person_for_role(r["code"])
+        return {"status": "EXECUTED", "kind": kind, "query": q, "role": {k: r[k] for k in ("code", "title", "function", "manager", "reports", "positions", "filled", "purpose", "decision_rights", "escalation_path")}, "kpis": business.role_kpis(r["code"]), "targets": business.targets_for(r["code"]),
+                "current_person": pr.get("person") if pr["status"] == "PERSON_KNOWN" else "PERSON_UNKNOWN", "person_candidates": pr.get("candidates", []), "compensation": "CONFIDENTIAL (overlay only, not returned)", "sources": r["src"], "label": r["conf"], "model": mid}
+    ctx = business.context_for(skill["skill_id"] if skill else "business_model_query", q, inputs)
+    return {"status": "EXECUTED", "kind": "context", "query": q, "context": {k: ctx[k] for k in ("playbook", "playbook_name", "kpis", "processes", "owner", "conflicts", "sources", "stale_sources", "rules", "gaps", "model") if k in ctx}, "label": "DERIVED", "model": mid}
+
 def _today(inputs):
     t = inputs.get("today")
     return datetime.date.fromisoformat(t) if isinstance(t, str) else (t or datetime.date.today())
@@ -157,7 +239,8 @@ def daily_briefing(inputs, skill=None, reg=None):
              "deadlines_today": b["today"], "overdue": b["overdue"], "tomorrow": b["tomorrow"],
              "waiting_for": wf["waiting_for"], "no_deadline": b["no_deadline"],
              "counts": dl["counts"], "source": XLSX.name,
-             "data_gaps": ["sales KPIs: UNKNOWN (no live feed)", "ops KPIs: UNKNOWN (no live feed)"]}
+             "data_gaps": ["sales KPIs: UNKNOWN (no live feed)", "ops KPIs: UNKNOWN (no live feed)"] + _bc(inputs).get("routine_missing_data", []),
+             "business_alerts": {"pending_decisions": [c["id"] for c in _bc(inputs).get("conflicts", [])], "gaps": _bc(inputs).get("gaps", [])}, "business_context": _bc_brief(inputs)}
     return brief
 
 def end_of_day_control(inputs, skill=None, reg=None):
@@ -170,9 +253,11 @@ def end_of_day_control(inputs, skill=None, reg=None):
 
 def weekly_review(inputs, skill=None, reg=None):
     dl = deadline_management(inputs)
+    b = _bc(inputs)
     return {"status": "ASSISTED", "actions_overdue": dl["buckets"]["overdue"], "open_count": sum(dl["counts"].values()),
             "sales": "UNKNOWN — no sales data source", "operations": "UNKNOWN — no ops data source",
-            "note": "Skeleton only; sales/ops sections require supplied datasets."}
+            "sections": b.get("routine_sections", []), "missing_sources": b.get("routine_missing_data", []), "pending_decisions": [c["id"] + " " + c["topic"] for c in b.get("conflicts", [])],
+            "note": "Skeleton only; sales/ops sections require supplied datasets.", "business_context": _bc_brief(inputs)}
 
 def meeting_preparation(inputs, skill=None, reg=None):
     if not inputs.get("meeting"): return {"status": "BLOCKED", "reason": "required input 'meeting' missing"}
@@ -184,8 +269,8 @@ def meeting_preparation(inputs, skill=None, reg=None):
             "previous_decisions": decision_memory({}, None, None)["decisions"][-5:],
             "open_actions": related or pr["ranked"][:5], "overdue": dl["buckets"]["overdue"],
             "waiting_for": wf["waiting_for"], "decisions_required": [r for r in pr["ranked"] if r["owner"].isupper()],
-            "numbers": "UNKNOWN — no KPI feed; supply if required",
-            "talking_points": [f"Close: {r['task']}" for r in (related or pr['ranked'][:3])]}
+            "numbers": "UNKNOWN — no KPI feed; expected KPIs per business model: " + ", ".join(k["name"] for k in _bc(inputs).get("kpis", [])[:5]) if _bc(inputs).get("available") else "UNKNOWN — no KPI feed; supply if required",
+            "talking_points": [f"Close: {r['task']}" for r in (related or pr['ranked'][:3])], "business_context": _bc_brief(inputs)}
 
 def delegation_design(inputs, skill=None, reg=None):
     instr = inputs.get("instruction") or inputs.get("notes") or inputs.get("recommendation")
@@ -266,10 +351,10 @@ def follow_up_management(inputs, skill=None, reg=None):
 def escalation_management(inputs, skill=None, reg=None):
     item = inputs.get("item")
     if not item: return {"status": "BLOCKED", "reason": "item missing"}
-    block = {"problem": item, "impact": inputs.get("impact", "UNKNOWN — supply"), "owner": inputs.get("owner", "UNKNOWN"),
+    block = {"problem": item, "impact": inputs.get("impact", "UNKNOWN — supply"), "owner": inputs.get("owner") or _bc_owner(inputs, "UNKNOWN"),
              "deadline_status": inputs.get("deadline_status", "UNKNOWN"), "done_so_far": inputs.get("done_so_far", "UNKNOWN"),
              "head_action": inputs.get("head_action", "Decide: escalate / re-assign / extend deadline")}
-    return {"status": "EXECUTED", "escalation": block}
+    return {"status": "EXECUTED", "escalation": block, "business_context": _bc_brief(inputs)}
 
 def decision_support(inputs, skill=None, reg=None):
     issue = inputs.get("issue") or inputs.get("analysis") or inputs.get("description")
@@ -280,7 +365,7 @@ def decision_support(inputs, skill=None, reg=None):
     return {"status": "ASSISTED", "decision_needed": {"issue": issue, "context": inputs.get("context", "UNKNOWN"),
             "options": opts, "recommendation": rec, "risk_of_delay": inputs.get("risk_of_delay", "UNKNOWN"),
             "deadline": inputs.get("deadline", "UNKNOWN"), "approver": HEAD,
-            "owner": inputs.get("owner", "<NAME>"), "head_action": inputs.get("head_action", "Decide/approve")}, "label": "DERIVED"}
+            "owner": inputs.get("owner") or _bc_owner(inputs, "<NAME>"), "head_action": inputs.get("head_action", "Decide/approve")}, "label": "DERIVED", "business_context": _bc_brief(inputs)}
 
 def approval_management(inputs, skill=None, reg=None):
     lvl = inputs.get("action_level"); ladder = (reg or {}).get("authority_ladder", [])
@@ -432,7 +517,7 @@ def analysis_on_supplied_data(inputs, skill=None, reg=None):
     key = next((k for k in ("sales_data","ops_data","dataset","performance_data") if k in inputs), None)
     if not key or not inputs[key]:
         return {"status": "BLOCKED", "code": "MISSING_INPUT", "reason": f"{skill['skill_id'] if skill else 'analysis'}: no dataset supplied; this runtime has no live feed",
-                "label": "UNKNOWN"}
+                "label": "UNKNOWN", "business_context": _bc_brief(inputs)}
     data = inputs[key]
     if not isinstance(data, list) or not all(isinstance(r, dict) for r in data):
         return {"status": "BLOCKED", "code": "INVALID_DATA", "reason": "dataset must be a list of dict rows"}
@@ -445,7 +530,7 @@ def analysis_on_supplied_data(inputs, skill=None, reg=None):
     for k, v in nums.items():
         if len(v) >= 2: trend[k] = {"first": v[0], "last": v[-1], "change_pct": round((v[-1]-v[0])/v[0]*100, 1) if v[0] else None}
     return {"status": "ASSISTED", "rows": len(data), "stats": stats, "trend": trend, "label": "DERIVED",
-            "note": "Computed from supplied data only; interpretation requires domain confirmation."}
+            "note": "Computed from supplied data only; interpretation requires domain confirmation.", "business_context": _bc_brief(inputs)}
 
 def performance_gap_diagnosis(inputs, skill=None, reg=None):
     d = inputs.get("performance_data") or inputs.get("description")
@@ -467,8 +552,9 @@ def root_cause_analysis(inputs, skill=None, reg=None):
     whys = inputs.get("whys") or []
     chain = [{"why": i + 1, "answer": w} for i, w in enumerate(whys[:5])]
     root = whys[-1] if len(whys) >= 3 else None
+    b = _bc(inputs)
     return {"status": "ASSISTED", "symptom": desc, "why_chain": chain, "root_cause": root or "UNKNOWN — fewer than 3 whys supplied",
-            "corrective_action": inputs.get("corrective_action", "PENDING root cause"),
+            "corrective_action": inputs.get("corrective_action", "PENDING root cause"), "playbook_questions": b.get("questions", []), "playbook_diagnostics": b.get("diagnostic_steps", []), "business_context": _bc_brief(inputs),
             "cause_type_candidates": performance_gap_diagnosis({"description": " ".join([desc] + whys)})["candidate_causes"],
             "label": "DERIVED" if root else "UNVERIFIED"}
 

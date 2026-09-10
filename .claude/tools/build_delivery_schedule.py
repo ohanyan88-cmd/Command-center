@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Կառուցում է Գադուկյանին ուղարկվող գրաֆիկը՝ ուղիղ ռեեստրից։
+"""Կառուցում է @P1-ին ուղարկվող գրաֆիկը՝ ուղիղ ռեեստրից։
 Դուրս է գնում միայն ext=True կետերը՝ deliv դաշտի ձևակերպմամբ։
 Ելք՝ 01_Active/Operations/Delivery-schedule-<date>.xlsx  և  Delivery-schedule-whatsapp-<date>.txt"""
 import sys, os, io, datetime

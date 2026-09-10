@@ -5,9 +5,21 @@
  "declared_maturity": "L4",
  "computed_maturity": "L4",
  "tests": [
+  "test_boundary.S01_Classification.test_classes_defined_and_not_one_bucket",
+  "test_boundary.S01_Classification.test_path_rules_classify_overlay_and_generated_as_non_versionable",
+  "test_boundary.S02_ContentDetection.test_real_core_files_are_clean",
+  "test_boundary.S02_ContentDetection.test_safe_core_content_allowed",
+  "test_boundary.S02_ContentDetection.test_salary_and_subscriber_leakage_detected",
+  "test_boundary.S02_ContentDetection.test_secrets_detected",
+  "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
+  "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
+  "test_boundary.S03_GitStagingBoundary.test_workspace_repository_index_is_clean",
+  "test_business.B07_SkillIntegration.test_conflict_and_approval_rule_unknown_surface_not_guess",
+  "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
   "test_skills.T04_Authority.test_authority_checking_executor"
  ],
  "failure_tests": [
+  "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
   "test_failclosed.F01_EveryBlockedCode.test_APPROVAL_REQUIRED",
   "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
   "test_failclosed.F01_EveryBlockedCode.test_DISABLED_SKILL",
@@ -17,6 +29,12 @@
   "test_skills.T04_Authority.test_unknown_level"
  ],
  "hardening_cases": [
+  "test_boundary.S02_ContentDetection.test_salary_and_subscriber_leakage_detected",
+  "test_boundary.S02_ContentDetection.test_secrets_detected",
+  "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
+  "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
+  "test_business.B07_SkillIntegration.test_conflict_and_approval_rule_unknown_surface_not_guess",
+  "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
   "test_enforcement.E01_PromptCapture.test_ignore_skill_system_is_flagged_adversarial",
   "test_enforcement.E02_DirectExecutionBypass.test_adversarial_prompt_cannot_get_maintenance",
   "test_enforcement.E02_DirectExecutionBypass.test_direct_engine_import_denied",
@@ -39,6 +57,10 @@
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_state_tools_denied_repair_allowed_prompt_and_stop_continue"
  ],
  "adversarial": [
+  "test_boundary.S02_ContentDetection.test_salary_and_subscriber_leakage_detected",
+  "test_boundary.S02_ContentDetection.test_secrets_detected",
+  "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
+  "test_business.B07_SkillIntegration.test_conflict_and_approval_rule_unknown_surface_not_guess",
   "test_enforcement.E01_PromptCapture.test_ignore_skill_system_is_flagged_adversarial",
   "test_enforcement.E02_DirectExecutionBypass.test_adversarial_prompt_cannot_get_maintenance",
   "test_enforcement.E02_DirectExecutionBypass.test_direct_engine_import_denied",
@@ -56,6 +78,9 @@
   "test_hardening.H04_AdversarialInputs.test_prompt_injection_cannot_escalate_authority"
  ],
  "failure_injection": [
+  "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
+  "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
+  "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
   "test_enforcement.E05_FailClosedOnEngineFailure.test_engine_unavailable_denies_state_tools",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
@@ -63,6 +88,7 @@
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_state_tools_denied_repair_allowed_prompt_and_stop_continue"
  ],
  "authority_tests": [
+  "test_business.B07_SkillIntegration.test_conflict_and_approval_rule_unknown_surface_not_guess",
   "test_enforcement.E03_AuthorityEmbedded.test_embedded_authorization_text_does_not_unlock_material_action",
   "test_failclosed.F01_EveryBlockedCode.test_APPROVAL_REQUIRED",
   "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
@@ -106,6 +132,7 @@
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_state_tools_denied_repair_allowed_prompt_and_stop_continue"
  ],
  "evals": [
+  "eval:b_change_tariff",
   "eval:b_direct_first",
   "eval:b_embedded_authority",
   "eval:b_governed_allowed",
@@ -118,9 +145,9 @@
   "test_enforcement.E06_MaintenanceRoutingBoundary.test_system_prompt_with_business_words_is_not_routed_to_sales"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:57:03",
- "fingerprint": "32f53bcd670634ab41f2d53d",
- "core_fingerprint": "0356ece6648346c2",
+ "certified_at": "2026-09-10T22:35:01",
+ "fingerprint": "9569f50da37223cbe8f97579",
+ "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -129,7 +156,9 @@
   "test_hardening",
   "test_enforcement",
   "test_workspace",
-  "test_runtime"
+  "test_runtime",
+  "test_business",
+  "test_boundary"
  ],
  "audit_infrastructure": false
 }

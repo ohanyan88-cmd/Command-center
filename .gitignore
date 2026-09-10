@@ -14,6 +14,12 @@ desktop.ini
 # ── Project Python runtime (rebuilt from .claude/runtime/requirements.lock) — never versioned ──
 .venv/
 
+# ── Business Operating Model: CORE (bm_*.py, schema, builder, certifier) IS versioned; the SENSITIVE OVERLAY and every
+#    generated model file are local only. Mechanically enforced by .claude/policy/sensitive_scan.py (pre-commit/pre-push) ──
+.claude/business/overlay/
+.claude/business/*.json
+.claude/business/Business-model.md
+
 # ── Runtime state (hardened store, audit mirror, tickets, quarantine) — never versioned ──
 .claude/state/
 .claude/audit/

@@ -5,6 +5,7 @@
  "declared_maturity": "L3",
  "computed_maturity": "L4",
  "tests": [
+  "test_business.B05_TargetsAndPromotion.test_promotion_rules_and_observations_never_touch_core",
   "test_skills.T06_StateIdempotency.test_decision_logging",
   "test_store.S04_LegacyMigration.test_jsonl_migrated_once_and_moved_aside"
  ],
@@ -43,6 +44,7 @@
   "test_store.S03_CorruptionDetection.test_row_tamper_detected_by_checksum"
  ],
  "authority_tests": [
+  "test_business.B05_TargetsAndPromotion.test_promotion_rules_and_observations_never_touch_core",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
  "completion_verification": [
@@ -60,9 +62,9 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:57:03",
- "fingerprint": "dde85fa30dc75fb6f52b0b2e",
- "core_fingerprint": "0356ece6648346c2",
+ "certified_at": "2026-09-10T22:35:01",
+ "fingerprint": "c4621c62008232b2f5291425",
+ "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -71,7 +73,9 @@
   "test_hardening",
   "test_enforcement",
   "test_workspace",
-  "test_runtime"
+  "test_runtime",
+  "test_business",
+  "test_boundary"
  ],
  "audit_infrastructure": false
 }

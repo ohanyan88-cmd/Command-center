@@ -33,6 +33,7 @@ python .claude/skills/skill.py declare --ticket <id> "<պատճառ>"           
 ```
 Ticket-ի id-ն տրվում է hook-ի ներարկած համատեքստում (`⛔ SKILL GATE · ticket …`)։
 
+- **Business Operating Model-ը** (`.claude/business/`, HouseNet) ամեն գործարկման համատեքստն է. «ով է պատասխանատու / որ գործընթաց / որ KPI / ինչ ենք անում եթե…» հարցերին պատասխանում ես աղբյուրով (S01…S15), ոչ հիշողությամբ. հակասությունը՝ SOURCE_CONFLICT, չսահմանվածը՝ OWNER_UNKNOWN / TARGET_UNKNOWN / PROCESS_UNDEFINED / APPROVAL_RULE_UNKNOWN. թիվ/կանոն չես հորինում։ Նոր փաստ = աղբյուր `bm_*.py`-ում (CORE, մարդիկ միայն `@P` token) կամ `overlay/ov_*.py`-ում (անուն/աշխատավարձ/թվեր) + `build_business_model.py` (certify)։ Չատից լսածը = OBSERVATION, ոչ ճշմարտություն։ Աշխատավարձ, բաժանորդի տվյալ, անուն, գաղտնիք՝ երբեք commit (scanner-ը մեխանիկապես արգելում է)։
 - **Python runtime՝ դետերմինիստիկ.** hook-երը, `skill.py`-ը, թեստերը, eval-ները և release-ը միշտ աշխատում են `<root>/.venv`-ով (`.claude/runtime/`՝ shim + launcher + manifest + lock). PATH-ի `python`-ը վարքի վրա չի ազդում։
 - **Համակարգային (maintenance) մտադրությունները** (agent runtime, Skill System, hooks, workspace policy, tests, repo, config, architecture, state/audit) **բիզնես հմտությունների չեն ուղղորդվում**՝ նույնիսկ «pipeline»/«audit» բառերով. ticket-ը UNRESOLVED · domain SYSTEM է, ճանապարհը՝ `maintenance`/`declare`։
 
@@ -58,7 +59,7 @@ Ticket-ի id-ն տրվում է hook-ի ներարկած համատեքստու�
 
 ## Դուրս գնացողը և սահմանը
 
-- **Դուրս գնացողը** (Գադուկյան և ուրիշներ)՝ Գև-ի անունից, «Գև», ոչ «Ես»։ Երբեք ներքին խոհանոց (Claude, pull/push, Bitrix ստուգում)։
+- **Դուրս գնացողը** (@P1 և ուրիշներ)՝ Գև-ի անունից, «Գև», ոչ «Ես»։ Երբեք ներքին խոհանոց (Claude, pull/push, Bitrix ստուգում)։
 - **Բնօրինակ տեքստը միշտ պահիր** որպես ապացույց (`04_Sources/`). քո ձևակերպումը մեկնաբանություն է։
 - **Դուրս ուղարկելը կամ Գև-ի անունից պարտավորություն վերցնելը՝ միայն նրա ՕԿ-ից հետո։**
 - Գին, աշխատանքից ազատում, պայմանագիր, հրապարակային, անշրջելի քայլ՝ **նախ պատրաստում ես Գև-ի համար, չես անում ինքնուրույն**։ Գև-ը սկրիպտ/bat չի գործարկում — վերակառուցումը դու ես անում։

@@ -4,7 +4,9 @@
  "maturity_level": "L1",
  "declared_maturity": "L1",
  "computed_maturity": "L1",
- "tests": [],
+ "tests": [
+  "test_business.B08_RealModel.test_real_queries"
+ ],
  "failure_tests": [],
  "hardening_cases": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
@@ -20,15 +22,17 @@
  "concurrency_tests": [],
  "enforcement_tests": [],
  "evals": [
+  "eval:b_backlog_playbook",
   "eval:ops_backlog"
  ],
  "routing_evals": [
-  "eval:r_backlog"
+  "eval:r_backlog",
+  "test_business.B08_RealModel.test_real_queries"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:57:03",
- "fingerprint": "87160281dfc58f7da6b83ef3",
- "core_fingerprint": "0356ece6648346c2",
+ "certified_at": "2026-09-10T22:35:01",
+ "fingerprint": "f119fe1ac2d836d1cd988bdb",
+ "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -37,7 +41,9 @@
   "test_hardening",
   "test_enforcement",
   "test_workspace",
-  "test_runtime"
+  "test_runtime",
+  "test_business",
+  "test_boundary"
  ],
  "audit_infrastructure": true
 }

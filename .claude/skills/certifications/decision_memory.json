@@ -50,13 +50,14 @@
  ],
  "enforcement_tests": [],
  "evals": [
+  "eval:b_decided_process",
   "eval:what_did_we_decide"
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:57:03",
- "fingerprint": "eeefe4048b357ba4a8027780",
- "core_fingerprint": "0356ece6648346c2",
+ "certified_at": "2026-09-10T22:35:01",
+ "fingerprint": "1b30ad5a2bd0a62c2e8c0ef3",
+ "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -65,7 +66,9 @@
   "test_hardening",
   "test_enforcement",
   "test_workspace",
-  "test_runtime"
+  "test_runtime",
+  "test_business",
+  "test_boundary"
  ],
  "audit_infrastructure": false
 }

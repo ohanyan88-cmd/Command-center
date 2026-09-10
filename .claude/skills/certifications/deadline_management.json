@@ -53,6 +53,7 @@
   "test_enforcement.E04_MultiStepAndNarration.test_plan_runs_full_graph_cannot_skip_intermediate"
  ],
  "evals": [
+  "eval:b_missed_deadline",
   "eval:daily_brief",
   "eval:overdue_action"
  ],
@@ -61,9 +62,9 @@
   "test_skills.T02_Router.test_trigger_resolution"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:57:03",
- "fingerprint": "096b6a6ba551ad96edf603ce",
- "core_fingerprint": "0356ece6648346c2",
+ "certified_at": "2026-09-10T22:35:01",
+ "fingerprint": "8e684f02a528ebee7da23120",
+ "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -72,7 +73,9 @@
   "test_hardening",
   "test_enforcement",
   "test_workspace",
-  "test_runtime"
+  "test_runtime",
+  "test_business",
+  "test_boundary"
  ],
  "audit_infrastructure": false
 }

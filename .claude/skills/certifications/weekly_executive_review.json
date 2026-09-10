@@ -23,12 +23,14 @@
  ],
  "concurrency_tests": [],
  "enforcement_tests": [],
- "evals": [],
+ "evals": [
+  "eval:b_weekly_review"
+ ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-10T16:57:03",
- "fingerprint": "12738cbd0322ca98669d5f56",
- "core_fingerprint": "0356ece6648346c2",
+ "certified_at": "2026-09-10T22:35:01",
+ "fingerprint": "7571f895f34d7a992e640e95",
+ "core_fingerprint": "981554765ee40e5b",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -37,7 +39,9 @@
   "test_hardening",
   "test_enforcement",
   "test_workspace",
-  "test_runtime"
+  "test_runtime",
+  "test_business",
+  "test_boundary"
  ],
  "audit_infrastructure": true
 }

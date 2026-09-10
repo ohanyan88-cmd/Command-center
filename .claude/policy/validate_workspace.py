@@ -162,7 +162,7 @@ def check_path(path, pol, root=DEFAULT_ROOT, is_dir=None):
         return v
     if top == ".claude":
         if len(parts) == 2:
-            fixed = pol["directories"][".claude"].get("fixed_subdirs", [])
+            fixed = pol["directories"][".claude"].get("fixed_subdirs", []) + pol["directories"][".claude"].get("optional_subdirs", [])
             if is_dir and name not in fixed and name not in ("__pycache__",): v.append(f"{rel}: unknown .claude subdirectory (allowed {fixed})")
             if not is_dir and name not in pol["directories"][".claude"].get("allowed_files", []): v.append(f"{rel}: unknown file in .claude root (allowed {pol['directories']['.claude'].get('allowed_files')})")
             return v
@@ -261,7 +261,30 @@ def validate_tree(root=DEFAULT_ROOT, pol=None, policy_path=POLICY_PATH):
         for f in rt["required_files"]:
             if f not in txt: problems.append(f"README.md does not mention required file {f}")
     problems += check_identity(root, pol)
+    problems += check_boundary(root)
     return sorted(set(problems))
+
+def check_boundary(root):
+    """Sensitive-data boundary: versionable business-model core carries no CONFIDENTIAL/RESTRICTED content; the git index tracks
+    no CONFIDENTIAL/RESTRICTED path; pre-commit/pre-push boundary hooks are installed (data_classification.json + sensitive_scan.py)."""
+    problems = []
+    try:
+        import sensitive_scan as ss
+    except ImportError: return ["sensitive_scan.py unavailable — boundary unchecked (fail closed)"]
+    try:
+        pol = ss.load_policy(); root = pathlib.Path(root)
+        core = sorted((root / ".claude" / "business").glob("bm_*.py")) + [p for p in ((root / ".claude" / "business" / "build_business_model.py"), (root / ".claude" / "business" / "certify_business.py"), (root / ".claude" / "skills" / "business.py")) if p.exists()]
+        for rel, fs in ss.scan_paths(core, root=root, pol=pol, names=ss.overlay_names(root / ".claude" / "business" / "overlay.json")).items():
+            problems.append(f"{rel}: CONFIDENTIAL/RESTRICTED content in the versionable core ({fs[0]['rule']})")
+        if (root / ".git").is_dir():
+            import subprocess
+            out = subprocess.run(["git", "ls-files"], cwd=str(root), capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.split()
+            for rel in out:
+                cls, why = ss.classify_path(rel, pol)
+                if cls in ("CONFIDENTIAL", "RESTRICTED"): problems.append(f"{rel}: tracked by git but classified {cls} ({why})")
+            if not ss.hooks_installed(root): problems.append("git boundary hooks missing — python .claude/policy/sensitive_scan.py --install-hooks")
+    except Exception as e: problems.append(f"boundary check failed: {type(e).__name__}: {e}")
+    return problems
 
 def check_identity(root, pol):
     """Identity/configuration drift: active files must agree on workspace + agent names; stale canonical names fail."""

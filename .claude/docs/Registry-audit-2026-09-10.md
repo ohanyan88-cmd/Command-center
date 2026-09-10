@@ -1,6 +1,6 @@
 # Registry Quality Audit — 2026-09-10
 
-**Before:** 132 skills · **After:** 61 skills · **Retired/merged:** 71
+**Before:** 132 skills · **After:** 62 skills · **Retired/merged:** 71
 
 Rule: a skill survives only if it provides a capability no other skill provides (distinct executor behaviour, distinct required input, or distinct routing target). Same executor + same input + same output = alias → merged. Tools are not skills → `tools_available` / `tool_intents`.
 
@@ -202,12 +202,13 @@ Rule: a skill survives only if it provides a capability no other skill provides 
 - `executive_reporting` (F_DATA_BI, target L2, executor `executive_reporting`): EXECUTIVE SNAPSHOT over real task data: RED/YELLOW/GREEN + deviations/risks/decisions/owners; sales/ops marked UNKNOWN.
 - `information_classification` (G_COMMUNICATION, target L2, executor `information_classification`): Classify incoming items (email/chat/notes) ACTION/DECISION/DELEGATE/MONITOR/FYI/IGNORE; protect the Head's attention.
 - `executive_summarization` (G_COMMUNICATION, target L1, executor `drafting`): What happened / why it matters / recommendation / Head action; meeting notes → decisions, tasks, owners, deadlines.
-- `management_communication` (G_COMMUNICATION, target L2, executor `outgoing_communication`): Draft outgoing messages (management, Finance, Gadukyan, follow-ups) in «Գև» voice, internal wording stripped; sending needs Head OK.
+- `management_communication` (G_COMMUNICATION, target L2, executor `outgoing_communication`): Draft outgoing messages (management, Finance, the company principal, follow-ups) in «Գև» voice, internal wording stripped; sending needs Head OK.
 - `communication_quality_checking` (G_COMMUNICATION, target L2, executor `communication_quality_check`): Check clarity/assignment/deadline/tone; flag internal wording.
 - `commitment_memory` (H_MEMORY_CONTEXT, target L3, executor `commitment_memory`): Retrieve open commitments from the hardened store.
 - `decision_memory` (H_MEMORY_CONTEXT, target L3, executor `decision_memory`): Retrieve logged decisions.
 - `information_retrieval` (H_MEMORY_CONTEXT, target L2, executor `memory_retrieval`): Find facts, history, project context, dependencies and links across workspace + memory files.
 - `open_loop_memory` (H_MEMORY_CONTEXT, target L3, executor `open_loops`): All open loops: tasks + waiting + commitments + decisions pending.
+- `business_model_query` (H_MEMORY_CONTEXT, target L3, executor `business_query`): Answer who-owns / which-process / which-KPI / which-playbook / who-approves / role questions from the canonical Business Operating Model (.claude/business) with source ids; conflicts and unknowns are surfaced (OWNER_UNKNOWN, KPI_DEFINITION_MISSING, PROCESS_UNDEFINED, TARGET_UNKNOWN, APPROVAL_RULE_UNKNOWN, SOURCE_CONFLICT), never invented.
 - `authority_checking` (I_GOVERNANCE, target L4, executor `authority_checking`): Check a requested action level against a skill's max_action and the approval policy.
 - `risk_classification` (I_GOVERNANCE, target L2, executor `risk_classification`): Classify an action LOW/MEDIUM/HIGH/CRITICAL by materiality (pricing/comp/hiring/contract/public/irreversible) and reversibility.
 - `data_sensitivity_awareness` (I_GOVERNANCE, target L2, executor `sensitivity_check`): Flag credentials/personal data; redact from logs.
@@ -226,6 +227,6 @@ Rule: a skill survives only if it provides a capability no other skill provides 
 - E_PROCESS_AUTOMATION: 4
 - F_DATA_BI: 3
 - G_COMMUNICATION: 4
-- H_MEMORY_CONTEXT: 4
+- H_MEMORY_CONTEXT: 5
 - I_GOVERNANCE: 7
 - J_TOOL_INTEGRATION: 1

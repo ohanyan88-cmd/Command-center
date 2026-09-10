@@ -396,7 +396,7 @@ def run_skill(reg, skill_id, inputs=None, *, intent="", action_level="ANALYZE", 
         rec.update(result_status=status, duration_ms=round((time.perf_counter() - t0) * 1000, 1), **extra)
         audit(rec)
         out = {"status": status, "skill": skill_id, "execution_id": execution_id, "ticket_id": ticket_id}
-        out.update({k: v for k, v in extra.items() if k in ("blocked", "result", "validated", "validation_error", "verification", "error")})
+        out.update({k: v for k, v in extra.items() if k in ("blocked", "result", "validated", "validation_error", "verification", "error", "business_context")})
         if ticket_id: _ticket_attach(ticket_id, {"execution_id": execution_id, "skill": skill_id, "status": status})
         return out
     plan = {"status": "RESOLVED", "chain": [skill_id]}
@@ -406,23 +406,41 @@ def run_skill(reg, skill_id, inputs=None, *, intent="", action_level="ANALYZE", 
     fn = getattr(executors, s["executor"] or "", None)
     if not fn:
         return done("BLOCKED", blocked=[{"skill": skill_id, "code": "NOT_OPERATIONAL", "reason": "executor not implemented"}], validated=False)
+    # BUSINESS CONTEXT — the Business Operating Model (.claude/business) is consulted for EVERY execution: playbook, KPIs,
+    # processes, owner, sources, rules and structured gap codes. Absent model → BUSINESS_CONTEXT_MISSING (never invented).
     try:
-        result = fn({k: v for k, v in inputs.items() if not k.startswith("_")}, skill=s, reg=reg)
+        import business
+        bctx = business.context_for(skill_id, intent, inputs, inputs.get("_chain_name"))
+    except Exception as e: bctx = {"available": False, "gaps": ["BUSINESS_CONTEXT_MISSING"], "reason": f"{type(e).__name__}: {e}"}
+    rec["business_context"] = business.summary(bctx) if "business" in globals() or True else None
+    try:
+        result = fn({**({"intent": intent} if intent and not str(intent).startswith("run ") else {}), **{k: v for k, v in inputs.items() if not k.startswith("_")}, "business_context": bctx}, skill=s, reg=reg)
         ok, verr = executors.validate_output(skill_id, result)
         if not ok:
             return done("VALIDATION_FAILED", validated=False, validation_error=verr, result_summary=executors.summarize(result))
         status = result.get("status", "EXECUTED")
         if s["maturity_level"] == "L1" and status == "EXECUTED": status = "ASSISTED"
         if status == "BLOCKED":
-            return done("BLOCKED", blocked=[{"skill": skill_id, "code": result.get("code", "MISSING_INPUT"), "reason": result.get("reason")}], validated=True, result=result)
+            return done("BLOCKED", blocked=[{"skill": skill_id, "code": result.get("code", "MISSING_INPUT"), "reason": result.get("reason")}], validated=True, result=result, business_context=rec["business_context"])
         vok, vinfo = executors.verify_completion(skill_id, result, inputs)
         if not vok:
-            return done("VERIFICATION_FAILED", validated=True, verification={"ok": False, "detail": vinfo}, result_summary=executors.summarize(result), result=result)
-        return done(status, validated=True, verification={"ok": True, "detail": vinfo}, result_summary=executors.summarize(result), result=result)
+            return done("VERIFICATION_FAILED", validated=True, verification={"ok": False, "detail": vinfo}, result_summary=executors.summarize(result), result=result, business_context=rec["business_context"])
+        return done(status, validated=True, verification={"ok": True, "detail": vinfo}, result_summary=executors.summarize(result), result=result, business_context=rec["business_context"])
     except Exception as e:
         return done("FAILED", validated=False, error=f"{type(e).__name__}: {e}")
 
+def _bctx(sid, plan, inputs):
+    """Business context for a step that the gate blocked before execution — the BLOCKED answer still names the playbook, KPIs, data and owner."""
+    try:
+        import business
+        return business.summary(business.context_for(sid, plan.get("intent", ""), inputs, plan.get("chain_name")))
+    except Exception as e: return {"available": False, "gaps": ["BUSINESS_CONTEXT_MISSING"], "reason": f"{type(e).__name__}: {e}"}
+
 def run_plan(reg, plan, inputs=None, *, action_level="ANALYZE", approval_token=None, ticket_id=None):
+    inputs = dict(inputs or {}); inputs["_chain_name"] = plan.get("chain_name")          # business context resolves the playbook from the chain
+    return _run_plan_impl(reg, plan, inputs, action_level=action_level, approval_token=approval_token, ticket_id=ticket_id)
+
+def _run_plan_impl(reg, plan, inputs=None, *, action_level="ANALYZE", approval_token=None, ticket_id=None):
     """Execute a resolved multi-skill chain in dependency order. Partial execution preserves completed evidence
     and marks the overall task incomplete (PARTIAL / BLOCKED / FAILED / VERIFICATION_FAILED)."""
     inputs = dict(inputs or {}); execution_id = uuid.uuid4().hex[:12]
@@ -442,7 +460,7 @@ def run_plan(reg, plan, inputs=None, *, action_level="ANALYZE", approval_token=N
         return out
     if g["status"] == "BLOCKED":
         for sid in plan.get("chain", []):
-            out["steps"].append({"status": "BLOCKED", "skill": sid, "blocked": [b for b in g["blocked"] if b["skill"] == sid]})
+            out["steps"].append({"status": "BLOCKED", "skill": sid, "blocked": [b for b in g["blocked"] if b["skill"] == sid], "business_context": _bctx(sid, plan, inputs)})
         return finish("BLOCKED")
     for sid in plan["chain"]:
         if sid in g["runnable"] or sid in g["assisted"]:
@@ -461,7 +479,7 @@ def run_plan(reg, plan, inputs=None, *, action_level="ANALYZE", approval_token=N
             if r["status"] == "FAILED": return finish("FAILED")
             if r["status"] == "VERIFICATION_FAILED": return finish("VERIFICATION_FAILED")
         else:
-            out["steps"].append({"status": "BLOCKED", "skill": sid, "blocked": [b for b in g["blocked"] if b["skill"] == sid]})
+            out["steps"].append({"status": "BLOCKED", "skill": sid, "blocked": [b for b in g["blocked"] if b["skill"] == sid], "business_context": _bctx(sid, plan, inputs)})
     if any(st["status"] not in SUCCESS_STATUSES for st in out["steps"]) or g["blocked"]:
         return finish("PARTIAL" if any(st["status"] in SUCCESS_STATUSES for st in out["steps"]) else "BLOCKED")
     return finish("OK")
