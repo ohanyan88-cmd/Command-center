@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-12T00:52:04",
+ "generated_at": "2026-09-12T01:08:40",
  "algorithm": "sha256",
  "files": {
   ".claude/business/bm_company.py": {
@@ -141,6 +141,10 @@
   ".claude/integrations/registry.py": {
    "sha256": "ec4547f92c093d74df2b7bd9929738ae46aec80c7c36441a0ae699d652b4370d",
    "size": 15473
+  },
+  ".claude/policy/approval_rule.json": {
+   "sha256": "5776ee9b969ce87310d618f25e12e68e9dc67ce5aec6b05a987ab864b56ae06d",
+   "size": 3104
   },
   ".claude/policy/data_classification.json": {
    "sha256": "1878a4222b63433970f72431b9e6d2f858b501ee29286e3c57943a5dd96ee6c0",
@@ -467,8 +471,8 @@
    "size": 2541
   },
   "CLAUDE.md": {
-   "sha256": "ab33846a26b7f9a4223b49de8374fb3443b38fae16fdcf88d9fddeefbc121142",
-   "size": 14827
+   "sha256": "3a11b3e4437e9d1b1f620d7b9f19137ce8488eb469247f96b3490987485cdefe",
+   "size": 17435
   },
   "Journal.md": {
    "sha256": "623832a7257bf4b3da6be31b7fe30dc3f02f1928cd822555bd2bece42a66db9d",
