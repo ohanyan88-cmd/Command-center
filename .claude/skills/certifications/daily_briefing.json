@@ -6,6 +6,7 @@
  "computed_maturity": "L4",
  "tests": [
   "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
+  "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
   "test_integrations.I03_Envelope.test_normalized_envelope_provenance_freshness_and_cache",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
   "test_skills.T05_Execution.test_daily_briefing",
@@ -20,6 +21,7 @@
   "test_failclosed.F01_EveryBlockedCode.test_VERIFICATION_FAILED",
   "test_failclosed.F02_NeverMisrepresented.test_blocked_never_carries_result_data_as_success",
   "test_failclosed.F02_NeverMisrepresented.test_partial_preserves_completed_evidence_and_marks_incomplete",
+  "test_integrations.A02_AuditFailClosed.test_fixture_and_cached_reads_also_fail_closed_and_brief_reports_it",
   "test_integrations.I03_Envelope.test_failure_keeps_stale_cache_explicit_never_as_current",
   "test_integrations.I04_FailureMatrix.test_every_failure_code_maps_to_a_structured_envelope_and_health",
   "test_integrations.I04_FailureMatrix.test_tool_unavailable_when_powershell_missing",
@@ -39,6 +41,8 @@
   "test_hardening.H05_ChainFailureInjection.test_disabled_core_skill_blocks_chain_step",
   "test_hardening.H05_ChainFailureInjection.test_interrupted_chain_preserves_prior_steps_and_audits",
   "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success",
+  "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
+  "test_integrations.A02_AuditFailClosed.test_fixture_and_cached_reads_also_fail_closed_and_brief_reports_it",
   "test_integrations.I03_Envelope.test_failure_keeps_stale_cache_explicit_never_as_current",
   "test_integrations.I04_FailureMatrix.test_every_failure_code_maps_to_a_structured_envelope_and_health",
   "test_integrations.I04_FailureMatrix.test_tool_unavailable_when_powershell_missing",
@@ -48,7 +52,8 @@
   "test_hardening.H01_RegistryFailureInjection.test_bad_authority_rejected",
   "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
   "test_hardening.H04_AdversarialInputs.test_forged_token_still_bounded_by_max_action",
-  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable"
  ],
  "failure_injection": [
   "test_hardening.H01_RegistryFailureInjection.test_unknown_dependency_rejected",
@@ -59,6 +64,8 @@
   "test_hardening.H05_ChainFailureInjection.test_disabled_core_skill_blocks_chain_step",
   "test_hardening.H05_ChainFailureInjection.test_interrupted_chain_preserves_prior_steps_and_audits",
   "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success",
+  "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
+  "test_integrations.A02_AuditFailClosed.test_fixture_and_cached_reads_also_fail_closed_and_brief_reports_it",
   "test_integrations.I03_Envelope.test_failure_keeps_stale_cache_explicit_never_as_current",
   "test_integrations.I04_FailureMatrix.test_every_failure_code_maps_to_a_structured_envelope_and_health",
   "test_integrations.I04_FailureMatrix.test_tool_unavailable_when_powershell_missing",
@@ -91,7 +98,7 @@
   "test_skills.T02_Router.test_dependency_order"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-11T00:53:42",
+ "certified_at": "2026-09-11T23:29:20",
  "fingerprint": "81c052a9eb6f06eb786f3186",
  "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",

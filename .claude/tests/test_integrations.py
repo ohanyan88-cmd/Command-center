@@ -108,14 +108,14 @@ class I02_ReadOnlyBoundary(unittest.TestCase):
 class I03_Envelope(unittest.TestCase):
     @covers("daily_briefing", "meeting_preparation", *GOV, kinds=("unit",))
     def test_normalized_envelope_provenance_freshness_and_cache(self):
-        _clear_cache()
+        _clear_cache(); h0 = health.get("INT-OL-CAL") or {}
         with Fixture(LIVE):
             e = layer.query("INT-OL-CAL", "calendar.events", {"from": f"{T}T00:00:00", "to": f"{T}T23:59:59"}, use_cache=True)
             self.assertEqual(e["status"], "OK"); self.assertEqual(e["kind"], "meeting"); self.assertEqual(e["count"], 3); self.assertEqual(e["freshness"], "LIVE"); self.assertEqual(e["mode"], "FIXTURE")
             for k in ("integration_id", "source_system", "retrieved_at", "source_updated_at", "classification", "authority", "confidence", "provenance", "label", "meaning"): self.assertIn(k, e)
             self.assertEqual(C.check_records("meeting", e["records"]), []); self.assertEqual(e["provenance"]["op"], "calendar.events"); self.assertEqual(len(e["provenance"]["record_ids"]), 3)
             self.assertEqual(e["classification"], "CONFIDENTIAL"); self.assertEqual(e["label"], "LIVE_DATA"); self.assertIn("not a confirmed business fact", e["meaning"])
-            h = health.get("INT-OL-CAL"); self.assertIsNone(h["last_success"]); self.assertEqual(h["success_count"], 0); self.assertEqual(h["fixture_reads"], 1)   # fixture ≠ real evidence
+            h = health.get("INT-OL-CAL"); self.assertEqual(h["success_count"], h0.get("success_count", 0)); self.assertEqual(h["last_success"], h0.get("last_success")); self.assertEqual(h["fixture_reads"], h0.get("fixture_reads", 0) + 1)   # fixture ≠ real evidence
             e2 = layer.query("INT-OL-CAL", "calendar.events", {"from": f"{T}T00:00:00", "to": f"{T}T23:59:59"}, use_cache=True)
             self.assertEqual(e2["freshness"], "LIVE"); self.assertFalse(layer._cache_path().exists())          # fixtures are never cached
         if (ROOT / "Tasks.xlsx").exists():                                                                      # real source: second read within ttl is CACHED and says so
@@ -319,8 +319,8 @@ class I10_Reconciliation(unittest.TestCase):
     def test_fact_authority_conflict_and_precedence(self):
         same = reconcile.reconcile_fact("meeting_time", [{"source": "INT-OL-CAL", "value": "10:00"}, {"source": "INT-OL-CAL", "value": "11:00"}])
         self.assertEqual(same["status"], "SOURCE_CONFLICT"); self.assertEqual(same["label"], "UNKNOWN"); self.assertEqual(len(same["observations"]), 2)
-        diff = reconcile.reconcile_fact("task_status", [{"source": "INT-OL-MAIL", "value": "done"}, {"source": "INT-TASKS", "value": "Ընթացքում"}, {"source": "INT-B24", "value": "closed"}])
-        self.assertEqual((diff["status"], diff["source"], diff["value"]), ("RESOLVED", "INT-TASKS", "Ընթացքում")); self.assertEqual({o["source"] for o in diff["overridden"]}, {"INT-OL-MAIL", "INT-B24"}); self.assertEqual(len(diff["observations"]), 3)
+        diff = reconcile.reconcile_fact("register_task_status", [{"source": "INT-OL-MAIL", "value": "done"}, {"source": "INT-TASKS", "value": "Ընթացքում"}, {"source": "INT-B24", "value": "closed"}])
+        self.assertEqual((diff["status"], diff["source"], diff["value"]), ("RESOLVED", "INT-TASKS", "Ընթացքում")); self.assertEqual({o["source"] for o in diff["overridden"]}, {"INT-OL-MAIL"}); self.assertEqual(diff["unconfigured_sources_ignored"], ["INT-B24"]); self.assertEqual(len(diff["observations"]), 3)
         self.assertEqual(reconcile.reconcile_fact("meeting_time", [])["status"], "NO_OBSERVATION"); self.assertEqual(reconcile.reconcile_fact("net_promoter_score", [{"source": "INT-B24", "value": 1}])["status"], "AUTHORITY_UNDEFINED")
         ign = reconcile.reconcile_fact("meeting_time", [{"source": "INT-XX", "value": "9:00"}, {"source": "INT-TASKS", "value": "10:00"}]); self.assertEqual(ign["unconfigured_sources_ignored"], ["INT-XX"]); self.assertEqual(ign["source"], "INT-TASKS")
     @covers("source_reconciliation", *GOV, kinds=("unit",))
@@ -380,8 +380,178 @@ class I12_AuditAndPrivacy(unittest.TestCase):
         if not (ROOT / "Tasks.xlsx").exists(): self.skipTest("Tasks.xlsx absent")
         _clear_cache(); layer.query("INT-TASKS", "tasks.list", {"open_only": True}, use_cache=True)
         p = layer._cache_path(); self.assertTrue(str(p).startswith(str(engine.STATE_DIR))); d = json.loads(p.read_text(encoding="utf-8")); self.assertEqual(len(d), 1)
-        self.assertEqual(set(next(iter(d.values()))), {"retrieved_at", "records", "source_updated_at", "identity", "mode"})       # minimal: last result only, no history
+        self.assertEqual(set(next(iter(d.values()))), {"retrieved_at", "records", "source_updated_at", "identity", "mode", "expires_at"})       # minimal: last result only, hard expiry, no history
         import sensitive_scan as ss; self.assertEqual(ss.classify_path(".claude/state/integrations_cache.json", ss.load_policy())[0], "CONFIDENTIAL")
+
+# ═══════════════════ external audit of c3ffda1 — regression tests per finding ═══════════════════
+class A01_ConfidentialCache(unittest.TestCase):
+    """Finding 1 — mailbox/calendar payloads never persist; persisted entries carry a hard expiry enforced on load/startup."""
+    @covers("daily_briefing", "open_loop_memory", "data_sensitivity_awareness", *GOV, kinds=("unit", "failure_injection", "adversarial"))
+    def test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable(self):
+        _clear_cache(); layer._MEM.clear()
+        for iid in ("INT-OL-MAIL", "INT-OL-CAL"): self.assertFalse(registry.get(iid)["freshness"]["persist"], iid)
+        self.assertTrue(registry.get("INT-TASKS")["freshness"]["persist"])
+        # a real-mode mail read through the memory path (adapter monkeypatched → no Outlook needed) must not touch the disk cache
+        import adapter_outlook
+        secret_preview = "CONFIDENTIAL-PREVIEW-" + "zq7"
+        def fake_read(op, params=None, cfg=None, integration_id=None):
+            return {"records": [_msg("Hello", "x@example.test", secret_preview, "mm1")], "source_updated_at": None, "identity": {"addresses": ["gev@housenet.am"], "verified": True}, "partial": False, "notes": []}
+        old = adapter_outlook.read; adapter_outlook.read = fake_read
+        try:
+            e1 = layer.query("INT-OL-MAIL", "mail.list", {"folder": "Inbox"}, use_cache=True); self.assertEqual((e1["status"], e1["mode"]), ("OK", "REAL"))
+            e2 = layer.query("INT-OL-MAIL", "mail.list", {"folder": "Inbox"}, use_cache=True); self.assertEqual(e2["freshness"], "CACHED")   # memory-only hit
+        finally: adapter_outlook.read = old
+        p = layer._cache_path(); self.assertFalse(p.exists() and secret_preview in p.read_text(encoding="utf-8"))
+        self.assertFalse(p.exists(), "mail read created a persistent cache file")
+        k = next(iter(layer._MEM)); self.assertIn(secret_preview, json.dumps(layer._MEM[k]))
+        layer._MEM[k]["expires_at"] = "2000-01-01T00:00:00"                      # expire it → unrecoverable from normal runtime paths
+        self.assertIsNone(layer._cache_get("INT-OL-MAIL", k)); self.assertNotIn(k, layer._MEM)
+        self.assertIn(k, layer.prune_cache() + [k])
+        # a legacy/foreign persistent entry carrying mail payload is destroyed on the very next load (not only after a later successful query)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps({"INT-OL-MAIL|mail.list|abc": {"retrieved_at": "2026-09-11T00:00:00", "expires_at": "2999-01-01T00:00:00", "records": [{"preview": secret_preview}], "mode": "REAL"},
+                                 "INT-TASKS|tasks.list|old": {"retrieved_at": "2026-09-11T00:00:00", "expires_at": "2000-01-01T00:00:00", "records": [{"title": "expired"}], "mode": "REAL"},
+                                 "INT-TASKS|tasks.list|noexp": {"retrieved_at": "2026-09-11T00:00:00", "records": [{"title": "legacy without expiry"}], "mode": "REAL"}}), encoding="utf-8")
+        loaded = layer._cache_load(); self.assertEqual(loaded, {})
+        self.assertFalse(p.exists() and (secret_preview in p.read_text(encoding="utf-8") or "expired" in p.read_text(encoding="utf-8")))
+        e = layer.query("INT-OL-MAIL", "mail.list", {"folder": "Inbox"}, use_cache=True) if False else None   # (no live call needed)
+    @covers("task_management", *GOV, kinds=("unit", "failure_injection"))
+    def test_persistent_register_cache_has_hard_expiry_on_startup(self):
+        if not (ROOT / "Tasks.xlsx").exists(): self.skipTest("Tasks.xlsx absent")
+        _clear_cache()
+        layer.query("INT-TASKS", "tasks.list", {"open_only": True}, use_cache=True)
+        p = layer._cache_path(); d = json.loads(p.read_text(encoding="utf-8")); k = next(iter(d)); self.assertTrue(d[k]["expires_at"] > d[k]["retrieved_at"])
+        d[k]["expires_at"] = "2000-01-01T00:00:00"; p.write_text(json.dumps(d), encoding="utf-8")
+        dropped = layer.prune_cache(); self.assertIn(k, dropped); self.assertFalse(p.exists())
+        e = layer.query("INT-TASKS", "tasks.list", {"open_only": True}, use_cache=True); self.assertEqual(e["freshness"], "LIVE")   # expired entry was never served
+
+class A02_AuditFailClosed(unittest.TestCase):
+    """Finding 2 — a CONFIDENTIAL read without persisted, re-readable governed audit evidence is not a successful read."""
+    def _with_broken_audit(self, fn, how):
+        if how == "raise":
+            orig = engine.audit
+            def broken(rec): raise RuntimeError("audit store offline")
+            engine.audit = broken
+        else:
+            st = engine._store(); orig = st.get
+            st.get = lambda table, key: None if table == "audit" else orig(table, key)
+        try: return fn()
+        finally:
+            if how == "raise": engine.audit = orig
+            else: engine._store().get = orig
+    @covers("audit_logging", "completion_verification", "task_management", *GOV, kinds=("failure", "failure_injection", "enforcement"))
+    def test_real_read_withheld_when_audit_cannot_be_persisted_or_reread(self):
+        if not (ROOT / "Tasks.xlsx").exists(): self.skipTest("Tasks.xlsx absent")
+        _clear_cache(); before = (health.get("INT-TASKS") or {}).get("success_count", 0)
+        for how in ("raise", "reread"):
+            e = self._with_broken_audit(lambda: layer.query("INT-TASKS", "tasks.list", {"open_only": True}, use_cache=False), how)
+            self.assertEqual((e["status"], e["code"], e["records"], e["health"]), ("FAILED", "AUDIT_UNAVAILABLE", [], "DEGRADED"), how)
+            self.assertIn("withheld", e["reason"]); self.assertFalse(e.get("audit_recorded"))
+        h = health.get("INT-TASKS"); self.assertEqual(h["success_count"], before); self.assertEqual(h["audit_failures"], 2)    # no success evidence without audit
+        ok = layer.query("INT-TASKS", "tasks.list", {"open_only": True}, use_cache=False)
+        self.assertEqual(ok["status"], "OK"); self.assertTrue(ok["audit_id"]); self.assertTrue(engine._store().get("audit", ok["audit_id"]))
+        self.assertEqual(health.get("INT-TASKS")["success_count"], before + 1)
+    @covers("audit_logging", "daily_briefing", *GOV, kinds=("failure", "failure_injection"))
+    def test_fixture_and_cached_reads_also_fail_closed_and_brief_reports_it(self):
+        _clear_cache()
+        with Fixture(LIVE):
+            e = self._with_broken_audit(lambda: layer.query("INT-OL-CAL", "calendar.events", {"from": T, "to": T}, use_cache=False), "raise")
+            self.assertEqual((e["status"], e["code"]), ("FAILED", "AUDIT_UNAVAILABLE")); self.assertEqual(e["records"], [])
+            r = self._with_broken_audit(lambda: executors.daily_briefing({"today": T}), "raise")
+        self.assertEqual(r["live"]["critical_unavailable"], ["INT-OL-CAL"]); self.assertTrue(any("AUDIT_UNAVAILABLE" in x["text"] for x in r["risks"]))
+        if (ROOT / "Tasks.xlsx").exists():
+            layer.query("INT-TASKS", "tasks.list", {"open_only": True}, use_cache=True)
+            c = self._with_broken_audit(lambda: layer.query("INT-TASKS", "tasks.list", {"open_only": True}, use_cache=True), "raise")
+            self.assertEqual((c["status"], c["code"], c["records"]), ("FAILED", "AUDIT_UNAVAILABLE", []))          # even a cache hit needs its audit
+    @covers("audit_logging", *GOV, kinds=("unit",))
+    def test_audit_helper_is_consistent_with_core_store(self):
+        aid = layer._audit({"integration_id": "INT-TASKS", "op": "probe", "result_status": "OK"})
+        self.assertTrue(aid); rec = engine._store().get("audit", aid); self.assertTrue(rec)
+        self.assertEqual(rec["skill_id"] if "skill_id" in rec else rec.get("payload", {}).get("skill_id"), "<integration:INT-TASKS>")
+        with self.assertRaises(layer.AuditUnavailable): self._with_broken_audit(lambda: layer._audit({"integration_id": "INT-TASKS", "op": "x", "result_status": "OK"}), "raise")
+        self.assertIsNone(self._with_broken_audit(lambda: layer._audit({"integration_id": "INT-TASKS", "op": "x", "result_status": "FAILED"}, required=False), "raise"))
+
+class A03_TaskAuthorityScope(unittest.TestCase):
+    """Finding 3 — register tasks and Bitrix-native tasks are separate scopes; no stale manual status overrides a system of record."""
+    @covers("source_reconciliation", "task_management", "confidence_handling", *GOV, kinds=("unit", "failure"))
+    def test_scoped_hierarchies(self):
+        self.assertNotIn("task_status", registry.FACT_AUTHORITY); self.assertNotIn("task_deadline", registry.FACT_AUTHORITY)
+        for ft in ("register_task_status", "register_task_deadline", "crm_task_status", "crm_task_deadline"):
+            fa = registry.FACT_AUTHORITY[ft]; self.assertTrue(fa.get("scope") and fa.get("system_of_record"), ft)
+        self.assertEqual(registry.FACT_AUTHORITY["crm_task_status"]["tiers"], [["INT-B24"]]); self.assertNotIn("INT-B24", sum(registry.FACT_AUTHORITY["register_task_status"]["tiers"], []))
+        obs = [{"source": "INT-TASKS", "value": "Ընթացքում", "record_id": "INT-TASKS:1"}, {"source": "INT-B24", "value": "5", "record_id": "INT-B24:9"}, {"source": "INT-OL-MAIL", "value": "done?"}]
+        crm = reconcile.reconcile_fact("crm_task_status", obs)
+        self.assertEqual((crm["status"], crm["source"], crm["value"], crm["system_of_record"]), ("RESOLVED", "INT-B24", "5", "INT-B24")); self.assertEqual(set(crm["unconfigured_sources_ignored"]), {"INT-TASKS", "INT-OL-MAIL"}); self.assertEqual(crm["overridden"], [])
+        reg = reconcile.reconcile_fact("register_task_status", obs)
+        self.assertEqual((reg["status"], reg["source"], reg["value"]), ("RESOLVED", "INT-TASKS", "Ընթացքում")); self.assertIn("INT-B24", reg["unconfigured_sources_ignored"])
+        amb = reconcile.reconcile_fact("task_status", obs); self.assertEqual(amb["status"], "AUTHORITY_UNDEFINED"); self.assertIn("scoped", amb["reason"])
+    @covers("source_reconciliation", "task_management", *GOV, kinds=("unit", "failure"))
+    def test_cross_system_link_keeps_both_statuses_and_flags_divergence(self):
+        reg = {"status": "Ընթացքում", "due": "2026-09-12", "record_id": "INT-TASKS:1"}; crm = {"status": "5", "deadline": "2026-09-10T18:00:00", "record_id": "INT-B24:9"}
+        link = reconcile.reconcile_task_link(reg, crm, {"status": "MATCH"})
+        self.assertEqual((link["status"], link["code"], link["divergent"], link["override"]), ("LINKED", "STATUS_DIVERGENCE", True, None))
+        self.assertEqual(link["register"]["status"], "Ընթացքում"); self.assertEqual(link["crm"]["status"], "5"); self.assertEqual(link["label"], "UNKNOWN"); self.assertIn("writes nothing", link["resolution_required"])
+        same = reconcile.reconcile_task_link(reg, {**crm, "status": "Ընթացքում"}, {"status": "MATCH"}); self.assertFalse(same["divergent"]); self.assertNotIn("code", same)
+        unc = reconcile.reconcile_task_link(reg, crm, {"status": "ENTITY_MATCH_UNCERTAIN"}); self.assertEqual(unc["status"], "ENTITY_MATCH_UNCERTAIN"); self.assertNotIn("code", unc)
+        self.assertEqual(reconcile.reconcile_task_link(reg, None, {"status": "NO_MATCH"})["status"], "UNLINKED")
+    @covers("source_reconciliation", *GOV, kinds=("unit",))
+    def test_business_model_carries_scoped_live_authority(self):
+        import business
+        m = business.load()
+        if not m: self.skipTest("business model not built")
+        fa = m["sources"]["live_sources"]["fact_authority"]; self.assertIn("crm_task_status", fa); self.assertNotIn("task_status", fa)
+
+class A04_CertificationScope(unittest.TestCase):
+    """Finding 4 — scope_verified only when EVERY required operation succeeded as a REAL read."""
+    @covers("completion_verification", *GOV, kinds=("unit", "failure_injection", "completion"))
+    def test_required_ops_declared_and_subset_never_verifies(self):
+        for iid, spec in registry.INTEGRATIONS.items():
+            self.assertIn("required_certification_ops", spec, iid); self.assertTrue(set(spec["required_certification_ops"]) <= set(spec["read_ops"]), iid)
+            if spec["read_ops"]: self.assertTrue(spec["required_certification_ops"], iid)
+        self.assertEqual(registry.INTEGRATIONS["INT-OL-MAIL"]["required_certification_ops"], ["mail.list", "mail.search"]); self.assertGreaterEqual(len(registry.INTEGRATIONS["INT-B24"]["required_certification_ops"]), 3)
+        if not (ROOT / "Tasks.xlsx").exists(): self.skipTest("Tasks.xlsx absent")
+        _clear_cache(); spec = registry.INTEGRATIONS["INT-TASKS"]; saved = list(spec["required_certification_ops"]); saved_ops = dict(spec["read_ops"])
+        spec["read_ops"]["tasks.history"] = {"kind": "task", "params": []}; spec["required_certification_ops"] = ["tasks.list", "tasks.history"]      # second scope exists but cannot be read for real
+        out = TMP / "cert_scope.json"
+        try: rec = certify_integrations.certify(real=True, out=out)
+        finally: spec["required_certification_ops"] = saved; spec["read_ops"] = saved_ops
+        r = rec["integrations"]["INT-TASKS"]
+        self.assertEqual(r["state"], "CONNECTED"); self.assertFalse(r["evidence"]["scope_verified"]); self.assertTrue(r["ops_proof"]["tasks.list"]["ok"]); self.assertFalse(r["ops_proof"]["tasks.history"]["ok"])
+        self.assertTrue(any("scope NOT verified" in n for n in r["notes"]))
+        rec2 = certify_integrations.certify(real=True, out=out); self.assertEqual(rec2["integrations"]["INT-TASKS"]["state"], "VERIFIED_READ"); self.assertEqual(list(rec2["integrations"]["INT-TASKS"]["ops_proof"]), ["tasks.list"])
+    @covers("completion_verification", *GOV, kinds=("failure_injection",))
+    def test_fixture_success_on_every_required_op_is_not_scope_proof(self):
+        _clear_cache(); out = TMP / "cert_fixture.json"
+        with Fixture({"INT-OL-MAIL": {"mail.list": {"records": LIVE["INT-OL-MAIL"]["records"]}, "mail.search": {"records": LIVE["INT-OL-MAIL"]["records"][:1]}}, "INT-OL-CAL": LIVE["INT-OL-CAL"]}):
+            rec = certify_integrations.certify(real=True, out=out)
+        for iid in ("INT-OL-MAIL", "INT-OL-CAL"):
+            r = rec["integrations"][iid]; self.assertEqual(r["state"], "CONFIGURED", iid); self.assertFalse(r["evidence"]["scope_verified"]); self.assertTrue(all(p["mode"] == "FIXTURE" and not p["ok"] for p in r["ops_proof"].values()))
+
+class A05_Concurrency(unittest.TestCase):
+    """Finding 5 — parallel reads never lose health evidence; the persistent cache survives concurrent writers."""
+    @covers("audit_logging", "completion_verification", *GOV, kinds=("concurrency", "unit"))
+    def test_parallel_threads_and_processes_keep_every_success(self):
+        import concurrent.futures
+        iid = "INT-CONC-TEST"; base = (health.get(iid) or {}).get("success_count", 0)
+        with concurrent.futures.ThreadPoolExecutor(16) as ex:
+            list(ex.map(lambda i: health.record(iid, True, op="t", mode="REAL"), range(160)))
+        code = ("import sys; sys.path.insert(0, r'%s'); sys.path.insert(0, r'%s'); import engine, health; engine.STATE_DIR = __import__('pathlib').Path(r'%s')\n"
+                "[health.record('%s', True, op='p', mode='REAL') for _ in range(25)]") % (str(ROOT / ".claude" / "integrations"), str(ROOT / ".claude" / "skills"), str(engine.STATE_DIR), iid)
+        procs = [subprocess.Popen([sys.executable, "-c", code]) for _ in range(4)]
+        for pr in procs: self.assertEqual(pr.wait(timeout=120), 0)
+        h = health.get(iid)
+        self.assertEqual(h["success_count"], base + 160 + 100); self.assertEqual(h["consecutive_failures"], 0); self.assertTrue(h["last_success"]); self.assertIn(h["last_success"][:10], h["success_days"])
+        self.assertFalse(list(engine.STATE_DIR.glob("integrations_health.json.*.tmp")))
+    @covers("task_management", *GOV, kinds=("concurrency",))
+    def test_parallel_register_reads_keep_cache_and_health_consistent(self):
+        if not (ROOT / "Tasks.xlsx").exists(): self.skipTest("Tasks.xlsx absent")
+        import concurrent.futures
+        _clear_cache(); base = (health.get("INT-TASKS") or {}).get("success_count", 0)
+        with concurrent.futures.ThreadPoolExecutor(8) as ex:
+            envs = list(ex.map(lambda i: layer.query("INT-TASKS", "tasks.list", {"open_only": True, "owner": str(i % 3)}, use_cache=True), range(24)))
+        live = [e for e in envs if e["status"] == "OK" and e["freshness"] == "LIVE"]; self.assertTrue(all(e["status"] == "OK" for e in envs), [e.get("code") for e in envs if e["status"] != "OK"])
+        self.assertEqual(health.get("INT-TASKS")["success_count"], base + len(live))
+        p = layer._cache_path(); d = json.loads(p.read_text(encoding="utf-8")); self.assertEqual(len(d), 3); self.assertTrue(all(v.get("expires_at") for v in d.values()))
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

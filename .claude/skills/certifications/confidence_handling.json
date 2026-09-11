@@ -5,11 +5,13 @@
  "declared_maturity": "L2",
  "computed_maturity": "L3",
  "tests": [
+  "test_integrations.A03_TaskAuthorityScope.test_scoped_hierarchies",
   "test_integrations.I10_Reconciliation.test_fact_authority_conflict_and_precedence",
   "test_skills.T07_VerificationAudit.test_confidence"
  ],
  "failure_tests": [
   "test_failclosed.F01_EveryBlockedCode.test_CONFLICTING_SOURCE",
+  "test_integrations.A03_TaskAuthorityScope.test_scoped_hierarchies",
   "test_integrations.I10_Reconciliation.test_fact_authority_conflict_and_precedence",
   "test_skills.T07_VerificationAudit.test_confidence"
  ],
@@ -34,7 +36,7 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-11T00:53:42",
+ "certified_at": "2026-09-11T23:29:20",
  "fingerprint": "989e22a4b1b736601ecbe2bd",
  "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",

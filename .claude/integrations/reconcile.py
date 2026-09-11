@@ -97,7 +97,7 @@ def reconcile_fact(fact_type, observations, fact_authority=None):
     """observations: [{source, value, retrieved_at, record_id, ...}] → RESOLVED (with every observation kept and lower-tier differences listed),
     SOURCE_CONFLICT (same-tier disagreement), AUTHORITY_UNDEFINED (no configured hierarchy → no guess), NO_OBSERVATION."""
     fa = (fact_authority or registry.FACT_AUTHORITY).get(fact_type)
-    if not fa: return {"status": "AUTHORITY_UNDEFINED", "fact_type": fact_type, "observations": list(observations), "reason": "no configured source hierarchy for this fact type — live ≠ correct; ask Gev which source rules"}
+    if not fa: return {"status": "AUTHORITY_UNDEFINED", "fact_type": fact_type, "observations": list(observations), "reason": "no configured source hierarchy for this fact type — live ≠ correct; ask Gev which source rules" + (" (task facts are scoped: register_task_* vs crm_task_*)" if "task" in str(fact_type) else "")}
     tiers = fa["tiers"]; obs = [o for o in observations if o.get("source")]
     unknown = [o["source"] for o in obs if not any(o["source"] in t for t in tiers)]
     for i, tier in enumerate(tiers):
@@ -107,10 +107,28 @@ def reconcile_fact(fact_type, observations, fact_authority=None):
         if len(vals) > 1:
             return {"status": "SOURCE_CONFLICT", "code": "SOURCE_CONFLICT", "fact_type": fact_type, "tier": i, "sources": sorted({o["source"] for o in here}), "values": sorted(vals), "observations": obs,
                     "resolution": "not chosen — same-authority sources disagree; Gev decides or a source is corrected", "label": "UNKNOWN"}
-        win = here[0]; lower = [o for o in obs if o["source"] not in tier and str(o.get("value")) != str(win.get("value"))]
+        win = here[0]; lower = [o for o in obs if o["source"] not in tier and o["source"] not in unknown and str(o.get("value")) != str(win.get("value"))]   # out-of-scope sources are ignored, not "overridden"
         return {"status": "RESOLVED", "fact_type": fact_type, "value": win.get("value"), "source": win["source"], "tier": i, "retrieved_at": win.get("retrieved_at"), "record_id": win.get("record_id"),
-                "overridden": lower, "observations": obs, "unconfigured_sources_ignored": unknown, "label": "LIVE_DATA" if str(win["source"]).startswith("INT-") else "CONFIRMED", "authority_src": fa.get("src", [])}
+                "overridden": lower, "observations": obs, "unconfigured_sources_ignored": unknown, "out_of_scope_ignored": [o["source"] for o in obs if o["source"] in unknown], "scope": fa.get("scope"), "system_of_record": fa.get("system_of_record"),
+                "label": "LIVE_DATA" if str(win["source"]).startswith("INT-") else "CONFIRMED", "authority_src": fa.get("src", [])}
     return {"status": "NO_OBSERVATION", "fact_type": fact_type, "observations": obs, "unconfigured_sources_ignored": unknown, "label": "UNKNOWN"}
+
+def reconcile_task_link(register_task, crm_task, link):
+    """Scope-aware cross-system task view (audit finding 3). register_task: {status, due, source:"INT-TASKS", record_id};
+    crm_task: {status, deadline, source:"INT-B24", record_id}; link: result of link_entities / matching (status MATCH|ENTITY_MATCH_UNCERTAIN|NO_MATCH).
+    Each system stays authoritative for ITS OWN record; nothing is overridden. A confirmed link with different states → STATUS_DIVERGENCE (a signal for Gev, not a merge)."""
+    reg = {"source": "INT-TASKS", "scope": "management register", "status": (register_task or {}).get("status"), "due": (register_task or {}).get("due"), "record_id": (register_task or {}).get("record_id")} if register_task else None
+    crm = {"source": "INT-B24", "scope": "Bitrix24-native task", "status": (crm_task or {}).get("status"), "deadline": (crm_task or {}).get("deadline"), "record_id": (crm_task or {}).get("record_id")} if crm_task else None
+    ls = (link or {}).get("status", "NO_MATCH")
+    out = {"register": reg, "crm": crm, "link": ls, "override": None, "note": "each system is the system of record for its own task; no status is copied across"}
+    if not reg or not crm or ls != "MATCH":
+        out["status"] = "UNLINKED" if ls == "NO_MATCH" or not (reg and crm) else "ENTITY_MATCH_UNCERTAIN"; return out
+    out["status"] = "LINKED"
+    if str(reg["status"]) != str(crm["status"]):
+        out["code"] = "STATUS_DIVERGENCE"; out["divergent"] = True; out["label"] = "UNKNOWN"
+        out["resolution_required"] = "Gev confirms which record is stale — the register is corrected by hand, Bitrix by its owner; Deputy writes nothing"
+    else: out["divergent"] = False
+    return out
 
 def meeting_pack(meeting, tasks=(), commitments=(), decisions=(), business_available=False):
     title = meeting.get("title") or ""; text = title + " " + (meeting.get("description_preview") or "")

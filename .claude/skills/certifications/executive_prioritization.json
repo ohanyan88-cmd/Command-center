@@ -51,7 +51,7 @@
   "test_skills.T02_Router.test_trigger_resolution"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-11T00:53:42",
+ "certified_at": "2026-09-11T23:29:20",
  "fingerprint": "fac0333fe25d205e633997eb",
  "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",

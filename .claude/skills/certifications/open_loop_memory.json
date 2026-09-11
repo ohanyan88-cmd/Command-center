@@ -5,6 +5,7 @@
  "declared_maturity": "L3",
  "computed_maturity": "L4",
  "tests": [
+  "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
   "test_integrations.I09_MeetingPrepAndOpenLoops.test_open_loops_extract_candidates_not_facts",
   "test_integrations.I10_Reconciliation.test_message_classification_and_candidates",
   "test_skills.T05_Execution.test_open_loops"
@@ -18,15 +19,18 @@
   "test_hardening.H02_SourceFailureInjection.test_source_missing_blocks_not_fabricates",
   "test_hardening.H02_SourceFailureInjection.test_stale_source_blocks_unless_acknowledged",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
   "test_integrations.I04_FailureMatrix.test_every_failure_code_maps_to_a_structured_envelope_and_health"
  ],
  "adversarial": [
   "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
-  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable"
  ],
  "failure_injection": [
   "test_hardening.H02_SourceFailureInjection.test_source_missing_blocks_not_fabricates",
   "test_hardening.H02_SourceFailureInjection.test_stale_source_blocks_unless_acknowledged",
+  "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
   "test_integrations.I04_FailureMatrix.test_every_failure_code_maps_to_a_structured_envelope_and_health"
  ],
  "authority_tests": [
@@ -44,7 +48,7 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-11T00:53:42",
+ "certified_at": "2026-09-11T23:29:20",
  "fingerprint": "848a92546988c2b4451572c1",
  "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",

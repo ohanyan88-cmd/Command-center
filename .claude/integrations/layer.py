@@ -24,23 +24,98 @@ def _fixture():
         except ValueError: _FIXTURE.update(path=p, mtime=m, data={})
     return _FIXTURE["data"] or {}
 
-def _audit(rec):
+class AuditUnavailable(Exception): pass
+
+def _audit(rec, *, required=True):
+    """Governed audit evidence for an integration read (audit finding 2 — never fail open). The record is written through the
+    hardened core store (engine.audit → SQLite, journal-first) and RE-READ; if it cannot be persisted or re-read, a required audit
+    raises AuditUnavailable and the caller must NOT report the read as successful. Returns the audit_id when persisted."""
     try:
         import engine
-        engine.audit({"execution_id": rec.get("execution_id") or hashlib.sha256(json.dumps(rec, sort_keys=True, default=str).encode()).hexdigest()[:12], "skill_id": f"<integration:{rec.get('integration_id')}>", **rec})
-    except Exception: pass
+        aid = rec.get("audit_id") or hashlib.sha256(json.dumps(rec, sort_keys=True, default=str).encode()).hexdigest()[:16]
+        out = engine.audit({"audit_id": aid, "execution_id": rec.get("execution_id") or aid[:12], "skill_id": f"<integration:{rec.get('integration_id')}>", **rec})
+        if not out or not engine._store().get("audit", aid): raise AuditUnavailable("audit record not re-readable after write")
+        return aid
+    except AuditUnavailable:
+        if required: raise
+        return None
+    except Exception as e:
+        if required: raise AuditUnavailable(f"{type(e).__name__}: {_secrets.redact(str(e))[:120]}")
+        return None
+
+# ───────── cache (audit finding 1): CONFIDENTIAL payloads are never persisted; what is persisted carries a hard expiry enforced on EVERY load ─────────
+_MEM = {}                      # memory-only cache for integrations whose freshness.persist is False (mailbox/calendar payloads); dies with the process
 
 def _cache_path(): return health.state_dir() / "integrations_cache.json"
 
+def _persist_allowed(iid):
+    spec = registry.get(iid) or {}
+    return bool((spec.get("freshness") or {}).get("persist", False))
+
+def _prune(d):
+    """Drop expired entries, entries without an expiry, and entries of integrations that may not persist. Returns (pruned_dict, dropped_keys)."""
+    now = datetime.datetime.now().isoformat(timespec="seconds"); keep, dropped = {}, []
+    for k, v in (d or {}).items():
+        iid = k.split("|", 1)[0]
+        if not isinstance(v, dict) or not v.get("expires_at") or v["expires_at"] <= now or not _persist_allowed(iid): dropped.append(k)
+        else: keep[k] = v
+    return keep, dropped
+
 def _cache_load():
+    """Load the persistent cache with hard expiry applied on load (not only after a later successful query); rewrites the file when anything was pruned."""
     p = _cache_path()
     if not p.exists(): return {}
-    try: return json.loads(p.read_text(encoding="utf-8"))
-    except (OSError, ValueError): return {}
+    with health.locked(p):
+        d = health.read_json(p, {}); keep, dropped = _prune(d)
+        if dropped:
+            if keep: health.write_json_atomic(p, keep)
+            else:
+                try: p.unlink()
+                except OSError: health.write_json_atomic(p, {})
+        return keep
 
 def _cache_save(d):
-    p = _cache_path(); p.parent.mkdir(parents=True, exist_ok=True)
-    tmp = p.with_suffix(".tmp"); tmp.write_text(json.dumps(d, ensure_ascii=False, default=str), encoding="utf-8"); os.replace(tmp, p)
+    p = _cache_path()
+    with health.locked(p):
+        keep, _ = _prune(d)
+        if keep: health.write_json_atomic(p, keep)
+        elif p.exists():
+            try: p.unlink()
+            except OSError: pass
+
+def prune_cache():
+    """Startup/idle pruning entry point: expired or non-persistable payloads are removed from disk and memory right now."""
+    p = _cache_path(); dropped = []
+    if p.exists():
+        with health.locked(p):
+            d = health.read_json(p, {}); keep, dropped = _prune(d)
+            if keep: health.write_json_atomic(p, keep)
+            else:
+                try: p.unlink()
+                except OSError: pass
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    for k in [k for k, v in _MEM.items() if v.get("expires_at", "") <= now]: _MEM.pop(k, None); dropped.append(k)
+    return dropped
+
+def _cache_get(iid, k):
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    if _persist_allowed(iid):
+        c = _cache_load().get(k)
+    else:
+        c = _MEM.get(k)
+        if c and c.get("expires_at", "") <= now: _MEM.pop(k, None); c = None
+    return c if (c and c.get("expires_at", "") > now) else None
+
+def _cache_put(iid, k, entry, ttl):
+    entry = dict(entry, expires_at=(datetime.datetime.now() + datetime.timedelta(seconds=ttl)).isoformat(timespec="seconds"))
+    if _persist_allowed(iid):
+        with health.locked(_cache_path()):
+            d = health.read_json(_cache_path(), {}); d[k] = entry; keep, _ = _prune(d)
+            health.write_json_atomic(_cache_path(), keep)
+    else:
+        now = datetime.datetime.now().isoformat(timespec="seconds")
+        for kk in [x for x, v in _MEM.items() if v.get("expires_at", "") <= now]: _MEM.pop(kk, None)
+        _MEM[k] = entry
 
 def _key(iid, op, params): return f"{iid}|{op}|" + hashlib.sha256(json.dumps(params or {}, sort_keys=True, default=str).encode()).hexdigest()[:16]
 
@@ -64,7 +139,7 @@ def capability(intent_text, integration_id=None):
     if wi:
         r = {"status": "BLOCKED", "code": "AUTHORITY_EXCEEDED", "capability": "WRITE_DISABLED", "write_intent": wi, "integration_id": integration_id, "mission": "READ_ONLY",
              "reason": f"{wi}: Deputy has no write capability toward any external system (Mission 4 READ-ONLY); the integration layer exposes no write operation — prepare it for Gev instead"}
-        _audit({"integration_id": integration_id or "*", "op": "capability", "result_status": "BLOCKED", "code": "AUTHORITY_EXCEEDED", "write_intent": wi}); return r
+        r["audit_recorded"] = bool(_audit({"integration_id": integration_id or "*", "op": "capability", "result_status": "BLOCKED", "code": "AUTHORITY_EXCEEDED", "write_intent": wi}, required=False)); return r
     return {"status": "OK", "write_intent": None, "capability": "READ"}
 
 def query(integration_id, op, params=None, *, use_cache=True, transport=None, intent=None, execution_id=None):
@@ -80,17 +155,20 @@ def query(integration_id, op, params=None, *, use_cache=True, transport=None, in
     if op not in spec["read_ops"]:
         code = "READ_ONLY_VIOLATION" if C.WRITE_OP_RX.search(op or "") else "UNKNOWN_OPERATION"
         env = C.failure(integration_id, system, op, code, f"{integration_id} exposes read operations {sorted(spec['read_ops'])} only; {op!r} refused")
-        _audit({"integration_id": integration_id, "op": op, "result_status": "FAILED", "code": code, "execution_id": execution_id}); return env
+        env["audit_recorded"] = bool(_audit({"integration_id": integration_id, "op": op, "result_status": "FAILED", "code": code, "execution_id": execution_id}, required=False)); return env
     kind = spec["read_ops"][op]["kind"]; fr = spec["freshness"]; ttl = fr.get("cache_ttl_seconds") or 0; max_age = fr.get("max_age_seconds")
     k = _key(integration_id, op, params); h = health.get(integration_id) or {}
     fx = _fixture(); fixture_active = bool(fx) and integration_id in fx           # fixtures always win over the cache and are never written into it
     if use_cache and ttl and not fixture_active:
-        c = _cache_load().get(k)
+        c = _cache_get(integration_id, k)
         if c and _age(c["retrieved_at"]) <= ttl:
             age = _age(c["retrieved_at"]); fresh = "STALE" if (max_age is not None and age > max_age) else "CACHED"
             env = C.envelope(integration_id, system, op, kind, c["records"], authority=spec["authority"], classification=spec["classification"], retrieved_at=c["retrieved_at"],
                              source_updated_at=c.get("source_updated_at"), freshness=fresh, identity=c.get("identity"), mode=c.get("mode", "REAL"), cache_age_seconds=age, notes=[f"served from cache ({age}s old)"])
-            _audit({"integration_id": integration_id, "op": op, "param_keys": sorted(params), "result_status": "OK", "count": env["count"], "freshness": fresh, "execution_id": execution_id}); return env
+            try: env["audit_id"] = _audit({"integration_id": integration_id, "op": op, "param_keys": sorted(params), "result_status": "OK", "count": env["count"], "freshness": fresh, "execution_id": execution_id})
+            except AuditUnavailable as e:
+                return C.failure(integration_id, system, op, "AUDIT_UNAVAILABLE", f"governed audit could not be persisted — cached result withheld ({e})", health="DEGRADED", last_success=h.get("last_success"), mode=c.get("mode", "REAL"))
+            return env
     mode = "REAL"
     try:
         if fixture_active:
@@ -113,25 +191,27 @@ def query(integration_id, op, params=None, *, use_cache=True, transport=None, in
                          source_updated_at=raw.get("source_updated_at"), freshness="LIVE", partial=raw.get("partial"), notes=notes, pii_flags=flags, duplicates=dups, identity=raw.get("identity"), mode=mode)
         if _secrets.leaks(env):
             raise C.IntegrationError("LEAK_PREVENTED", "a configured secret value appeared in the envelope — result discarded")
+        # AUDIT FIRST (fail closed): a CONFIDENTIAL read without persisted governed audit evidence is not a successful read
+        try: env["audit_id"] = _audit({"integration_id": integration_id, "op": op, "param_keys": sorted(params), "result_status": "OK", "count": env["count"], "freshness": "LIVE", "mode": mode, "partial": env["partial"], "pii_flags": flags, "execution_id": execution_id})
+        except AuditUnavailable as e: raise C.IntegrationError("AUDIT_UNAVAILABLE", f"governed audit could not be persisted — result withheld ({e})", retryable=True)
         health.record(integration_id, True, status="DEGRADED" if raw.get("partial") else "AVAILABLE", op=op, mode=mode)
         if ttl and use_cache and mode == "REAL":
-            cache = _cache_load(); cache[k] = {"retrieved_at": env["retrieved_at"], "records": records, "source_updated_at": env["source_updated_at"], "identity": env["identity"], "mode": mode}
-            for kk in [x for x in cache if _age(cache[x]["retrieved_at"]) > max(ttl * 4, 3600)]: cache.pop(kk, None)
-            _cache_save(cache)
-        _audit({"integration_id": integration_id, "op": op, "param_keys": sorted(params), "result_status": "OK", "count": env["count"], "freshness": "LIVE", "mode": mode, "partial": env["partial"], "pii_flags": flags, "execution_id": execution_id})
+            _cache_put(integration_id, k, {"retrieved_at": env["retrieved_at"], "records": records, "source_updated_at": env["source_updated_at"], "identity": env["identity"], "mode": mode}, ttl)
         return env
     except C.IntegrationError as e:
         hs = C.HEALTH_FOR_CODE.get(e.code, "UNAVAILABLE"); reason = _secrets.redact(e.reason)
         health.record(integration_id, False, status=hs, code=e.code, reason=reason, op=op, mode=mode)
-        stale = _cache_load().get(k)          # the last good read is always surfaced explicitly (stale_*), never as current data
+        stale = _cache_get(integration_id, k)          # the last good UNEXPIRED read is surfaced explicitly (stale_*), never as current data
         env = C.failure(integration_id, system, op, e.code, reason, health=hs, last_success=(health.get(integration_id) or {}).get("last_success"), detail=_secrets.redact(str(e.detail)) if e.detail else None,
                         retryable=e.retryable, stale_records=(stale or {}).get("records"), stale_retrieved_at=(stale or {}).get("retrieved_at"), mode=mode)
-        _audit({"integration_id": integration_id, "op": op, "param_keys": sorted(params), "result_status": "FAILED", "code": e.code, "health": hs, "mode": mode, "execution_id": execution_id}); return env
+        env["audit_recorded"] = bool(_audit({"integration_id": integration_id, "op": op, "param_keys": sorted(params), "result_status": "FAILED", "code": e.code, "health": hs, "mode": mode, "execution_id": execution_id}, required=False)); return env
     except Exception as e:
         reason = _secrets.redact(f"{type(e).__name__}: {e}")[:200]
         health.record(integration_id, False, status="UNAVAILABLE", code="UNAVAILABLE", reason=reason, op=op, mode=mode)
         env = C.failure(integration_id, system, op, "UNAVAILABLE", reason, last_success=(health.get(integration_id) or {}).get("last_success"), mode=mode)
-        _audit({"integration_id": integration_id, "op": op, "param_keys": sorted(params), "result_status": "FAILED", "code": "UNAVAILABLE", "mode": mode, "execution_id": execution_id}); return env
+        env["audit_recorded"] = bool(_audit({"integration_id": integration_id, "op": op, "param_keys": sorted(params), "result_status": "FAILED", "code": "UNAVAILABLE", "mode": mode, "execution_id": execution_id}, required=False)); return env
+
+prune_cache()                  # startup: expired / non-persistable payloads never survive a process start
 
 def certification():
     p = HERE / "certification.json"

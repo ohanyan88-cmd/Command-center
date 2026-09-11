@@ -23,7 +23,8 @@ def _first_op(spec): return next(iter(spec["read_ops"]), None)
 def _sample_params(iid, op):
     t = datetime.date.today()
     return {"calendar.events": {"from": f"{t}T00:00:00", "to": f"{t + datetime.timedelta(days=7)}T23:59:59", "limit": 20}, "mail.list": {"folder": "Inbox", "since": f"{t - datetime.timedelta(days=2)}T00:00:00", "limit": 5, "preview_chars": 80},
-            "tasks.list": {"open_only": True}, "identity": {}, "crm.deals": {"limit": 5}}.get(op, {})
+            "mail.search": {"folder": "Inbox", "query": "re:", "since": f"{t - datetime.timedelta(days=14)}T00:00:00", "limit": 3, "preview_chars": 40},
+            "tasks.list": {"open_only": True}, "identity": {}, "crm.deals": {"limit": 5}, "crm.stages": {"entity_id": "DEAL_STAGE"}}.get(op, {})
 
 def failure_behavior(iid, op):
     """Inject every failure code through the layer (fixture) and require the mapped envelope + health. Runs in an isolated state dir."""
@@ -114,29 +115,36 @@ def certify(real=True, verbose=False, out=None):
         op = _first_op(spec)
         if op:
             fb = failure_behavior(iid, op); ev["failure_behavior_tested"] = not fb; probs += fb
-        env = None
-        if configured and op and real:
-            env = layer.query(iid, op, _sample_params(iid, op), use_cache=False)
-            if env["status"] == "OK" and env.get("mode") == "REAL":
-                state = "CONNECTED"
+        env = None; envs = []; ops_proof = {}
+        required = list(spec.get("required_certification_ops") or ([op] if op else []))
+        if configured and required and real:
+            # SCOPE PROOF (audit finding 4): every required operation must succeed as a REAL authenticated read; fixtures never count
+            for rop in required:
+                e = layer.query(iid, rop, _sample_params(iid, rop), use_cache=False); envs.append(e)
+                real_ok = e["status"] == "OK" and e.get("mode") == "REAL"
+                ops_proof[rop] = {"ok": real_ok, "mode": e.get("mode"), "count": e.get("count"), "code": e.get("code"), "retrieved_at": e.get("retrieved_at"), "audit_id": e.get("audit_id"),
+                                  "schema_ok": real_ok and not C.check_records(e["kind"], e["records"]), "provenance_ok": real_ok and e["provenance"].get("integration_id") == iid and e["provenance"].get("op") == rop and all(r.get("record_id") for r in e["records"]),
+                                  "freshness_ok": real_ok and e["freshness"] == "LIVE" and bool(e.get("retrieved_at"))}
+                notes.append(f"real read {rop}: " + (f"{e['count']} record(s) at {e['retrieved_at']}" + (" (partial)" if e.get("partial") else "") if real_ok else f"FAILED {e.get('code')} — {str(e.get('reason'))[:80]}" + (" [fixture — not evidence]" if e.get("mode") == "FIXTURE" else "")))
+            good = [r for r in required if ops_proof[r]["ok"]]
+            if good:
+                state = "CONNECTED"; env = next(e for e in envs if e["status"] == "OK" and e.get("mode") == "REAL")
                 ident = env.get("identity") or {}
-                ev["authentication_verified"] = bool(ident) and ident.get("verified") is not False or (spec["auth"].get("mechanism", "").startswith("local"))
+                ev["authentication_verified"] = (bool(ident) and ident.get("verified") is not False) or spec["auth"].get("mechanism", "").startswith("local")
                 if ident.get("verified") is False: notes.append(ident.get("note") or "identity unverified")
-                ev["scope_verified"] = True
-                ev["schema_validated"] = not C.check_records(env["kind"], env["records"])
-                ev["freshness_validated"] = env["freshness"] == "LIVE" and bool(env.get("retrieved_at"))
-                ev["provenance_preserved"] = env["provenance"].get("integration_id") == iid and env["provenance"].get("op") == op and all(r.get("record_id") for r in env["records"])
-                notes.append(f"real read {op}: {env['count']} record(s) at {env['retrieved_at']}" + (" (partial)" if env.get("partial") else ""))
-            else:
-                notes.append(f"real read {op} failed: {env.get('code')} — {env.get('reason')}")
-        elif op and not real: notes.append("real read skipped (real=False)")
-        sb = sensitive_boundary([env] if env else []); ev["sensitive_boundary_tested"] = not sb; probs += sb
+                ev["scope_verified"] = len(good) == len(required)                       # ALL required scopes proven by real reads, not one
+                ev["schema_validated"] = all(ops_proof[r]["schema_ok"] for r in required)
+                ev["freshness_validated"] = all(ops_proof[r]["freshness_ok"] for r in required)
+                ev["provenance_preserved"] = all(ops_proof[r]["provenance_ok"] for r in required)
+                if len(good) < len(required): notes.append(f"scope NOT verified — proven {good} of required {required}")
+        elif required and not real: notes.append("real reads skipped (real=False)")
+        sb = sensitive_boundary([e for e in envs if e]); ev["sensitive_boundary_tested"] = not sb; probs += sb
         h = health.get(iid) or {}
         if state == "CONNECTED" and all(ev.values()): state = "VERIFIED_READ"
         if state == "VERIFIED_READ" and h.get("success_count", 0) >= 10 and len(h.get("success_days", [])) >= 2 and h.get("consecutive_failures", 0) == 0: state = "RELIABLE_READ"
         if state == "CONFIGURED" and h.get("last_success") and not env:
             notes.append(f"health shows a real read at {h['last_success']} but none succeeded now")
-        rec["integrations"][iid] = {"state": state, "evidence": ev, "problems": probs, "notes": notes, "configured": configured, "critical": spec["critical"],
+        rec["integrations"][iid] = {"state": state, "evidence": ev, "required_certification_ops": required, "ops_proof": ops_proof, "problems": probs, "notes": notes, "configured": configured, "critical": spec["critical"],
                                     "health": {k: h.get(k) for k in ("status", "last_check", "last_success", "consecutive_failures", "success_count", "success_days")}, "unblock": spec["unblock"], "read_ops": sorted(spec["read_ops"]), "write_ops": []}
         if wr or sb or (fb if op else []): rec["result"] = "FAIL"
     if rec["registry_problems"]: rec["result"] = "FAIL"

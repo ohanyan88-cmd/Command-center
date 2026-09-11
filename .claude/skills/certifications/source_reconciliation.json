@@ -6,6 +6,9 @@
  "computed_maturity": "L3",
  "tests": [
   "test_business.B01_ProvenanceAndPrecedence.test_conflict_not_silently_chosen_and_reference_precedence",
+  "test_integrations.A03_TaskAuthorityScope.test_business_model_carries_scoped_live_authority",
+  "test_integrations.A03_TaskAuthorityScope.test_cross_system_link_keeps_both_statuses_and_flags_divergence",
+  "test_integrations.A03_TaskAuthorityScope.test_scoped_hierarchies",
   "test_integrations.I10_Reconciliation.test_entity_linking_is_conservative",
   "test_integrations.I10_Reconciliation.test_fact_authority_conflict_and_precedence",
   "test_skills.T07_VerificationAudit.test_contradiction"
@@ -13,6 +16,8 @@
  "failure_tests": [
   "test_business.B01_ProvenanceAndPrecedence.test_conflict_not_silently_chosen_and_reference_precedence",
   "test_failclosed.F01_EveryBlockedCode.test_CONFLICTING_SOURCE",
+  "test_integrations.A03_TaskAuthorityScope.test_cross_system_link_keeps_both_statuses_and_flags_divergence",
+  "test_integrations.A03_TaskAuthorityScope.test_scoped_hierarchies",
   "test_integrations.I10_Reconciliation.test_fact_authority_conflict_and_precedence",
   "test_skills.T07_VerificationAudit.test_contradiction"
  ],
@@ -39,7 +44,7 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-11T00:53:42",
+ "certified_at": "2026-09-11T23:29:20",
  "fingerprint": "eff2efdb86369285be847ab3",
  "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
