@@ -230,6 +230,18 @@ class L05_LiveDataSync(unittest.TestCase):
             with self.assertRaises(data_sync.SyncError) as cm: data_sync.run(r, push=True, log=lambda *a: None, allow_branch=br)      # no upstream → nothing is claimed as pushed
             self.assertEqual(cm.exception.code, "NO_UPSTREAM")
         finally: data_sync.model_source_paths = orig
+    @covers(*GOV, "audit_logging", "commitment_memory", kinds=("unit", "failure", "failure_injection"))
+    def test_sync_never_exports_a_store_that_is_behind_the_versioned_durable_history(self):
+        r, ms, br = _repo("regress"); h0 = self._head(r); orig = data_sync.model_source_paths; data_sync.model_source_paths = lambda: ms
+        f = r / ".claude" / "state" / "durable" / "audit.jsonl"; f.write_text("\n".join(json.dumps({"op_id": f"hist-{i}", "recorded_at": "2026-09-01T00:00:00", "payload": {"execution_id": f"hist-{i}", "result_status": "EXECUTED"}}) for i in range(3)) + "\n", encoding="utf-8")
+        tm.write_checksums(r, r / ".claude" / "policy" / "durable_checksums.json"); subprocess.run(["git", "add", "-A"], cwd=str(r)); subprocess.run(["git", "commit", "-q", "-m", "history"], cwd=str(r))
+        keep = f.read_bytes(); h0 = self._head(r)
+        try:
+            _mutate_rows(r / "Tasks.xlsx")
+            with self.assertRaises(data_sync.SyncError) as cm: data_sync.run(r, push=False, log=lambda *a: None, allow_branch=br)
+            self.assertEqual(cm.exception.code, "DURABLE_REGRESSION"); self.assertIn("audit", cm.exception.detail)
+            self.assertEqual(f.read_bytes(), keep, "versioned durable history must not be rewritten"); self.assertEqual(self._head(r), h0)
+        finally: data_sync.model_source_paths = orig
     @covers(*GOV, kinds=("enforcement", "unit"))
     def test_gate_allows_the_sanctioned_sync_command_only_as_a_whole(self):
         gate = ROOT / ".claude" / "hooks" / "gate.py"; env = {**os.environ, "SKILL_STATE_DIR": str(TMP / "gate_state")}

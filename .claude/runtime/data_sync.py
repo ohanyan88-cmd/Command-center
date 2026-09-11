@@ -9,9 +9,10 @@ business.model_state, certify_business) — no second integrity system.
 Steps (fail closed at the first problem):
   1 CLASSIFY   git working tree + stored checksums → CLEAN · SYNC_REQUIRED · RELEASE_REQUIRED · UNCLASSIFIED (tree_manifest.classify_drift)
                RELEASE_REQUIRED / UNCLASSIFIED → refused: product/model/unknown changes only travel through skill.py release
-  2 EXPORT     durable Deputy state (actions, audit, commitments, decisions, observations) → .claude/state/durable/*.jsonl
-  3 STATIC OK  the certified business model must still be CURRENT (business.model_state) and certify_business must still PASS
+  2 STATIC OK  the certified business model must still be CURRENT (business.model_state) and certify_business must still PASS
                without a rebuild — a LIVE register row change never touches it; a schema/model-source change is RELEASE_REQUIRED
+  3 EXPORT     durable Deputy state (actions, audit, commitments, decisions, observations) → .claude/state/durable/*.jsonl —
+               refused (DURABLE_REGRESSION) when the local store holds fewer rows than the versioned files (import first)
   4 CHECKSUMS  durable_checksums.json refreshed; the refresh may only touch sync classes (otherwise refused)
   5 COMMIT     only the classified sync paths are staged and committed (git identity required; never --no-verify)
   6 PUSH       to the upstream of the current branch, then HEAD == upstream is verified (unless --no-push)
@@ -52,6 +53,19 @@ def _static_model_check(root, log):
     if rec["result"] != "PASS": raise SyncError("RELEASE_REQUIRED", "business certification would FAIL: " + "; ".join(f"{k}: {v['problems'][:2]}" for k, v in rec["checks"].items() if not v["pass"]))
     return {"status": "OK", "detail": f"model {rec['model_version']} core {rec['core_fingerprint']} still certified (no rebuild)"}
 
+def _durable_regression(root, ss):
+    """{table: (store_rows, file_rows)} for every durable table whose versioned file carries MORE rows than the local store — fail closed."""
+    import engine
+    st = engine._store(); d = ss.durable_dir(root); behind = {}
+    for t in ss.DURABLE_TABLES:
+        p = d / f"{t}.jsonl"
+        if not p.exists(): continue
+        rows = sum(1 for l in p.read_text(encoding="utf-8").splitlines() if l.strip())
+        try: have = st.count(t)
+        except Exception: have = 0
+        if have < rows: behind[t] = (have, rows)
+    return behind
+
 def run(root=ROOT, dry_run=False, push=True, log=print, allow_branch=None):
     """Execute the sync. Returns the report dict; raises SyncError (fail closed) — the CLI maps it to a non-zero exit code."""
     import tree_manifest as tm, state_snapshot as ss
@@ -67,12 +81,15 @@ def run(root=ROOT, dry_run=False, push=True, log=print, allow_branch=None):
         raise SyncError("RELEASE_REQUIRED", f"product/model change — use skill.py release: {what}")
     step("classify", "OK", f"{d['state']} · changes {{{', '.join(f'{k}: {len(v)}' for k, v in d['changes'].items())}}} · checksum drift {{{', '.join(f'{k}: {len(v)}' for k, v in d['checksum_drift'].items())}}} · ahead {d['ahead']} behind {d['behind']}")
     if d["state"] == "CLEAN": rep["result"] = "CLEAN"; step("result", "OK", "nothing to persist — GitHub main is current"); return rep
-    # 2 export durable state
+    # 2 static model still certified (no rebuild) — checked BEFORE anything is written
+    sm = _static_model_check(root, log); step("static business model", sm["status"], sm["detail"])
+    # 3 export durable state — never behind the versioned history: the local store must hold every row the durable files already carry
+    # (a fresh machine before `state_snapshot.py import` would otherwise export an empty state and erase history)
+    behind = _durable_regression(root, ss)
+    if behind: raise SyncError("DURABLE_REGRESSION", f"local store holds fewer rows than the versioned durable files {behind} — import first (python .claude/runtime/state_snapshot.py import / bootstrap.py); nothing exported")
     if dry_run: step("durable state export", "DRY", "would export .claude/state/durable/*.jsonl")
     else:
         c = ss.export(root, log=lambda *a: None); step("durable state export", "OK", ", ".join(f"{k}={v}" for k, v in c.items()))
-    # 3 static model still certified (no rebuild)
-    sm = _static_model_check(root, log); step("static business model", sm["status"], sm["detail"])
     # 4 checksums (only sync classes may move)
     spec = tm.live_data_spec(); ms = model_source_paths()
     cs = tm.verify_checksums(root); moving = cs["changed"] + cs["missing"] + cs["new"]
