@@ -233,7 +233,8 @@ class L05_LiveDataSync(unittest.TestCase):
     @covers(*GOV, "audit_logging", "commitment_memory", kinds=("unit", "failure", "failure_injection"))
     def test_sync_never_exports_a_store_that_is_behind_the_versioned_durable_history(self):
         r, ms, br = _repo("regress"); h0 = self._head(r); orig = data_sync.model_source_paths; data_sync.model_source_paths = lambda: ms
-        f = r / ".claude" / "state" / "durable" / "audit.jsonl"; f.write_text("\n".join(json.dumps({"op_id": f"hist-{i}", "recorded_at": "2026-09-01T00:00:00", "payload": {"execution_id": f"hist-{i}", "result_status": "EXECUTED"}}) for i in range(3)) + "\n", encoding="utf-8")
+        n = engine._store().count("audit") + 3                                       # the versioned history is strictly AHEAD of this process's store, whatever other suites wrote
+        f = r / ".claude" / "state" / "durable" / "audit.jsonl"; f.write_text("\n".join(json.dumps({"op_id": f"hist-{i}", "recorded_at": "2026-09-01T00:00:00", "payload": {"execution_id": f"hist-{i}", "result_status": "EXECUTED"}}) for i in range(n)) + "\n", encoding="utf-8")
         tm.write_checksums(r, r / ".claude" / "policy" / "durable_checksums.json"); subprocess.run(["git", "add", "-A"], cwd=str(r)); subprocess.run(["git", "commit", "-q", "-m", "history"], cwd=str(r))
         keep = f.read_bytes(); h0 = self._head(r)
         try:

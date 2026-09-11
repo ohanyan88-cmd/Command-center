@@ -57,6 +57,8 @@
   ".claude/state/durable/business_observations.jsonl",
   ".claude/state/durable/actions.jsonl",
   ".claude/state/durable/write_certifications.json",
+  ".claude/state/durable/checkpoints.jsonl",
+  ".claude/state/durable/loops.jsonl",
   ".claude/policy/durable_checksums.json"
  ],
  "entries": [
@@ -341,6 +343,14 @@
    "classification": "CONFIDENTIAL"
   },
   {
+   "path": ".claude/state/durable/checkpoints.jsonl",
+   "kind": "file",
+   "required": true,
+   "durability": "VERSION_DIRECTLY",
+   "restore": "git clone → state_snapshot.py import (Mission 5 observation checkpoints: signatures only)",
+   "classification": "CONFIDENTIAL"
+  },
+  {
    "path": ".claude/state/durable/commitments.jsonl",
    "kind": "file",
    "required": true,
@@ -354,6 +364,14 @@
    "required": true,
    "durability": "VERSION_DIRECTLY",
    "restore": "git clone → state_snapshot.py import",
+   "classification": "CONFIDENTIAL"
+  },
+  {
+   "path": ".claude/state/durable/loops.jsonl",
+   "kind": "file",
+   "required": true,
+   "durability": "VERSION_DIRECTLY",
+   "restore": "git clone → state_snapshot.py import (Mission 5 open management loops: references only)",
    "classification": "CONFIDENTIAL"
   },
   {

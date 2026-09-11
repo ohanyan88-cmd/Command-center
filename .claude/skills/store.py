@@ -25,6 +25,9 @@ TABLES = {
     "tickets":     "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, updated_at TEXT NOT NULL, session_id TEXT, status TEXT, payload TEXT NOT NULL, checksum TEXT NOT NULL",
     # Mission 4.2 — governed mutations (Action Runtime): one row per action, mutable state via upsert; idempotency_key/fingerprint indexed by query
     "actions":     "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, status TEXT, fingerprint TEXT, idempotency_key TEXT, session_id TEXT, batch_id TEXT, payload TEXT NOT NULL, checksum TEXT NOT NULL",
+    # Mission 5 — intelligence continuity: immutable observation checkpoints (signatures only) and mutable open loops (references only, upsert)
+    "checkpoints": "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, payload TEXT NOT NULL, checksum TEXT NOT NULL",
+    "loops":       "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, payload TEXT NOT NULL, checksum TEXT NOT NULL",
     "meta":        "key TEXT PRIMARY KEY, value TEXT",
 }
 

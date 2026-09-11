@@ -21,7 +21,7 @@ sys.path.insert(0, str(HERE.parent / "runtime")); import python_runtime; python_
 sys.path.insert(0, str(HERE)); sys.path.insert(0, str(TESTS))
 import engine
 
-SUITES = ["test_skills", "test_store", "test_failclosed", "test_hardening", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations", "test_portability", "test_actions", "test_live_data"]
+SUITES = ["test_skills", "test_store", "test_failclosed", "test_hardening", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations", "test_portability", "test_actions", "test_live_data", "test_intelligence"]
 KIND_FIELD = {"unit": "tests", "failure": "failure_tests", "adversarial": "hardening_cases", "failure_injection": "hardening_cases",
               "authority": "authority_tests", "completion": "completion_verification", "concurrency": "concurrency_tests",
               "enforcement": "enforcement_tests", "routing": "routing_evals"}
@@ -75,7 +75,7 @@ def main():
             for k in t["kinds"]:
                 evidence[sid][KIND_FIELD[k]].append(t["id"])
                 if k in ("adversarial", "failure_injection"): evidence[sid][k].append(t["id"])
-    for kind in ("scenarios", "routing", "bypass", "boundary", "business", "integration", "hands"):
+    for kind in ("scenarios", "routing", "bypass", "boundary", "business", "integration", "hands", "management"):
         for r in ev_res[kind]:
             for sid in r.get("skills", []):
                 if sid not in evidence: continue

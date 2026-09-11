@@ -104,6 +104,14 @@ try:
         if due_soon:
             print(f"\n  📌 ԽՈՍՏՈՒՄՆԵՐ, ԺԱՄԿԵՏԸ ≤3 ՕՐ — {len(due_soon)}")
             for x in due_soon: print(f"       [{d(x['due'])}] {x['text'][:60]}")
+        mg = b.get("management") or {}
+        if mg.get("status") == "EXECUTED":
+            tl = mg["TOP_LINE"]; print(f"\n  🎯 MANAGEMENT (Mission 5) · truth {mg.get('truth_mode')} · Gev-ին պետք է {tl['needs_gev']} · exceptions {tl['exceptions']} · {tl['highest'][:90]}")
+            for q in mg.get("GEV_ACTION", [])[:4]: print(f"       ⚑ [{q['category']}] {q['issue'][:80]} → {q['required'][:60]}")
+            for x in mg.get("ACTIONS", [])[:3]: print(f"       → {x[:120]}")
+            ch = mg.get("CHANGES") or {}
+            print("       Δ " + (("since " + str(ch.get('since'))[:16] + ": " + ", ".join(f"{k} {len(ch.get(k, []))}" for k in ("NEW", "CHANGED", "RESOLVED", "WORSENED", "NEEDS_GEV"))) if ch.get("available") else str(ch.get("reason", ""))[:90]))
+        elif mg: print(f"\n  🎯 MANAGEMENT unavailable — {mg.get('reason')}")
         ver = r.get("verification", {}); dbs = reg["_index"]["daily_briefing"]
         print(f"\n  ⚙  skill engine: daily_briefing v{dbs['version']} ({dbs['maturity_level']}) · exec {r['execution_id']} · verified {'✓' if ver.get('ok') else '✗'} · ticket {t['ticket_id']}")
     else:
