@@ -36,7 +36,7 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T02:45:54",
+ "certified_at": "2026-09-12T03:07:16",
  "fingerprint": "1ed8f8eb93cf92f07cb10064",
  "core_fingerprint": "ff70cd82ecc16905",
  "result": "PASS",
@@ -52,7 +52,8 @@
   "test_boundary",
   "test_integrations",
   "test_portability",
-  "test_actions"
+  "test_actions",
+  "test_live_data"
  ],
  "audit_infrastructure": false
 }

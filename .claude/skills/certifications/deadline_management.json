@@ -8,6 +8,7 @@
   "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
   "test_integrations.I07_HealthAndTasks.test_task_register_real_read_records_real_health",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
+  "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness",
   "test_skills.T05_Execution.test_deadline_management",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -52,6 +53,7 @@
   "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
   "test_integrations.I07_HealthAndTasks.test_task_register_real_read_records_real_health",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
+  "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness",
   "test_skills.T05_Execution.test_deadline_management",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -71,7 +73,7 @@
   "test_skills.T02_Router.test_trigger_resolution"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T02:45:54",
+ "certified_at": "2026-09-12T03:07:16",
  "fingerprint": "15cc67249fb92371ee8f41e6",
  "core_fingerprint": "ff70cd82ecc16905",
  "result": "PASS",
@@ -87,7 +89,8 @@
   "test_boundary",
   "test_integrations",
   "test_portability",
-  "test_actions"
+  "test_actions",
+  "test_live_data"
  ],
  "audit_infrastructure": false
 }

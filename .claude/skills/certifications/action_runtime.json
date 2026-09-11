@@ -99,7 +99,7 @@
   "test_actions.H05_CapabilityAndSkill.test_routing_and_executor_boundaries"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T02:45:54",
+ "certified_at": "2026-09-12T03:07:16",
  "fingerprint": "563d13607ee44c39d4b9459c",
  "core_fingerprint": "ff70cd82ecc16905",
  "result": "PASS",
@@ -115,7 +115,8 @@
   "test_boundary",
   "test_integrations",
   "test_portability",
-  "test_actions"
+  "test_actions",
+  "test_live_data"
  ],
  "audit_infrastructure": true
 }
