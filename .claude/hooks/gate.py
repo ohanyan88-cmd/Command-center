@@ -26,9 +26,9 @@ READ_ONLY_TOOLS = {"Read","Glob","Grep","LS","WebFetch","WebSearch","ToolSearch"
 STATE_TOOLS = {"Write","Edit","MultiEdit","NotebookEdit","Bash","PowerShell","Monitor"}      # Monitor runs shell commands too
 PROTECTED = re.compile(r"(\.claude[/\\](settings(\.local)?\.json|hooks[/\\]|policy[/\\]|tests[/\\]|state[/\\]|audit[/\\]|runtime[/\\]"
                        r"|skills[/\\](engine|store|certify|skill|executors|build_registry)\.py|skills[/\\](registry\.json|certifications))|(^|[/\\])CLAUDE\.md)", re.I)
-GOVERNED_CMD = re.compile(r"skill\.py\s+(resolve|plan|run|ticket|declare|maintenance|audit|status|validate|test|hardening|eval|certify|release|build|store|certs|enforcement)\b")
+GOVERNED_CMD = re.compile(r"skill\.py\s+(resolve|plan|run|ticket|declare|maintenance|audit|status|validate|test|hardening|eval|certify|release|sync|build|store|certs|enforcement)\b")
 GOVERNED_ONLY = re.compile(r"^\s*(cd\s+(\"[^\"]*\"|'[^']*'|\S+)\s*&&\s*)?(\S*[/\\])?python(3)?(\.exe)?\s+\S*skill\.py\s+"
-                           r"(resolve|plan|run|ticket|declare|maintenance|audit|status|validate|test|hardening|eval|certify|release|build|store|certs|enforcement)\b"
+                           r"(resolve|plan|run|ticket|declare|maintenance|audit|status|validate|test|hardening|eval|certify|release|sync|build|store|certs|enforcement)\b"
                            r"(?P<args>[^;&|<>]*)(?P<pipe>\|[^;&|<>]*)?\s*$")
 TEST_CMD = re.compile(r"(python(3)?(\.exe)?\s+(-m\s+unittest|.*(test_[a-z_]+|evals)\.py))")
 DIRECT_ENGINE = re.compile(r"(import\s+(engine|executors|store|certify|build_registry)\b|from\s+(engine|executors|store|certify)\s+import|python(3)?(\.exe)?\s+(\S*[/\\])?(engine|executors|store|certify|build_registry)\.py|sqlite3?\s+.*skill_state)", re.I)

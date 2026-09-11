@@ -205,6 +205,15 @@ class P06_CleanCloneBootstrap(unittest.TestCase):
         cs = tm.verify_checksums(d); self.assertEqual(cs["missing"], []); self.assertEqual([f for f in cs["changed"] if f not in dirty], [])
         durable = ssn.status(d) if False else None
         st_new = json.loads((d / ".claude" / "state" / "bootstrap_last.json").read_text(encoding="utf-8")); self.assertEqual(st_new["verdict"], "READY")
+    @covers(*GOV, "task_management", kinds=("unit", "completion"))
+    def test_recovery_carries_the_latest_synced_live_register_and_the_same_static_model(self):
+        """LIVE DATA path: the restored Tasks.xlsx is byte-identical to the committed one (the synced truth), and the business understanding
+        (core fingerprint) matches even though the register is STRUCTURE-scoped live data — never a stale extracted snapshot."""
+        c = _clean_clone(); d = c["dir"]
+        committed = subprocess.run(["git", "show", "HEAD:Tasks.xlsx"], cwd=str(ROOT), capture_output=True).stdout
+        self.assertEqual(hashlib.sha256((d / "Tasks.xlsx").read_bytes()).hexdigest(), hashlib.sha256(committed).hexdigest())
+        src = json.loads((d / ".claude" / "business" / "sources.json").read_text(encoding="utf-8")); s9 = src["source_snapshot"]["S09"]
+        self.assertEqual(s9["scope"], "STRUCTURE"); self.assertEqual(s9["live_integration"], "INT-TASKS"); self.assertIsNone(s9["size"])
     @covers(*GOV, kinds=("adversarial", "unit"))
     def test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key(self):
         c = _clean_clone(); d = c["dir"]; home = c["home"]

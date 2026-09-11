@@ -4,7 +4,7 @@ The runtime (skills/business.py) rejects a model whose schema_version is not in 
 change of encoded business facts; bump SCHEMA_VERSION only when the shape changes."""
 SCHEMA_VERSION = "2.0"            # 1.x = Mission 3 mixed model (no longer accepted); 2.x = core/overlay split
 COMPATIBLE = ("2.0",)
-MODEL_VERSION = "2026-09-11.2"    # date.sequence of the encoded business facts
+MODEL_VERSION = "2026-09-12.1"    # date.sequence of the encoded business facts (2026-09-12.1: S09 = LIVE_REGISTER, STRUCTURE-scoped)
 PERSON_TOKEN = r"@P\d+"           # core may reference people only through these tokens; the overlay maps token → name
 
 CORE_FILES = ("sources", "business_model", "processes", "ownership", "kpis", "targets", "playbooks", "routines", "gaps")

@@ -41,13 +41,44 @@ def _sha(p):
         for chunk in iter(lambda: f.read(1 << 20), b""): h.update(chunk)
     return h.hexdigest()
 
+def xlsx_structure_sha256(p, sheet=None, header_rows=12):
+    """STRUCTURE fingerprint of a LIVE register workbook: the sheet names + the header block (rows 1..header_rows, as text) of the
+    register sheet(s). Rows below the header are live operational data and never enter the hash — a task create/update/assign/
+    close/reopen/note leaves it unchanged; renaming a column/sheet, moving the header or dropping the sheet changes it."""
+    import openpyxl
+    wb = openpyxl.load_workbook(p, read_only=True, data_only=True)
+    try:
+        parts = {"sheets": list(wb.sheetnames)}
+        for sh in ([sheet] if sheet else wb.sheetnames):
+            if sh not in wb.sheetnames: parts[sh] = None; continue
+            rows = [[("" if v is None else str(v)) for v in r] for r in wb[sh].iter_rows(min_row=1, max_row=int(header_rows), values_only=True)]
+            while rows and not any(rows[-1]): rows.pop()                       # trailing empty header rows carry no structure
+            parts[sh] = rows
+    finally: wb.close()
+    return hashlib.sha256(json.dumps(parts, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
+
+def source_fingerprint(s, p):
+    """What binds the model to this source: CONTENT sha256 (extracted documents) or the STRUCTURE sha256 (LIVE registers)."""
+    p = pathlib.Path(p)
+    if bm_sources.scope(s) == "STRUCTURE":
+        st = s.get("structure") or {}
+        if p.suffix.lower() in (".xlsx", ".xlsm"): return {"sha256": xlsx_structure_sha256(p, st.get("sheet"), st.get("header_rows", 12)), "scope": "STRUCTURE"}
+        raise BuildError("SOURCE_SPEC", [f"{s['source_id']}: STRUCTURE scope is defined for xlsx registers only ({p.suffix})"])
+    return {"sha256": _sha(p), "scope": "CONTENT"}
+
 def snapshot(root=ROOT):
+    """Per-source binding record. CONTENT sources carry sha256/size/mtime of the file; LIVE registers (STRUCTURE scope) carry the
+    structure sha256 plus the structure spec and live integration, never a content hash — row-level live data does not bind the model."""
     snap = {}
     for s in bm_sources.SOURCES:
-        p = root / s["path"]
+        p = root / s["path"]; base = {"path": s["path"], "currency": s["currency"], "authority": s["authority"], "scope": bm_sources.scope(s)}
+        if bm_sources.kind(s) == "LIVE_REGISTER": base.update(source_kind="LIVE_REGISTER", live_integration=s.get("live_integration"), structure=dict(s.get("structure") or {}))
         if p.exists():
-            st = p.stat(); snap[s["source_id"]] = {"path": s["path"], "sha256": _sha(p), "size": st.st_size, "mtime": int(st.st_mtime), "currency": s["currency"], "authority": s["authority"]}
-        else: snap[s["source_id"]] = {"path": s["path"], "sha256": None, "size": None, "mtime": None, "currency": s["currency"], "authority": s["authority"], "missing": True}
+            fp = source_fingerprint(s, p)
+            if fp["scope"] == "STRUCTURE": snap[s["source_id"]] = {**base, "sha256": fp["sha256"], "size": None, "mtime": None}
+            else:
+                st = p.stat(); snap[s["source_id"]] = {**base, "sha256": fp["sha256"], "size": st.st_size, "mtime": int(st.st_mtime)}
+        else: snap[s["source_id"]] = {**base, "sha256": None, "size": None, "mtime": None, "missing": True}
     return snap
 
 def _live_sources():

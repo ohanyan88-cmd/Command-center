@@ -26,6 +26,19 @@ EXTRACTION_INVARIANTS = {
 
 AUTHORITY_RANK = {"REFERENCE_APPROVED": 5, "CHARTER": 5, "ACTIVE_REGISTER": 4, "ACTIVE_DRAFT": 3, "PROPOSAL": 3, "EVIDENCE": 2, "HISTORICAL": 1}
 
+# SOURCE KIND — how a source binds the certified model (explicit semantics, one provenance system):
+#   EXTRACTED      (default)  the model's facts were extracted from the document's CONTENT → fingerprint_scope CONTENT: any byte
+#                             change = SOURCE_CHANGED → STALE_MODEL → rebuild + certification (product/model path).
+#   LIVE_REGISTER             a LIVE OPERATIONAL SOURCE (task register): its rows are live business state, read at query time
+#                             through the declared live integration (INT-*, with retrieved_at/freshness/authority per read) and
+#                             NEVER extracted into the model. The model depends only on its STRUCTURE (sheet + header block) →
+#                             fingerprint_scope STRUCTURE: row create/update/assign/close/reopen/note never changes the core
+#                             fingerprint or invalidates certification; a sheet/header (schema) change still does.
+SOURCE_KINDS = ("EXTRACTED", "LIVE_REGISTER")
+FINGERPRINT_SCOPES = ("CONTENT", "STRUCTURE")
+def kind(s): return s.get("source_kind", "EXTRACTED")
+def scope(s): return s.get("fingerprint_scope", "CONTENT")
+
 SOURCES = [
  {"source_id": "S01", "path": "02_Reference/People/Staffing-plan-2026-09-07.xlsx", "title": "Հաստիքացուցակ v2 — կառուցվածք, աշխատավարձ, վճարման մոդելներ, KPI (4 sheets)",
   "domain": "PEOPLE", "status": "APPROVED", "effective_date": "UNKNOWN (Oct 1 2026 proposed, unconfirmed — Open-questions #9)", "date": "2026-09-07",
@@ -58,9 +71,11 @@ SOURCES = [
  {"source_id": "S08", "path": "04_Sources/Whatsapp/Principal-2026-09-09-afternoon/chat.md", "title": "WhatsApp @P1 ↔ Gev, 2026-09-09 00:39 … 13:10",
   "domain": "MANAGEMENT", "status": "RAW EVIDENCE", "effective_date": "n/a", "date": "2026-09-09",
   "owner": "@P1 / Gev", "source_type": "chat export", "authority": "EVIDENCE", "currency": "CURRENT", "conflicts": ["C02", "C03"], "notes": "Retention flow, churn lists, save-list handoff."},
- {"source_id": "S09", "path": "Tasks.xlsx", "title": "Առաջադրանքներ — live task register (15 items, hand-edited by Gev)",
+ {"source_id": "S09", "path": "Tasks.xlsx", "title": "Առաջադրանքներ — LIVE task register (hand-edited by Gev; Action Runtime writes only with Gev's approval)",
   "domain": "MANAGEMENT", "status": "LIVE REGISTER", "effective_date": "n/a", "date": "2026-09-09",
-  "owner": "Gev", "source_type": "xlsx", "authority": "ACTIVE_REGISTER", "currency": "CURRENT", "conflicts": [], "notes": "Owners, deadlines and statuses of @P1's asks; read by daily_briefing."},
+  "owner": "Gev", "source_type": "xlsx", "authority": "ACTIVE_REGISTER", "currency": "CURRENT", "conflicts": [],
+  "source_kind": "LIVE_REGISTER", "fingerprint_scope": "STRUCTURE", "structure": {"sheet": "ԱՌԱՋԱԴՐԱՆՔՆԵՐ", "header_rows": 12}, "live_integration": "INT-TASKS",
+  "notes": "LIVE OPERATIONAL SOURCE: owners, deadlines and statuses are read live through INT-TASKS (retrieved_at/freshness per read) — never a static extract. The certified model binds only its STRUCTURE (sheet + header block); row edits are live data (skill.py sync), a schema change is a model change (release)."},
  {"source_id": "S10", "path": "01_Active/Operations/Open-questions.md", "title": "ՀԱՐՑԵՐ — 25 open questions to Gev (people roles, systems access, dates)",
   "domain": "MANAGEMENT", "status": "OPEN — 2 of 25 answered", "effective_date": "n/a", "date": "2026-09-10",
   "owner": "Deputy → Gev", "source_type": "md", "authority": "ACTIVE_REGISTER", "currency": "CURRENT", "conflicts": [], "notes": "Answered: #3 (churn voice = signal list request), #5 (keep Gev's system)."},

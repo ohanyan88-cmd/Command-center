@@ -12,6 +12,8 @@
   skill.py certs [skill_id]                         per-skill certification status (fresh / stale / missing)
   skill.py enforcement                              enforcement status: hooks configured, open/escaped tickets
   skill.py validate | status | test | hardening | eval | certify | build | release   (release = workspace → build → certify → validate → eval)
+  skill.py sync [--dry-run] [--no-push]             LIVE DATA SYNC: persist live operational data + durable state (Tasks.xlsx, Journal, durable/*)
+                                                    without a rebuild/certification/release; refuses product/model/unknown changes (→ release)
 json inputs may carry _action_level and _approval_token.
 """
 import sys, json, pathlib, subprocess
@@ -141,13 +143,16 @@ def main(argv):
         return 0
 
     if cmd == "test":
-        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations", "test_portability", "test_actions"], cwd=str(HERE.parent / "tests"))
+        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations", "test_portability", "test_actions", "test_live_data"], cwd=str(HERE.parent / "tests"))
     if cmd == "hardening":
         return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_hardening"], cwd=str(HERE.parent / "tests"))
     if cmd == "eval":
         return subprocess.call([sys.executable, str(HERE.parent / "tests" / "evals.py")], cwd=str(HERE.parent / "tests"))
     if cmd == "certify":
         return subprocess.call([sys.executable, str(HERE / "certify.py")], cwd=str(HERE))
+    if cmd == "sync":
+        # LIVE DATA SYNC (data only): classify → export durable state → static model still certified → checksums → commit → push. Product changes are refused → release.
+        return subprocess.call([sys.executable, str(HERE.parent / "runtime" / "data_sync.py")] + rest, cwd=str(HERE.parent.parent))
     if cmd == "release":
         # Controlled change management: BUILD → CERTIFY (all suites, per-skill evidence) → VALIDATE (fresh certs) → EVAL. Stops at first failure.
         biz = HERE.parent / "business"
