@@ -337,24 +337,84 @@ def daily_briefing(inputs, skill=None, reg=None):
                           + ([f"operations: no VERIFIED live source beyond the task register ({', '.join(str(s.get('integration_id')) + '=' + str(s.get('certification')) for s in live_ops if s.get('integration_id') != 'INT-TASKS')})"] if not ops_ok else [])
                           + bc.get("routine_missing_data", []),
              "business_alerts": {"pending_decisions": [c["id"] for c in bc.get("conflicts", [])], "gaps": bc.get("gaps", [])}, "business_context": _bc_brief(inputs)}
+    # MISSION 5 — the management brief (TOP LINE · CHANGES · SALES · OPERATIONS · TASKS · CALENDAR · MAIL · RISKS · ACTIONS · GEV) on the same live reads
+    brief["management"] = _management(inputs, lv, lambda IQ, st: IQ.brief(st, record=not inputs.get("no_checkpoint")))
+    if brief["management"].get("status") == "EXECUTED": brief["management_text"] = _iq().render_brief(brief["management"])
     return brief
+
+# ───────────────────────── MISSION 5 — live management intelligence (one pipeline: skills/intelligence.py) ─────────────────────────
+def _iq():
+    import intelligence; return intelligence
+
+def _management(inputs, lv, fn):
+    """Run one intelligence view on the canonical current state. Fails closed: an error is reported as UNAVAILABLE with its reason, never as an empty 'all fine'."""
+    try:
+        IQ = _iq(); st = IQ.current_state({**inputs, **({"live_context": lv} if isinstance(lv, dict) and lv.get("calendar") is not None else {})}); return fn(IQ, st)
+    except Exception as e: return {"status": "UNAVAILABLE", "reason": f"intelligence pipeline failed: {type(e).__name__}: {e}", "mutation_performed": False}
+
+def _focus(text):
+    t = _norm(text)
+    if re.search(r"(meeting|հանդիպ|calendar|օրացույց)", t): return "calendar"
+    if re.search(r"(\bmail\b|e-?mail|նամակ|փոստ|inbox)", t): return "mail"
+    if re.search(r"(sales|վաճառք|deal|pipeline|churn|չըռն)", t): return "sales"
+    if re.search(r"(operation|գործառն|\bops\b|backlog|\bsla\b|վառվում|install)", t): return "operations"
+    if re.search(r"(task|թասկ|առաջադրանք|ուշաց|\blate\b|overdue|stuck|կախված|blocked)", t): return "tasks"
+    return "all"
+
+def management_snapshot(inputs, skill=None, reg=None):
+    """LIVE MANAGEMENT SNAPSHOT: current state from every readable integration, exceptions ranked, recommendations, Gev queue — focused by the question (tasks / calendar / mail / sales / operations / all)."""
+    IQ = _iq(); st = IQ.current_state(inputs); exc = IQ.exceptions(st)
+    focus = inputs.get("focus") or _focus(inputs.get("intent") or inputs.get("query") or inputs.get("text") or "")
+    out = {"status": "EXECUTED", "focus": focus, "date": st["today"], "truth_mode": st["truth_mode"], "visibility": st["visibility"], "visibility_lines": IQ.visibility_lines(st), "unavailable": st["unavailable"],
+           "exceptions_count": len(exc), "top": [IQ.management_answer(e) for e in exc[:5]], "actions": [IQ.action_line(e) for e in exc[:7]], "gev": IQ.gev_queue(st, exc), "mutation_performed": False,
+           "verdict": ("no proven exception in the visible systems" if not exc else exc[0]["what"]) + (f" · visibility gaps: {', '.join(st['unavailable'])}" if st["unavailable"] else "")}
+    if focus in ("tasks", "all"): out["tasks"] = IQ.task_view(st, exc)
+    if focus in ("calendar", "all"): out["calendar"] = IQ.calendar_view(st)
+    if focus in ("mail", "all"): out["mail"] = IQ.mail_view(st, exc)
+    if focus in ("sales", "all"): out["sales"] = IQ.sales_intelligence(st, None)
+    if focus in ("operations", "all"): out["operations"] = IQ.operations_intelligence(st, exc)
+    out["business_context"] = _bc_brief(inputs); return out
+
+def exception_review(inputs, skill=None, reg=None):
+    """EXCEPTION MODE: only proven exceptions, ranked; incomplete visibility is stated separately — never 'everything is fine' when half the systems are dark."""
+    IQ = _iq(); st = IQ.current_state(inputs)
+    return {**IQ.exception_view(st), "mutation_performed": False, "business_context": _bc_brief(inputs)}
+
+def change_review(inputs, skill=None, reg=None):
+    """WHAT CHANGED since a checkpoint/time: NEW · CHANGED · RESOLVED · WORSENED · NEEDS_GEV from durable checkpoints + live reads."""
+    IQ = _iq(); st = IQ.current_state(inputs); today = _today(inputs); since = inputs.get("since"); t = _norm(inputs.get("intent") or inputs.get("query") or inputs.get("text") or "")
+    if not since and re.search(r"(yesterday|երեկ)", t): since = (today - datetime.timedelta(days=1)).isoformat()
+    if not since and re.search(r"(last week|անցյալ շաբաթ|a week)", t): since = (today - datetime.timedelta(days=7)).isoformat()
+    return {**IQ.change_view(st, since, record=not inputs.get("no_checkpoint")), "mutation_performed": False, "business_context": _bc_brief(inputs)}
+
+def decision_queue(inputs, skill=None, reg=None):
+    """GEV DECISION QUEUE: only what genuinely requires Gev — APPROVAL · DECISION · ESCALATION · OWNER NEEDED · PRIORITY CONFLICT · MISSING BUSINESS TRUTH."""
+    IQ = _iq(); st = IQ.current_state(inputs); exc = IQ.exceptions(st); q = IQ.gev_queue(st, exc)
+    loops = IQ.open_loops(st, exc, persist=False)
+    return {"status": "EXECUTED", "date": st["today"], "truth_mode": st["truth_mode"], "queue": q, "count": len(q), "categories": sorted({x["category"] for x in q}),
+            "forgotten": [l for l in loops["open"] if l.get("kind") in ("COMMITMENT", "DECISION_PENDING", "MAIL_DECISION")], "visibility_lines": IQ.visibility_lines(st), "unavailable": st["unavailable"],
+            "note": "ordinary team work is not in this queue; each item says why Gev specifically is needed", "mutation_performed": False, "business_context": _bc_brief(inputs)}
 
 def end_of_day_control(inputs, skill=None, reg=None):
     today = _today(inputs); tasks = _tasks(inputs); dl = deadline_management(inputs)
     done_today = [_ser(t) for t in tasks if not t["open"] and t["due"] == today]
     slipped = dl["buckets"]["overdue"] + [x for x in dl["buckets"]["today"]]
-    return {"status": "EXECUTED", "date": today.isoformat(), "completed_today": done_today, "not_completed": slipped,
-            "decisions_pending": [_ser(t) for t in tasks if t["open"] and t["owner"].isupper()],
-            "waiting_for": waiting_for_tracking(inputs)["waiting_for"], "tomorrow": dl["buckets"]["tomorrow"]}
+    out = {"status": "EXECUTED", "date": today.isoformat(), "completed_today": done_today, "not_completed": slipped,
+           "decisions_pending": [_ser(t) for t in tasks if t["open"] and t["owner"].isupper()],
+           "waiting_for": waiting_for_tracking(inputs)["waiting_for"], "tomorrow": dl["buckets"]["tomorrow"]}
+    out["management"] = _management(inputs, _live(inputs), lambda IQ, st: IQ.eod_view(st, record=not inputs.get("no_checkpoint")))     # Mission 5 EOD control: planned / completed / slipped / moved / unverified / escalation / Gev
+    return out
 
 def weekly_review(inputs, skill=None, reg=None):
     dl = deadline_management(inputs)
     b = _bc(inputs)
-    return {"status": "ASSISTED", "actions_overdue": dl["buckets"]["overdue"], "open_count": sum(dl["counts"].values()),
-            "sales": "UNKNOWN — no VERIFIED live sales source: " + ", ".join(f"{s.get('integration_id')}={s.get('certification')}" for s in _live_sources("sales")),
-            "operations": "UNKNOWN — no VERIFIED live operations source beyond the task register: " + ", ".join(f"{s.get('integration_id')}={s.get('certification')}" for s in _live_sources("operations") if s.get("integration_id") != "INT-TASKS"),
-            "sections": b.get("routine_sections", []), "missing_sources": b.get("routine_missing_data", []), "pending_decisions": [c["id"] + " " + c["topic"] for c in b.get("conflicts", [])],
-            "note": "Skeleton only; sales/ops sections require supplied datasets.", "business_context": _bc_brief(inputs)}
+    out = {"status": "ASSISTED", "actions_overdue": dl["buckets"]["overdue"], "open_count": sum(dl["counts"].values()),
+           "sales": "UNKNOWN — no VERIFIED live sales source: " + ", ".join(f"{s.get('integration_id')}={s.get('certification')}" for s in _live_sources("sales")),
+           "operations": "UNKNOWN — no VERIFIED live operations source beyond the task register: " + ", ".join(f"{s.get('integration_id')}={s.get('certification')}" for s in _live_sources("operations") if s.get("integration_id") != "INT-TASKS"),
+           "sections": b.get("routine_sections", []), "missing_sources": b.get("routine_missing_data", []), "pending_decisions": [c["id"] + " " + c["topic"] for c in b.get("conflicts", [])],
+           "note": "sales/ops KPI sections stay UNKNOWN without a live source; the management review below is built from what is live.", "business_context": _bc_brief(inputs)}
+    out["management"] = _management(inputs, _live(inputs, horizon_days=7), lambda IQ, st: IQ.weekly_view(st))     # Mission 5 weekly review surface
+    return out
 
 def meeting_preparation(inputs, skill=None, reg=None):
     if not inputs.get("meeting"): return {"status": "BLOCKED", "reason": "required input 'meeting' missing"}
@@ -589,12 +649,14 @@ def open_loops(inputs, skill=None, reg=None):
     dl = deadline_management(inputs); wf = waiting_for_tracking(inputs); cm = commitment_memory({}); dm = decision_memory({})
     pending = [t for t in _tasks(inputs) if t["open"] and t["owner"].isupper()]
     lv = _live(inputs); cands = _email_candidates(lv, inputs, _today(inputs))
-    return {"status": "EXECUTED", "open_tasks": sum(dl["counts"].values()), "overdue": dl["buckets"]["overdue"],
-            "waiting_for": wf["waiting_for"], "open_commitments": cm["commitments"],
-            "decisions_pending": [_ser(t) for t in pending], "decisions_logged": len(dm["decisions"]),
-            "email_candidates": [c for c in cands if c["class"] in ("ACTION", "DECISION", "DELEGATE", "MONITOR")], "email_candidates_total": len(cands),
-            "email_source": next((l for l in lv.get("health_lines", []) if l.startswith("INT-OL-MAIL")), lv.get("reason") or "INT-OL-MAIL not read"),
-            "note": "email_candidates are CANDIDATE_OPEN_LOOP (evidence from mail) — none is recorded as a commitment or task automatically"}
+    out = {"status": "EXECUTED", "open_tasks": sum(dl["counts"].values()), "overdue": dl["buckets"]["overdue"],
+           "waiting_for": wf["waiting_for"], "open_commitments": cm["commitments"],
+           "decisions_pending": [_ser(t) for t in pending], "decisions_logged": len(dm["decisions"]),
+           "email_candidates": [c for c in cands if c["class"] in ("ACTION", "DECISION", "DELEGATE", "MONITOR")], "email_candidates_total": len(cands),
+           "email_source": next((l for l in lv.get("health_lines", []) if l.startswith("INT-OL-MAIL")), lv.get("reason") or "INT-OL-MAIL not read"),
+           "note": "email_candidates are CANDIDATE_OPEN_LOOP (evidence from mail) — none is recorded as a commitment or task automatically"}
+    out["management"] = _management(inputs, lv, lambda IQ, st: {"status": "EXECUTED", "loops": IQ.open_loops(st, persist=not inputs.get("no_checkpoint")), "mail": IQ.mail_view(st), "truth_mode": st["truth_mode"], "visibility_lines": IQ.visibility_lines(st)})   # Mission 5 durable open loops + mail intelligence
+    return out
 
 def memory_retrieval(inputs, skill=None, reg=None):
     q = _norm(inputs.get("query", inputs.get("context", ""))); hits = []
@@ -900,6 +962,11 @@ def validate_output(skill_id, result):
         "approval_management": lambda r: "approved" in r,
         "authority_checking": lambda r: "allowed" in r,
         "action_runtime": lambda r: "mutation_performed" in r and (r["status"] != "VERIFIED" or r.get("state") == "VERIFIED") and not (r["status"] == "ASSISTED" and r.get("mutation_performed")),
+        # Mission 5 — intelligence never mutates, never hides visibility gaps, never invents categories
+        "management_snapshot": lambda r: r.get("mutation_performed") is False and "visibility" in r and "unavailable" in r and "truth_mode" in r and all(x.get("category") in ("APPROVAL", "DECISION", "ESCALATION", "OWNER NEEDED", "PRIORITY CONFLICT", "MISSING BUSINESS TRUTH") for x in r.get("gev", [])),
+        "exception_review": lambda r: r.get("mutation_performed") is False and "visibility_incomplete" in r and "exceptions" in r and all(e.get("WHAT_CAUSED_IT", "").split(" — ")[0] in ("CONFIRMED CAUSE", "SUPPORTED HYPOTHESIS", "UNKNOWN") for e in r["exceptions"]),
+        "change_review": lambda r: r.get("mutation_performed") is False and set(r.get("groups", {})) == {"NEW", "CHANGED", "RESOLVED", "WORSENED", "NEEDS_GEV"},
+        "decision_queue": lambda r: r.get("mutation_performed") is False and all(x.get("category") in ("APPROVAL", "DECISION", "ESCALATION", "OWNER NEEDED", "PRIORITY CONFLICT", "MISSING BUSINESS TRUTH") and x.get("why_gev") for x in r.get("queue", [])),
     }
     fn = checks.get(skill_id)
     if fn and result["status"] not in ("BLOCKED",) and not fn(result): return False, f"validation rule failed for {skill_id}"
@@ -934,6 +1001,13 @@ def verify_completion(skill_id, result, inputs=None):
             if not a: return False, "action record ABSENT on re-read"
             if result.get("status") == "VERIFIED" and a["state"] != "VERIFIED": return False, f"claimed VERIFIED but store says {a['state']}"
             return True, f"action {a['action_id']} re-read: {a['state']}"
+        if skill_id in ("management_snapshot", "exception_review", "change_review", "decision_queue"):
+            ck = (result.get("checkpoint") or (result.get("management") or {}).get("checkpoint") or {}).get("op_id")
+            if ck:
+                found = _st().get("checkpoints", ck); return (found is not None), f"checkpoint {ck} {'present' if found else 'ABSENT'} on re-read"
+            if isinstance(result.get("tasks"), dict) and "counts" in result["tasks"] and "tasks" not in inputs:
+                n = len([t for t in _tasks(inputs) if t["open"]]); return (n == result["tasks"]["counts"]["open"]), f"re-read {n} open vs reported {result['tasks']['counts']['open']}"
+            return result.get("mutation_performed") is False, "read-only intelligence: no mutation claimed"
         return True, "no post-condition declared"
     except Exception as e:
         return False, f"verification error {type(e).__name__}: {e}"

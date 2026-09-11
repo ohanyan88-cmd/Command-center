@@ -12,7 +12,8 @@
   "test_actions.H03_Verification.test_audit_chain_is_complete_and_secretless",
   "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
   "test_actions.H05_CapabilityAndSkill.test_capability_registry_is_honest",
-  "test_actions.H05_CapabilityAndSkill.test_routing_and_executor_boundaries"
+  "test_actions.H05_CapabilityAndSkill.test_routing_and_executor_boundaries",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
  ],
  "failure_tests": [
   "test_actions.H01_Governance.test_batch_approval_is_exact_and_partial_is_honest",
@@ -33,12 +34,14 @@
   "test_actions.H02_IdempotencyAndFailure.test_timeout_reconcile_first_and_blind_retry_prohibited",
   "test_actions.H03_Verification.test_provider_success_is_never_completion",
   "test_actions.H04_TasksWriteAdapter.test_stale_row_and_locked_workbook",
-  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
  ],
  "adversarial": [
   "test_actions.H01_Governance.test_approval_binds_to_exact_action_and_parameter_change_invalidates",
   "test_actions.H01_Governance.test_approval_text_recognition",
-  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
  ],
  "failure_injection": [
   "test_actions.H01_Governance.test_approval_binds_to_exact_action_and_parameter_change_invalidates",
@@ -57,7 +60,8 @@
   "test_actions.H01_Governance.test_batch_approval_is_exact_and_partial_is_honest",
   "test_actions.H01_Governance.test_no_approval_no_execution_and_reads_stay_free",
   "test_actions.H01_Governance.test_replay_expiry_rejection_and_risk_classes",
-  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
  ],
  "completion_verification": [
   "test_actions.H01_Governance.test_batch_approval_is_exact_and_partial_is_honest",
@@ -65,7 +69,8 @@
   "test_actions.H02_IdempotencyAndFailure.test_duplicate_requests_never_duplicate_writes",
   "test_actions.H02_IdempotencyAndFailure.test_timeout_reconcile_first_and_blind_retry_prohibited",
   "test_actions.H03_Verification.test_provider_success_is_never_completion",
-  "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback"
+  "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
  ],
  "concurrency_tests": [
   "test_actions.H02_IdempotencyAndFailure.test_concurrent_execution_writes_once_and_restart_keeps_idempotency"
@@ -92,16 +97,17 @@
   "eval:g_same_task_again",
   "eval:g_send_it",
   "eval:g_tariff",
-  "eval:g_timeout_retry"
+  "eval:g_timeout_retry",
+  "eval:h_execute_routes_to_hands"
  ],
  "routing_evals": [
   "eval:r_email_tool",
   "test_actions.H05_CapabilityAndSkill.test_routing_and_executor_boundaries"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "563d13607ee44c39d4b9459c",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:54:07",
+ "fingerprint": "8182980e405b17f41913ea44",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -116,7 +122,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": true
 }

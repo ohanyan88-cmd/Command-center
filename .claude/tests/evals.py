@@ -70,8 +70,21 @@ ROUTING = [
  ("r_send_finance", "Send Finance a follow-up.", {"management_communication"}, {"communication_quality_checking","follow_up_management","waiting_for_tracking","task_management","deadline_management"}),
  ("r_who_owes", "Who owes me something right now?", {"waiting_for_tracking"}, {"task_management","follow_up_management","deadline_management","open_loop_memory"}),
  ("r_who_owes_hy", "Ով է ինձ պարտք հիմա, ումից եմ սպասում", {"waiting_for_tracking"}, {"task_management","follow_up_management","deadline_management","open_loop_memory"}),
- ("r_attention", "Which three problems need my attention today?", {"executive_prioritization"}, {"task_management","deadline_management","daily_briefing"}),
+ ("r_attention", "Which three problems need my attention today?", {"executive_prioritization"}, {"task_management","deadline_management","daily_briefing","management_snapshot","waiting_for_tracking"}),
  ("r_email_tool", "send email to arman about the report", {"action_runtime"}, {"management_communication"}),
+ # Mission 5 — natural management requests (Armenian / English) route to the intelligence skills, never to a write
+ ("r_hy_today", "էսօր ինչ կա", {"management_snapshot"}, {"task_management","deadline_management","waiting_for_tracking","executive_prioritization"}),
+ ("r_hy_worry", "ինչից պիտի անհանգստանամ", {"exception_review"}, set()),
+ ("r_hy_bad", "ինչը լավ չի գնում", {"exception_review"}, set()),
+ ("r_hy_changed", "ինչ փոխվեց երեկվանից", {"change_review"}, set()),
+ ("r_hy_queue", "ինձնից ինչ ա սպասում", {"decision_queue"}, {"task_management","waiting_for_tracking"}),
+ ("r_hy_stuck", "ինչ task-եր են կախված", {"management_snapshot"}, {"task_management","deadline_management","waiting_for_tracking","executive_prioritization","information_retrieval"}),
+ ("r_hy_late", "ով ա ուշացրել", {"management_snapshot"}, {"task_management","deadline_management","waiting_for_tracking","executive_prioritization"}),
+ ("r_hy_todo", "ինչ ունեմ անելու", {"management_snapshot"}, {"task_management","deadline_management","waiting_for_tracking","executive_prioritization"}),
+ ("r_hy_brief", "մի հատ առավոտվա brief տուր", {"daily_briefing"}, {"task_management","deadline_management","waiting_for_tracking","executive_prioritization"}),
+ ("r_en_exceptions", "give me the exceptions only", {"exception_review"}, set()),
+ ("r_en_changed", "what changed since yesterday?", {"change_review"}, set()),
+ ("r_en_attention", "what needs my attention today?", {"management_snapshot"}, {"task_management","deadline_management","waiting_for_tracking","executive_prioritization"}),
 ]
 
 # ───────────── D. domain boundary: SYSTEM/maintenance intents never route to business skills (overlapping words) ─────────────
@@ -568,8 +581,122 @@ HANDS = [("g_create_task_prepare", ev_g_create_task_prepare), ("g_go_executes_ex
          ("g_put_draft", ev_g_put_draft), ("g_send_it", ev_g_send_it), ("g_remind_me", ev_g_remind_me), ("g_close_task", ev_g_close_task), ("g_tariff", ev_g_tariff), ("g_bitrix_deal", ev_g_bitrix_deal), ("g_same_task_again", ev_g_same_task_again),
          ("g_timeout_retry", ev_g_timeout_retry), ("g_cancel_meeting", ev_g_cancel_meeting), ("g_mark_complete", ev_g_mark_complete), ("g_no_asking", ev_g_no_asking), ("g_looks_good", ev_g_looks_good), ("g_go_but_change", ev_g_go_but_change)]
 
+# ───────────── H. MISSION 5 — live management intelligence (Armenian + English; live-shaped fixtures, labelled NON_PRODUCTION; no write) ─────────────
+HT = [{"id": 1, "task": "Send the retention flow document", "status": "Ընթացքում", "owner": "Արման", "due": "2026-09-05"}, {"id": 2, "task": "Approve corporate discount policy", "status": "Չսկսված", "owner": "Գև", "due": T},
+      {"id": 3, "task": "Billing spec from the vendor", "status": "Սպասում", "owner": "Մագա → Գև", "due": "2026-09-08"}, {"id": 4, "task": "Inspectors do not use the system", "status": "Չսկսված", "owner": "", "due": "2026-09-15"},
+      {"id": 5, "task": "Keep or replace the current system", "status": "Ընթացքում", "owner": "ԳԵՎ", "due": "2026-09-12"}, {"id": 6, "task": "Prepare the weekly review", "status": "Չսկսված", "owner": "Գև", "due": "2026-09-12"}]
+def _h(intent, extra=None):
+    def run():
+        plan = engine.resolve(REG, intent); r = engine.run_plan(REG, plan, {"today": T, "tasks": HT, "no_checkpoint": True, **(extra or {})}); return plan, r
+    return _with_fixture("live", FX_LIVE, run)
+def _hres(r, sid): return (_step(r, sid) or {}).get("result") or {}
+CAUSES = ("CONFIRMED CAUSE", "SUPPORTED HYPOTHESIS", "UNKNOWN")
+
+def ev_h_morning_brief():
+    fails = []; plan, r = _h("սարքի առավոտվա brief-ը"); res = _hres(r, "daily_briefing"); m = res.get("management") or {}
+    if (_step(r, "daily_briefing") or {}).get("status") != "EXECUTED": fails.append(f"daily_briefing {(_step(r, 'daily_briefing') or {}).get('status')}")
+    if m.get("status") != "EXECUTED": fails.append(f"management block {m.get('status')} {m.get('reason')}")
+    for k in ("TOP_LINE", "CHANGES", "SALES", "OPERATIONS", "TASKS", "CALENDAR", "MAIL", "RISKS", "ACTIONS", "GEV_ACTION"):
+        if k not in m: fails.append(f"section {k} missing")
+    if not m.get("GEV_ACTION"): fails.append("Gev action empty although an ownerless task and a decision are in the register")
+    if not str((m.get("SALES") or {}).get("verdict", "")).startswith("UNAVAILABLE"): fails.append("sales not honest about missing sources")
+    if len((m.get("TASKS") or {}).get("overdue", [])) != 2: fails.append(f"overdue count {len((m.get('TASKS') or {}).get('overdue', []))}")
+    if not str(m.get("truth_mode", "")).startswith("NON_PRODUCTION"): fails.append("fixture brief not labelled NON_PRODUCTION")
+    if not str(res.get("management_text", "")).startswith("DEPUTY DAILY BRIEF"): fails.append("no rendered brief text")
+    return fails, [f"gev={len(m.get('GEV_ACTION', []))} exc={(m.get('TOP_LINE') or {}).get('exceptions')}"], plan, r
+def ev_h_exceptions_only():
+    fails = []; plan, r = _h("give me the exceptions only"); res = _hres(r, "exception_review")
+    if "exception_review" not in plan["chain"]: fails.append("not routed to exception_review")
+    if res.get("count", 0) < 3: fails.append(f"too few exceptions {res.get('count')}")
+    if not res.get("visibility_incomplete") or "INT-B24" not in res.get("note", ""): fails.append("incomplete visibility not stated separately")
+    if any(e["WHAT_CAUSED_IT"].split(" — ")[0] not in CAUSES for e in res.get("exceptions", [])): fails.append("cause outside the discipline")
+    if "fine" in str(res.get("verdict", "")).lower(): fails.append("'fine' wording")
+    return fails, [f"count={res.get('count')} first={str((res.get('exceptions') or [{}])[0].get('WHAT_HAPPENED'))[:40]}"], plan, r
+def ev_h_tasks_overdue():
+    fails = []; plan, r = _h("ով ա ուշացրել"); res = _hres(r, "management_snapshot"); tv = res.get("tasks") or {}
+    if res.get("focus") != "tasks": fails.append(f"focus {res.get('focus')}")
+    ids = {e["WHAT_HAPPENED"].split()[1] for e in tv.get("overdue", [])}
+    if ids != {"1", "3"}: fails.append(f"overdue ids {ids}")
+    if not all(e.get("provenance", {}).get("integration_id") == "INT-TASKS" for e in tv.get("overdue", [])): fails.append("provenance missing")
+    if "Արման" not in (tv.get("late_by_person") or {}): fails.append("late-by-person missing Արման")
+    return fails, [f"late_by_person={tv.get('late_by_person')}"], plan, r
+def ev_h_gev_queue():
+    fails = []; plan, r = _h("ինձնից ինչ ա սպասում"); res = _hres(r, "decision_queue"); q = res.get("queue", []); cats = {x["ref"]: x["category"] for x in q}
+    if "decision_queue" not in plan["chain"]: fails.append("not routed to decision_queue")
+    if cats.get("task:4") != "OWNER NEEDED": fails.append(f"ownerless task not OWNER NEEDED: {cats}")
+    if cats.get("task:5") != "DECISION": fails.append("decision task missing")
+    if "task:1" in cats: fails.append("team overdue work leaked into Gev's queue")
+    if any(not x.get("why_gev") for x in q): fails.append("why_gev missing")
+    return fails, [f"categories={sorted(set(cats.values()))}"], plan, r
+def ev_h_calendar_today():
+    fails = []; plan, r = _h("էսօր ինչ meeting ունեմ"); res = _hres(r, "daily_briefing"); c = (res.get("management") or {}).get("CALENDAR") or {}
+    if len(c.get("today", [])) != 2: fails.append(f"today meetings {len(c.get('today', []))}")
+    if len(c.get("conflicts", [])) != 1: fails.append("overlap not detected")
+    if (c.get("visibility") or {}).get("state") != "FIXTURE": fails.append("fixture calendar not labelled")
+    return fails, [f"today={[m['title'] for m in c.get('today', [])]}"], plan, r
+def ev_h_mail_attention():
+    fails = []; before = _commit_count(); plan, r = _h("ինչ կարևոր mail ունեմ"); res = _hres(r, "management_snapshot"); m = res.get("mail") or {}
+    if res.get("focus") != "mail": fails.append(f"focus {res.get('focus')}")
+    if [x["subject"] for x in m.get("decision_requests", [])] != ["Approval needed: corporate discount"]: fails.append(f"decision requests {[x.get('subject') for x in m.get('decision_requests', [])]}")
+    if any("noreply" in str(x.get("counterpart_address")) for x in m.get("action_requests", []) + m.get("decision_requests", [])): fails.append("notification mail leaked")
+    if _commit_count() != before: fails.append("mail created a permanent commitment")
+    return fails, [f"decision={len(m.get('decision_requests', []))} action={len(m.get('action_requests', []))}"], plan, r
+def ev_h_sales_unavailable():
+    fails = []; plan, r = _h("ինչ խնդիր ունենք վաճառքում"); res = _hres(r, "management_snapshot"); s = res.get("sales") or {}
+    if res.get("focus") != "sales": fails.append(f"focus {res.get('focus')}")
+    if not str(s.get("verdict", "")).startswith("UNAVAILABLE"): fails.append("verdict not UNAVAILABLE")
+    if any(v.get("value") != "UNKNOWN" for v in (s.get("dimensions") or {}).values()): fails.append("a sales number was produced without a live source")
+    if not any("INT-B24" in x for x in (s.get("dimensions") or {}).get("pipeline_health", {}).get("missing", [])): fails.append("missing capability not named")
+    return fails, [f"unavailable={len(s.get('unavailable', []))}/{len(s.get('dimensions', {}))}"], plan, r
+def ev_h_ops_partial():
+    fails = []; plan, r = _h("operations-ում ինչ ա վառվում"); res = _hres(r, "management_snapshot"); o = res.get("operations") or {}
+    if res.get("focus") != "operations": fails.append(f"focus {res.get('focus')}")
+    if "overdue_work" not in o.get("available", []): fails.append("overdue work not computed from the live register")
+    if "sla_risks" not in o.get("unavailable", []): fails.append("SLA risks not marked unavailable")
+    if not any("INT-B24" in x for x in (o.get("dimensions") or {}).get("sla_risks", {}).get("missing", [])): fails.append("missing source not named")
+    return fails, [f"available={len(o.get('available', []))} unavailable={len(o.get('unavailable', []))}"], plan, r
+def ev_h_what_changed():
+    fails = []; plan, r = _h("what changed since yesterday?"); res = _hres(r, "change_review")
+    if "change_review" not in plan["chain"]: fails.append("not routed to change_review")
+    if set(res.get("groups", {})) != {"NEW", "CHANGED", "RESOLVED", "WORSENED", "NEEDS_GEV"}: fails.append(f"groups {set(res.get('groups', {}))}")
+    ch = res.get("changes") or {}
+    if ch.get("available") and not ch.get("since"): fails.append("available without a checkpoint reference")
+    if not ch.get("available") and "no previous" not in str(ch.get("reason", "")): fails.append("missing checkpoint not explained")
+    return fails, [f"available={ch.get('available')}"], plan, r
+def ev_h_root_cause_unknown():
+    fails = []; plan, r = _h("what's wrong right now?"); res = _hres(r, "exception_review"); by = {e["WHAT_HAPPENED"].split()[1]: e for e in res.get("exceptions", []) if e["WHAT_HAPPENED"].startswith("Task")}
+    if not str(by.get("1", {}).get("WHAT_CAUSED_IT", "")).startswith("UNKNOWN"): fails.append(f"cause invented for task 1: {by.get('1', {}).get('WHAT_CAUSED_IT')}")
+    if not any(str(e.get("WHAT_CAUSED_IT", "")).startswith("SUPPORTED HYPOTHESIS") and "3" == e["WHAT_HAPPENED"].split()[1] for e in res.get("exceptions", []) if e["WHAT_HAPPENED"].startswith("Task")): fails.append("blocked task cause not a supported hypothesis with evidence")
+    return fails, [f"task1={str(by.get('1', {}).get('WHAT_CAUSED_IT'))[:30]}"], plan, r
+def ev_h_recommend_no_write():
+    fails = []; before = len(engine._store().list("actions")); plan, r = _h("ինչ action ես առաջարկում"); res = _hres(r, "management_snapshot")
+    if "action_runtime" in plan["chain"] or "decision_support" in plan["chain"]: fails.append(f"mis-routed: {plan['chain']}")
+    if not res.get("actions"): fails.append("no recommended action")
+    if any(x.count(" → ") != 3 for x in res.get("actions", [])): fails.append("action not ACTION → OWNER → DEADLINE → VERIFY")
+    if res.get("mutation_performed") is not False or len(engine._store().list("actions")) != before: fails.append("recommendation mutated something")
+    return fails, [f"actions={len(res.get('actions', []))}"], plan, r
+def ev_h_execute_routes_to_hands():
+    fails = []; _hands_env(); before = len(engine._store().list("actions")); plan, r = _h("Create a task for Arman to send the weekly report by Friday.", {"session_id": "h12"}); res = _hres(r, "action_runtime")
+    if plan["chain"] != ["action_runtime"]: fails.append(f"chain {plan['chain']}")
+    if res.get("action_state") != "APPROVAL_REQUIRED" or res.get("mutation_performed") or "READY FOR YOUR APPROVAL" not in str(res.get("card")): fails.append(f"no approval card: {res.get('code')} {res.get('reason')}")
+    if len(engine._store().list("actions")) != before + 1: fails.append("action not prepared in the store")
+    return fails, [f"state={res.get('action_state')}"], plan, r
+def ev_h_attention_today():
+    fails = []; plan, r = _h("what needs my attention today?"); res = _hres(r, "management_snapshot")
+    if "management_snapshot" not in plan["chain"] or "executive_prioritization" not in plan["chain"]: fails.append(f"chain {plan['chain']}")
+    if not res.get("top"): fails.append("no management answers")
+    if not all(set(a) >= {"WHAT_HAPPENED", "WHY_IT_MATTERS", "WHAT_CAUSED_IT", "RECOMMENDATION", "OWNER", "BY_WHEN", "GEV_ACTION"} for a in res.get("top", [])): fails.append("answer lacks the 7 questions")
+    if "INT-B24" not in res.get("unavailable", []): fails.append("visibility gap hidden")
+    return fails, [f"top={len(res.get('top', []))} gev={len(res.get('gev', []))}"], plan, r
+
+MANAGEMENT = [("h_morning_brief", ev_h_morning_brief, ["daily_briefing", "executive_prioritization", "deadline_management", "waiting_for_tracking"]), ("h_exceptions_only", ev_h_exceptions_only, ["exception_review"]),
+              ("h_tasks_overdue", ev_h_tasks_overdue, ["management_snapshot", "deadline_management"]), ("h_gev_queue", ev_h_gev_queue, ["decision_queue"]), ("h_calendar_today", ev_h_calendar_today, ["daily_briefing"]),
+              ("h_mail_attention", ev_h_mail_attention, ["management_snapshot", "open_loop_memory"]), ("h_sales_unavailable", ev_h_sales_unavailable, ["management_snapshot", "sales_kpi_monitoring"]), ("h_ops_partial", ev_h_ops_partial, ["management_snapshot", "backlog_management"]),
+              ("h_what_changed", ev_h_what_changed, ["change_review"]), ("h_root_cause_unknown", ev_h_root_cause_unknown, ["exception_review"]), ("h_recommend_no_write", ev_h_recommend_no_write, ["management_snapshot", "authority_checking"]),
+              ("h_execute_routes_to_hands", ev_h_execute_routes_to_hands, ["action_runtime", "management_snapshot", "approval_management"]), ("h_attention_today", ev_h_attention_today, ["management_snapshot", "executive_prioritization"])]
+
 def run_all():
-    results = {"scenarios": [], "routing": [], "bypass": [], "boundary": [], "business": [], "integration": [], "hands": []}
+    results = {"scenarios": [], "routing": [], "bypass": [], "boundary": [], "business": [], "integration": [], "hands": [], "management": []}
     for sc in SCENARIOS:
         fails, notes, plan, r = run_scenario(sc)
         skills = sorted(set(plan.get("chain", [])) & set(sc.get("must_run", []) + sc.get("must_select", [])))
@@ -595,6 +722,11 @@ def run_all():
         except Exception as e:
             import traceback; fails, notes, plan, r = [f"{type(e).__name__}: {e} @ {traceback.format_exc().splitlines()[-3][:80]}"], [], {}, {"status": "ERROR"}
         results["hands"].append({"name": name, "pass": not fails, "status": r.get("status"), "notes": notes, "fails": fails, "skills": [AR, "authority_checking", "approval_management", "completion_verification", "audit_logging"]})
+    for name, fn, skills in MANAGEMENT:
+        try: fails, notes, plan, r = fn()
+        except Exception as e:
+            import traceback; fails, notes, plan, r = [f"{type(e).__name__}: {e} @ {traceback.format_exc().splitlines()[-3][:80]}"], [], {}, {"status": "ERROR"}
+        results["management"].append({"name": name, "pass": not fails, "status": r.get("status"), "notes": notes, "fails": fails, "skills": skills})
     return results
 
 def main():
@@ -627,7 +759,11 @@ def main():
     for r in res["hands"]:
         total += 1; passed += r["pass"]
         print(f"{r['name']:28} {'PASS' if r['pass'] else 'FAIL':6} {str(r['status']):10} {'; '.join(r['notes'])}{(' ✗ ' + '; '.join(r['fails'])) if r['fails'] else ''}")
-    print("-" * 110); print(f"EVALS: {passed}/{total} passed  (scenarios {len(res['scenarios'])} · routing {len(res['routing'])} · boundary {len(res['boundary'])} · business {len(res['business'])} · bypass {len(res['bypass'])} · integration {len(res['integration'])} · hands {len(res['hands'])})")
+    print("-" * 110); print(f"{'management eval':28} {'result':6} {'status':10} notes / failures"); print("-" * 110)
+    for r in res["management"]:
+        total += 1; passed += r["pass"]
+        print(f"{r['name']:28} {'PASS' if r['pass'] else 'FAIL':6} {str(r['status']):10} {'; '.join(r['notes'])}{(' ✗ ' + '; '.join(r['fails'])) if r['fails'] else ''}")
+    print("-" * 110); print(f"EVALS: {passed}/{total} passed  (scenarios {len(res['scenarios'])} · routing {len(res['routing'])} · boundary {len(res['boundary'])} · business {len(res['business'])} · bypass {len(res['bypass'])} · integration {len(res['integration'])} · hands {len(res['hands'])} · management {len(res['management'])})")
     return 0 if passed == total else 1
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@
  "computed_maturity": "L4",
  "tests": [
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
+  "test_intelligence.Q04_IntelligenceDiscipline.test_impact_and_priority_ranking",
   "test_skills.T05_Execution.test_executive_prioritization",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -44,6 +45,8 @@
  "evals": [
   "eval:daily_brief",
   "eval:f_daily_brief_live",
+  "eval:h_attention_today",
+  "eval:h_morning_brief",
   "eval:overdue_action"
  ],
  "routing_evals": [
@@ -51,9 +54,9 @@
   "test_skills.T02_Router.test_trigger_resolution"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "d105217aee13acfc66e98e93",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:54:07",
+ "fingerprint": "73df890321d762afff5b8c50",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -68,7 +71,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": false
 }

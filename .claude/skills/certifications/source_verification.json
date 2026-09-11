@@ -7,6 +7,7 @@
  "tests": [
   "test_business.B01_ProvenanceAndPrecedence.test_every_fact_has_source_and_confidence_and_source_status_answers",
   "test_business.B08_RealModel.test_extraction_invariants_green_and_tamper_detected",
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
   "test_live_data.L01_StructureFingerprint.test_schema_changes_change_the_structure_fingerprint",
   "test_live_data.L02_ModelBinding.test_extracted_model_source_change_still_invalidates",
   "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
@@ -21,6 +22,7 @@
   "test_failclosed.F01_EveryBlockedCode.test_MISSING_SKILL",
   "test_failclosed.F01_EveryBlockedCode.test_STALE_SOURCE",
   "test_failclosed.F02_NeverMisrepresented.test_blocked_never_carries_result_data_as_success",
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
   "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
   "test_skills.T07_VerificationAudit.test_source_verification"
  ],
@@ -64,9 +66,9 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "c0156d33a901a3d0ea518275",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:54:07",
+ "fingerprint": "c3523d86e5da6a06cebe6d8e",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -81,7 +83,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": false
 }

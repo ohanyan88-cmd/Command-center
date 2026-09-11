@@ -5,11 +5,13 @@
  "declared_maturity": "L0",
  "computed_maturity": "L0",
  "tests": [
-  "test_integrations.I05_Bitrix24.test_normalized_deals_and_identity"
+  "test_integrations.I05_Bitrix24.test_normalized_deals_and_identity",
+  "test_intelligence.Q06_SalesOps.test_sales_framework_on_fixture_and_honest_production_refusal"
  ],
  "failure_tests": [
   "test_failclosed.F01_EveryBlockedCode.test_NOT_OPERATIONAL",
   "test_failclosed.F01_EveryBlockedCode.test_TOOL_UNAVAILABLE",
+  "test_intelligence.Q06_SalesOps.test_sales_framework_on_fixture_and_honest_production_refusal",
   "test_skills.T02b_DomainBoundary.test_system_intent_stays_fail_closed"
  ],
  "hardening_cases": [
@@ -52,9 +54,9 @@
   "test_skills.T02b_DomainBoundary.test_system_intents_route_no_business_skill"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "342e8e8bc38c388296189eb1",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:54:07",
+ "fingerprint": "847212c82ce673f16ede8639",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -69,7 +71,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": true
 }

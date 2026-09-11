@@ -1,0 +1,71 @@
+{
+ "skill_id": "exception_review",
+ "skill_version": "1.2.0",
+ "maturity_level": "L3",
+ "declared_maturity": "L3",
+ "computed_maturity": "L4",
+ "tests": [
+  "test_intelligence.Q01_Truthfulness.test_conflicting_evidence_surfaced_and_unknowns_stay_unknown",
+  "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
+  "test_intelligence.Q04_IntelligenceDiscipline.test_cause_kinds_with_evidence",
+  "test_intelligence.Q04_IntelligenceDiscipline.test_impact_and_priority_ranking",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register"
+ ],
+ "failure_tests": [
+  "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register"
+ ],
+ "hardening_cases": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "adversarial": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "failure_injection": [
+  "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named"
+ ],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "completion_verification": [
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [],
+ "evals": [
+  "eval:h_exceptions_only",
+  "eval:h_root_cause_unknown"
+ ],
+ "routing_evals": [
+  "eval:r_en_exceptions",
+  "eval:r_hy_bad",
+  "eval:r_hy_worry"
+ ],
+ "failed_tests": [],
+ "certified_at": "2026-09-12T03:54:07",
+ "fingerprint": "c46ef3a7c68dcf69064c1513",
+ "core_fingerprint": "332eefd5f0bb8296",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement",
+  "test_workspace",
+  "test_runtime",
+  "test_business",
+  "test_boundary",
+  "test_integrations",
+  "test_portability",
+  "test_actions",
+  "test_live_data",
+  "test_intelligence"
+ ],
+ "audit_infrastructure": false
+}

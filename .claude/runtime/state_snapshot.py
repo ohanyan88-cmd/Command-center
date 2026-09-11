@@ -15,7 +15,8 @@ ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE)); import python_runtime; python_runtime.ensure()
 sys.path.insert(0, str(ROOT / ".claude" / "skills"))
 
-DURABLE_TABLES = ("commitments", "decisions", "audit", "actions")
+DURABLE_TABLES = ("commitments", "decisions", "audit", "actions", "checkpoints", "loops")
+MUTABLE_TABLES = ("actions", "loops")                 # rows that change state in place (upsert): the export restores the latest exported state
 EXTRA_COLS = {"audit": ("execution_id", "skill_id", "result_status"), "actions": ("status", "fingerprint", "idempotency_key", "session_id", "batch_id")}
 
 def _index_cols(t, payload):
@@ -66,7 +67,7 @@ def import_(root=ROOT, log=print):
             op = rec.get("op_id"); payload = rec.get("payload") or {}
             if not op: bad += 1; continue
             extra = {c: rec[c] for c in EXTRA_COLS.get(t, ()) if c in rec} or _index_cols(t, payload)
-            if t == "actions":                                            # mutable rows: restore the exported state (later exports win by recorded_at order)
+            if t in MUTABLE_TABLES:                                       # mutable rows: restore the exported state (later exports win by recorded_at order)
                 cur = st.get(t, op)
                 if cur is None: st.upsert(t, op, payload, extra_cols=extra or None); new += 1
                 else: dup += 1

@@ -28,7 +28,8 @@ SKIP_WALK = {".git", ".venv", "__pycache__", "_TEMP_WORK_COLLECTION"}
 # Versioned but rewritten by every release/bootstrap (timestamps, appended history): restored by clone, then legitimately regenerated —
 # excluded from content checksums and parity (their EXISTENCE is still required by the manifest where listed).
 RELEASE_CHURN = ("**/.claude/skills/certifications/*.json", ".claude/skills/certifications/*.json", ".claude/skills/registry.json", ".claude/docs/Registry-audit-*.md",
-                 ".claude/state/durable/audit.jsonl", ".claude/state/durable/business_observations.jsonl", ".claude/state/durable/actions.jsonl", ".claude/state/durable/write_certifications.json", ".claude/policy/durable_checksums.json")
+                 ".claude/state/durable/audit.jsonl", ".claude/state/durable/business_observations.jsonl", ".claude/state/durable/actions.jsonl", ".claude/state/durable/write_certifications.json",
+                 ".claude/state/durable/checkpoints.jsonl", ".claude/state/durable/loops.jsonl", ".claude/policy/durable_checksums.json")
 
 def _churn(rel):
     r = rel.replace("\\", "/")
@@ -82,6 +83,8 @@ def build(pol=None):
     add(".claude/state/durable/decisions.jsonl", "file", True, "VERSION_DIRECTLY", "git clone → state_snapshot.py import", "CONFIDENTIAL")
     add(".claude/state/durable/audit.jsonl", "file", True, "VERSION_DIRECTLY", "git clone → state_snapshot.py import (governance history)", "CONFIDENTIAL")
     add(".claude/state/durable/actions.jsonl", "file", True, "VERSION_DIRECTLY", "git clone → state_snapshot.py import (governed mutations: idempotency survives restart)", "CONFIDENTIAL")
+    add(".claude/state/durable/checkpoints.jsonl", "file", True, "VERSION_DIRECTLY", "git clone → state_snapshot.py import (Mission 5 observation checkpoints: signatures only)", "CONFIDENTIAL")
+    add(".claude/state/durable/loops.jsonl", "file", True, "VERSION_DIRECTLY", "git clone → state_snapshot.py import (Mission 5 open management loops: references only)", "CONFIDENTIAL")
     add(".secure/manifest.json", "file", True, "VERSION_DIRECTLY", "git clone (names/checksums/restore paths only)")
     add(".secure/credentials.gpg", "file", True, "VERSION_ENCRYPTED", "bootstrap.py → secure_recovery.py restore (needs the external recovery key)", "RESTRICTED")
     add(".claude/business/overlay", "directory", True, "VERSION_DIRECTLY", "git clone (overlay authoring ov_*.py)", "CONFIDENTIAL")

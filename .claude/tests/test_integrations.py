@@ -442,12 +442,12 @@ class A02_AuditFailClosed(unittest.TestCase):
     @covers("audit_logging", "completion_verification", "task_management", *GOV, kinds=("failure", "failure_injection", "enforcement"))
     def test_real_read_withheld_when_audit_cannot_be_persisted_or_reread(self):
         if not (ROOT / "Tasks.xlsx").exists(): self.skipTest("Tasks.xlsx absent")
-        _clear_cache(); before = (health.get("INT-TASKS") or {}).get("success_count", 0)
+        _clear_cache(); before = (health.get("INT-TASKS") or {}).get("success_count", 0); before_af = (health.get("INT-TASKS") or {}).get("audit_failures", 0)
         for how in ("raise", "reread"):
             e = self._with_broken_audit(lambda: layer.query("INT-TASKS", "tasks.list", {"open_only": True}, use_cache=False), how)
             self.assertEqual((e["status"], e["code"], e["records"], e["health"]), ("FAILED", "AUDIT_UNAVAILABLE", [], "DEGRADED"), how)
             self.assertIn("withheld", e["reason"]); self.assertFalse(e.get("audit_recorded"))
-        h = health.get("INT-TASKS"); self.assertEqual(h["success_count"], before); self.assertEqual(h["audit_failures"], 2)    # no success evidence without audit
+        h = health.get("INT-TASKS"); self.assertEqual(h["success_count"], before); self.assertEqual(h["audit_failures"], before_af + 2)    # no success evidence without audit (health accumulates across tests)
         ok = layer.query("INT-TASKS", "tasks.list", {"open_only": True}, use_cache=False)
         self.assertEqual(ok["status"], "OK"); self.assertTrue(ok["audit_id"]); self.assertTrue(engine._store().get("audit", ok["audit_id"]))
         self.assertEqual(health.get("INT-TASKS")["success_count"], before + 1)

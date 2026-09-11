@@ -1,6 +1,6 @@
 # Registry Quality Audit — 2026-09-12
 
-**Before:** 132 skills · **After:** 63 skills · **Retired/merged:** 71
+**Before:** 132 skills · **After:** 67 skills · **Retired/merged:** 71
 
 Rule: a skill survives only if it provides a capability no other skill provides (distinct executor behaviour, distinct required input, or distinct routing target). Same executor + same input + same output = alias → merged. Tools are not skills → `tools_available` / `tool_intents`.
 
@@ -170,6 +170,10 @@ Rule: a skill survives only if it provides a capability no other skill provides 
 - `approval_management` (A_EXECUTIVE_CONTROL, target L4, executor `approval_management`): Detect when an action level needs explicit Head approval and check the approval token.
 - `meeting_preparation` (A_EXECUTIVE_CONTROL, target L2, executor `meeting_preparation`): Prepare a meeting pack: purpose, participants, previous decisions, open actions, overdue, waiting-for, decisions required, talking points.
 - `daily_briefing` (A_EXECUTIVE_CONTROL, target L4, executor `daily_briefing`): GOOD MORNING BRIEF: top priorities, Head actions, decisions pending, deadlines today/overdue/tomorrow, waiting-for, data gaps.
+- `management_snapshot` (A_EXECUTIVE_CONTROL, target L3, executor `management_snapshot`): MISSION 5: one canonical current-state intelligence answer — live reads from every readable integration (INT-TASKS, Outlook calendar/mail; Bitrix24/MikroBILL honestly UNAVAILABLE until connected), provenance/freshness on every fact, exceptions ranked (severity → urgency → impact → deadline → dependency), evidence-disciplined causes, ACTION → OWNER → DEADLINE → VERIFY recommendations, Gev queue; focused by the question (tasks / calendar / mail / sales / operations / all).
+- `exception_review` (A_EXECUTIVE_CONTROL, target L3, executor `exception_review`): MISSION 5 EXCEPTION MODE — 'what's wrong right now?': only proven exceptions, ranked by severity, urgency, impact, deadline, dependency; visibility gaps stated separately (never 'everything is fine' when systems are dark).
+- `change_review` (A_EXECUTIVE_CONTROL, target L3, executor `change_review`): MISSION 5 — 'what changed since <checkpoint/time>?': durable observation checkpoints + live reads → NEW · CHANGED · RESOLVED · WORSENED · NEEDS_GEV; field-level noise suppressed.
+- `decision_queue` (A_EXECUTIVE_CONTROL, target L3, executor `decision_queue`): MISSION 5 — items that genuinely require Gev: APPROVAL · DECISION · ESCALATION · OWNER NEEDED · PRIORITY CONFLICT · MISSING BUSINESS TRUTH, each with issue, why Gev, required action, deadline, consequence.
 - `end_of_day_control` (A_EXECUTIVE_CONTROL, target L2, executor `end_of_day_control`): EOD: completed / not completed / decisions pending / waiting / tomorrow.
 - `weekly_executive_review` (A_EXECUTIVE_CONTROL, target L1, executor `weekly_review`): Weekly S&O review skeleton from available data; sales/ops sections marked UNKNOWN without datasets.
 - `sales_kpi_monitoring` (B_SALES_MANAGEMENT, target L1, executor `analysis_on_supplied_data`): Track leads/conversion/sales/revenue vs target from a supplied dataset.
@@ -208,7 +212,7 @@ Rule: a skill survives only if it provides a capability no other skill provides 
 - `commitment_memory` (H_MEMORY_CONTEXT, target L3, executor `commitment_memory`): Retrieve open commitments from the hardened store.
 - `decision_memory` (H_MEMORY_CONTEXT, target L3, executor `decision_memory`): Retrieve logged decisions.
 - `information_retrieval` (H_MEMORY_CONTEXT, target L2, executor `memory_retrieval`): Find facts, history, project context, dependencies and links across workspace + memory files.
-- `open_loop_memory` (H_MEMORY_CONTEXT, target L3, executor `open_loops`): All open loops: tasks + waiting + commitments + decisions pending.
+- `open_loop_memory` (H_MEMORY_CONTEXT, target L3, executor `open_loops`): All open loops: tasks + waiting + commitments + decisions pending + mail candidates; Mission 5 durable loops (references only) that close on evidence.
 - `business_model_query` (H_MEMORY_CONTEXT, target L3, executor `business_query`): Answer who-owns / which-process / which-KPI / which-playbook / who-approves / role questions from the canonical Business Operating Model (.claude/business) with source ids; conflicts and unknowns are surfaced (OWNER_UNKNOWN, KPI_DEFINITION_MISSING, PROCESS_UNDEFINED, TARGET_UNKNOWN, APPROVAL_RULE_UNKNOWN, SOURCE_CONFLICT), never invented.
 - `authority_checking` (I_GOVERNANCE, target L4, executor `authority_checking`): Check a requested action level against a skill's max_action and the approval policy.
 - `risk_classification` (I_GOVERNANCE, target L2, executor `risk_classification`): Classify an action LOW/MEDIUM/HIGH/CRITICAL by materiality (pricing/comp/hiring/contract/public/irreversible) and reversibility.
@@ -221,7 +225,7 @@ Rule: a skill survives only if it provides a capability no other skill provides 
 
 ## Per-domain counts (after)
 
-- A_EXECUTIVE_CONTROL: 17
+- A_EXECUTIVE_CONTROL: 21
 - B_SALES_MANAGEMENT: 13
 - C_OPERATIONS_MANAGEMENT: 8
 - D_PEOPLE_PERFORMANCE: 1

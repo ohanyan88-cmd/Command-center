@@ -5,6 +5,7 @@
  "declared_maturity": "L1",
  "computed_maturity": "L3",
  "tests": [
+  "test_intelligence.Q06_SalesOps.test_operations_framework_partial_and_honest",
   "test_skills.T05_Execution.test_unknown_data_behavior"
  ],
  "failure_tests": [
@@ -30,9 +31,9 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "ff10df8116794cf6162ee0e4",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:54:07",
+ "fingerprint": "86149739bd3b6cbba5adaad1",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -47,7 +48,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": true
 }

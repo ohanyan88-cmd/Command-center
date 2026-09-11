@@ -5,6 +5,7 @@
  "declared_maturity": "L2",
  "computed_maturity": "L2",
  "tests": [
+  "test_intelligence.Q07_Governance.test_brief_eod_weekly_and_open_loops_carry_the_management_block",
   "test_skills.T05_Execution.test_eod"
  ],
  "failure_tests": [
@@ -21,6 +22,7 @@
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
  "completion_verification": [
+  "test_intelligence.Q07_Governance.test_brief_eod_weekly_and_open_loops_carry_the_management_block",
   "test_skills.T05_Execution.test_eod"
  ],
  "concurrency_tests": [],
@@ -28,9 +30,9 @@
  "evals": [],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "47c5e741aac3a17e0e5dc94b",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:54:07",
+ "fingerprint": "dd34907613bbb4721c5ef553",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -45,7 +47,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": false
 }
