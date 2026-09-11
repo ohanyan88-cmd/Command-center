@@ -1,6 +1,6 @@
 # Registry Quality Audit — 2026-09-12
 
-**Before:** 132 skills · **After:** 62 skills · **Retired/merged:** 71
+**Before:** 132 skills · **After:** 63 skills · **Retired/merged:** 71
 
 Rule: a skill survives only if it provides a capability no other skill provides (distinct executor behaviour, distinct required input, or distinct routing target). Same executor + same input + same output = alias → merged. Tools are not skills → `tools_available` / `tool_intents`.
 
@@ -157,6 +157,7 @@ Rule: a skill survives only if it provides a capability no other skill provides 
 
 - `executive_prioritization` (A_EXECUTIVE_CONTROL, target L3, executor `executive_prioritization`): Rank open items P1–P4 by business impact, urgency, owner and deadline; surface the 3–5 that need the Head's attention.
 - `task_management` (A_EXECUTIVE_CONTROL, target L4, executor `task_management`): Read, list and inspect tasks from the source of truth (xlsx); normalize fields. Also the read/write primitive for the tracker.
+- `action_runtime` (A_EXECUTIVE_CONTROL, target L3, executor `action_runtime`): The ONE governed path for real mutations (tasks, calendar, provider e-mail drafts/sends, CRM, billing): understand the intent, resolve business context, build the exact Action Request, check capability + authority, PREPARE the exact action and SHOW it to Gev, execute ONLY an unmistakably approved pending action (token bound to the action fingerprint, single-use), verify by independent read-back, reconcile unknown outcomes, update open loops, audit every step. AUTONOMOUS EXTERNAL WRITE AUTHORITY = NONE (.claude/policy/approval_rule.json).
 - `delegation_design` (A_EXECUTIVE_CONTROL, target L2, executor `delegation_design`): Turn a vague instruction, meeting note or recommendation into an executable task: one named owner, deadline, expected output.
 - `commitment_tracking` (A_EXECUTIVE_CONTROL, target L4, executor `commitment_tracking`): Record commitments ('I'll call Friday', 'if X then tell me') as tracked items with idempotency in the hardened store.
 - `waiting_for_tracking` (A_EXECUTIVE_CONTROL, target L4, executor `waiting_for_tracking`): Register of what we are waiting for, from whom, since when, expected by when — including cross-department handoffs.
@@ -220,7 +221,7 @@ Rule: a skill survives only if it provides a capability no other skill provides 
 
 ## Per-domain counts (after)
 
-- A_EXECUTIVE_CONTROL: 16
+- A_EXECUTIVE_CONTROL: 17
 - B_SALES_MANAGEMENT: 13
 - C_OPERATIONS_MANAGEMENT: 8
 - D_PEOPLE_PERFORMANCE: 1

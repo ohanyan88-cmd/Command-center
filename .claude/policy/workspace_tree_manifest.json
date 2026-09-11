@@ -55,6 +55,8 @@
   ".claude/docs/Registry-audit-*.md",
   ".claude/state/durable/audit.jsonl",
   ".claude/state/durable/business_observations.jsonl",
+  ".claude/state/durable/actions.jsonl",
+  ".claude/state/durable/write_certifications.json",
   ".claude/policy/durable_checksums.json"
  ],
  "entries": [
@@ -320,6 +322,14 @@
    "required": true,
    "durability": "VERSION_DIRECTLY",
    "restore": "git clone (.gitkeep)",
+   "classification": "CONFIDENTIAL"
+  },
+  {
+   "path": ".claude/state/durable/actions.jsonl",
+   "kind": "file",
+   "required": true,
+   "durability": "VERSION_DIRECTLY",
+   "restore": "git clone → state_snapshot.py import (governed mutations: idempotency survives restart)",
    "classification": "CONFIDENTIAL"
   },
   {

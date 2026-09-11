@@ -1,10 +1,18 @@
 {
  "skill_id": "authority_checking",
  "skill_version": "1.2.0",
- "maturity_level": "L4",
+ "maturity_level": "L1",
  "declared_maturity": "L4",
- "computed_maturity": "L4",
+ "computed_maturity": "L1",
  "tests": [
+  "test_actions.H01_Governance.test_ambiguous_pending_target_fails_closed",
+  "test_actions.H01_Governance.test_approval_text_recognition",
+  "test_actions.H01_Governance.test_no_approval_no_execution_and_reads_stay_free",
+  "test_actions.H02_IdempotencyAndFailure.test_duplicate_requests_never_duplicate_writes",
+  "test_actions.H03_Verification.test_audit_chain_is_complete_and_secretless",
+  "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
+  "test_actions.H05_CapabilityAndSkill.test_capability_registry_is_honest",
+  "test_actions.H05_CapabilityAndSkill.test_routing_and_executor_boundaries",
   "test_boundary.S01_Classification.test_classes_defined_and_not_one_bucket",
   "test_boundary.S01_Classification.test_path_rules_classify_awareness_vs_blocking",
   "test_boundary.S02_ContentDetection.test_real_core_files_are_clean",
@@ -55,12 +63,17 @@
   "test_portability.P04_SecureRecovery.test_workspace_artifact_manifest_has_no_values_and_key_is_external",
   "test_portability.P05_MachineSpecificAndPaths.test_machine_dependencies_are_declared",
   "test_portability.P05_MachineSpecificAndPaths.test_no_dependence_on_the_original_absolute_path",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key",
-  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore",
   "test_skills.T04_Authority.test_authority_checking_executor"
  ],
  "failure_tests": [
+  "test_actions.H01_Governance.test_batch_approval_is_exact_and_partial_is_honest",
+  "test_actions.H01_Governance.test_no_approval_no_execution_and_reads_stay_free",
+  "test_actions.H02_IdempotencyAndFailure.test_stale_state_provider_failures_and_audit_unavailable",
+  "test_actions.H02_IdempotencyAndFailure.test_timeout_reconcile_first_and_blind_retry_prohibited",
+  "test_actions.H03_Verification.test_provider_success_is_never_completion",
+  "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
+  "test_actions.H04_TasksWriteAdapter.test_stale_row_and_locked_workbook",
   "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
   "test_failclosed.F01_EveryBlockedCode.test_APPROVAL_REQUIRED",
   "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
@@ -86,6 +99,15 @@
   "test_skills.T04_Authority.test_unknown_level"
  ],
  "hardening_cases": [
+  "test_actions.H01_Governance.test_approval_binds_to_exact_action_and_parameter_change_invalidates",
+  "test_actions.H01_Governance.test_approval_text_recognition",
+  "test_actions.H01_Governance.test_replay_expiry_rejection_and_risk_classes",
+  "test_actions.H02_IdempotencyAndFailure.test_concurrent_execution_writes_once_and_restart_keeps_idempotency",
+  "test_actions.H02_IdempotencyAndFailure.test_duplicate_requests_never_duplicate_writes",
+  "test_actions.H02_IdempotencyAndFailure.test_stale_state_provider_failures_and_audit_unavailable",
+  "test_actions.H02_IdempotencyAndFailure.test_timeout_reconcile_first_and_blind_retry_prohibited",
+  "test_actions.H03_Verification.test_provider_success_is_never_completion",
+  "test_actions.H04_TasksWriteAdapter.test_stale_row_and_locked_workbook",
   "test_boundary.S02_ContentDetection.test_salary_and_subscriber_leakage_detected",
   "test_boundary.S02_ContentDetection.test_secrets_detected",
   "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
@@ -128,7 +150,6 @@
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
@@ -136,6 +157,8 @@
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_state_tools_denied_repair_allowed_prompt_and_stop_continue"
  ],
  "adversarial": [
+  "test_actions.H01_Governance.test_approval_binds_to_exact_action_and_parameter_change_invalidates",
+  "test_actions.H01_Governance.test_approval_text_recognition",
   "test_boundary.S02_ContentDetection.test_salary_and_subscriber_leakage_detected",
   "test_boundary.S02_ContentDetection.test_secrets_detected",
   "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
@@ -165,6 +188,14 @@
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key"
  ],
  "failure_injection": [
+  "test_actions.H01_Governance.test_approval_binds_to_exact_action_and_parameter_change_invalidates",
+  "test_actions.H01_Governance.test_replay_expiry_rejection_and_risk_classes",
+  "test_actions.H02_IdempotencyAndFailure.test_concurrent_execution_writes_once_and_restart_keeps_idempotency",
+  "test_actions.H02_IdempotencyAndFailure.test_duplicate_requests_never_duplicate_writes",
+  "test_actions.H02_IdempotencyAndFailure.test_stale_state_provider_failures_and_audit_unavailable",
+  "test_actions.H02_IdempotencyAndFailure.test_timeout_reconcile_first_and_blind_retry_prohibited",
+  "test_actions.H03_Verification.test_provider_success_is_never_completion",
+  "test_actions.H04_TasksWriteAdapter.test_stale_row_and_locked_workbook",
   "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
   "test_boundary.S03_GitStagingBoundary.test_staged_sensitive_files_blocked_and_safe_core_allowed",
   "test_business.B07_SkillIntegration.test_fail_closed_when_business_model_missing",
@@ -185,13 +216,18 @@
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_entry_point_outside_venv_fails_closed_without_bootstrap",
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_state_tools_denied_repair_allowed_prompt_and_stop_continue"
  ],
  "authority_tests": [
+  "test_actions.H01_Governance.test_ambiguous_pending_target_fails_closed",
+  "test_actions.H01_Governance.test_approval_binds_to_exact_action_and_parameter_change_invalidates",
+  "test_actions.H01_Governance.test_approval_text_recognition",
+  "test_actions.H01_Governance.test_batch_approval_is_exact_and_partial_is_honest",
+  "test_actions.H01_Governance.test_no_approval_no_execution_and_reads_stay_free",
+  "test_actions.H01_Governance.test_replay_expiry_rejection_and_risk_classes",
   "test_business.B07_SkillIntegration.test_conflict_and_approval_rule_unknown_surface_not_guess",
   "test_enforcement.E03_AuthorityEmbedded.test_embedded_authorization_text_does_not_unlock_material_action",
   "test_failclosed.F01_EveryBlockedCode.test_APPROVAL_REQUIRED",
@@ -205,6 +241,12 @@
   "test_skills.T04_Authority.test_unknown_level"
  ],
  "completion_verification": [
+  "test_actions.H01_Governance.test_batch_approval_is_exact_and_partial_is_honest",
+  "test_actions.H01_Governance.test_replay_expiry_rejection_and_risk_classes",
+  "test_actions.H02_IdempotencyAndFailure.test_duplicate_requests_never_duplicate_writes",
+  "test_actions.H02_IdempotencyAndFailure.test_timeout_reconcile_first_and_blind_retry_prohibited",
+  "test_actions.H03_Verification.test_provider_success_is_never_completion",
+  "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
   "test_integrations.A04_CertificationScope.test_required_ops_declared_and_subset_never_verifies",
   "test_integrations.I07_HealthAndTasks.test_task_register_real_read_records_real_health",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
@@ -213,15 +255,15 @@
   "test_integrations.I09_MeetingPrepAndOpenLoops.test_open_loops_extract_candidates_not_facts",
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
-  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore",
   "test_skills.T04_Authority.test_authority_checking_executor"
  ],
  "concurrency_tests": [
+  "test_actions.H02_IdempotencyAndFailure.test_concurrent_execution_writes_once_and_restart_keeps_idempotency",
   "test_integrations.A05_Concurrency.test_parallel_register_reads_keep_cache_and_health_consistent",
   "test_integrations.A05_Concurrency.test_parallel_threads_and_processes_keep_every_success"
  ],
  "enforcement_tests": [
+  "test_actions.H03_Verification.test_audit_chain_is_complete_and_secretless",
   "test_enforcement.E01_PromptCapture.test_chat_prompt_is_not_governed_but_still_gates_state_tools",
   "test_enforcement.E01_PromptCapture.test_ignore_skill_system_is_flagged_adversarial",
   "test_enforcement.E01_PromptCapture.test_prompt_creates_ticket_with_resolution_and_context",
@@ -259,18 +301,40 @@
   "eval:b_ignore_system",
   "eval:b_read_allowed",
   "eval:b_simple_task",
-  "eval:f_write_rejected"
+  "eval:f_write_rejected",
+  "eval:g_bitrix_deal",
+  "eval:g_cancel_meeting",
+  "eval:g_close_task",
+  "eval:g_create_task_prepare",
+  "eval:g_email_team",
+  "eval:g_go_but_change",
+  "eval:g_go_executes_exact",
+  "eval:g_local_draft",
+  "eval:g_looks_good",
+  "eval:g_mark_complete",
+  "eval:g_move_meeting",
+  "eval:g_no_asking",
+  "eval:g_put_draft",
+  "eval:g_remind_me",
+  "eval:g_same_task_again",
+  "eval:g_send_it",
+  "eval:g_tariff",
+  "eval:g_timeout_retry"
  ],
  "routing_evals": [
   "eval:r_tariff",
+  "test_actions.H05_CapabilityAndSkill.test_routing_and_executor_boundaries",
   "test_enforcement.E06_MaintenanceRoutingBoundary.test_system_prompt_with_business_words_is_not_routed_to_sales",
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
- "failed_tests": [],
- "certified_at": "2026-09-12T00:44:37",
- "fingerprint": "db5962ac06d32195c899fdf0",
- "core_fingerprint": "054b5e18ba1d5ff9",
- "result": "PASS",
+ "failed_tests": [
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
+  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore"
+ ],
+ "certified_at": "2026-09-12T01:55:38",
+ "fingerprint": "2c5a04c3696e625afd9ffc9c",
+ "core_fingerprint": "ff70cd82ecc16905",
+ "result": "FAIL",
  "suites": [
   "test_skills",
   "test_store",
@@ -282,7 +346,8 @@
   "test_business",
   "test_boundary",
   "test_integrations",
-  "test_portability"
+  "test_portability",
+  "test_actions"
  ],
  "audit_infrastructure": true
 }

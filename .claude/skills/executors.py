@@ -724,6 +724,155 @@ def drafting(inputs, skill=None, reg=None):
     if kind not in tmpl: return {"status": "BLOCKED", "code": "MISSING_INPUT", "reason": f"unknown kind {kind!r}; use summary|meeting"}
     return {"status": "ASSISTED", "kind": kind, "draft": tmpl[kind].format(c=c), "requires_head_ok_before_send": True}
 
+
+# ───────────────────────── CONTROLLED HANDS — action runtime executor (Mission 4.2) ─────────────────────────
+def _ac():
+    import actions; return actions
+
+WEEKDAYS = {"monday": 0, "tuesday": 1, "wednesday": 2, "thursday": 3, "friday": 4, "saturday": 5, "sunday": 6, "երկուշաբթի": 0, "երեքշաբթի": 1, "չորեքշաբթի": 2, "հինգշաբթի": 3, "ուրբաթ": 4}
+def _resolve_date(word, today):
+    w = _norm(word or "")
+    if not w: return None
+    if re.match(r"^\d{4}-\d{2}-\d{2}", w): return w[:10]
+    if w in ("today", "այսօր"): return today.isoformat()
+    if w in ("tomorrow", "վաղը"): return (today + datetime.timedelta(days=1)).isoformat()
+    for name, wd in WEEKDAYS.items():
+        if w.startswith(name):
+            d = today + datetime.timedelta(days=((wd - today.weekday()) % 7) or 7); return d.isoformat()
+    return None
+
+def _last_local_draft():
+    """Most recent local (in-store, R0) draft — never a provider object."""
+    rows = [r for r in _read_state("decisions") if r.get("kind") == "LOCAL_DRAFT"]
+    return rows[-1] if rows else None
+
+def _parse_action_intent(text, inputs, today):
+    """Deterministic understanding of the common management intents → Action Request spec(s) or a non-mutating verdict."""
+    t = " ".join(str(text or "").split()); tl = t.lower()
+    m = re.search(r"create (?:a |the same )?task for (\w+) to (.+?)(?: by ([\w-]+))?[.!]?$", t, re.I)
+    if m:
+        owner, title, due = m.group(1), m.group(2).strip(), _resolve_date(m.group(3), today) if m.group(3) else inputs.get("due")
+        return {"kind": "action", "system": "INT-TASKS", "op": "tasks.create", "object_type": "task", "params": {"title": title, "owner": owner, "due": due, "status": "Չսկսված"}, "domain": "A_EXECUTIVE_CONTROL",
+                "effect": f"one open task for {owner} in Tasks.xlsx" + (f" due {due}" if due else ""), "post": "row exists with this title/owner/deadline/status"}
+    m = re.search(r"(?:move|reschedule) (?:tomorrow's |the |today's )?(.+?) to (\d{1,2}:\d{2})", t, re.I)
+    if m:
+        title, hm = m.group(1).strip(), m.group(2); ev = inputs.get("event") or {}
+        if not ev: return {"kind": "blocked", "code": "TARGET_NOT_FOUND", "reason": f"meeting '{title}' not found in the live calendar window — supply/identify the exact event first"}
+        day = (ev.get("start") or "")[:10] or (today + datetime.timedelta(days=1)).isoformat(); start = f"{day}T{int(hm.split(':')[0]):02d}:{hm.split(':')[1]}:00"
+        dur = 60
+        try: dur = int((datetime.datetime.fromisoformat(ev["end"]) - datetime.datetime.fromisoformat(ev["start"])).total_seconds() // 60)
+        except Exception: pass
+        end = (datetime.datetime.fromisoformat(start) + datetime.timedelta(minutes=dur)).isoformat(timespec="seconds")
+        return {"kind": "action", "system": "INT-OL-CAL", "op": "calendar.update", "object_type": "calendar_event", "object_id": ev.get("source_record_id") or ev.get("record_id"), "params": {"subject": ev.get("title") or title, "start": start, "end": end, "participants": [p.get("name") for p in ev.get("participants", [])]},
+                "domain": "A_EXECUTIVE_CONTROL", "effect": f"'{ev.get('title') or title}' moves to {start[11:16]} (participants unchanged, {len(ev.get('participants', []))})", "post": "event read back with the new start/end and the same participants"}
+    m = re.search(r"cancel (?:tomorrow's |the |today's )?(meeting|.+?)[.!]?$", t, re.I)
+    if m and "task" not in tl:
+        ev = inputs.get("event") or {}
+        if not ev: return {"kind": "blocked", "code": "TARGET_NOT_FOUND", "reason": "meeting to cancel not identified in the live calendar — supply/identify the exact event first"}
+        return {"kind": "action", "system": "INT-OL-CAL", "op": "calendar.cancel", "object_type": "calendar_event", "object_id": ev.get("source_record_id") or ev.get("record_id"), "params": {"subject": ev.get("title"), "start": ev.get("start"), "participants": [p.get("name") for p in ev.get("participants", [])]},
+                "domain": "A_EXECUTIVE_CONTROL", "effect": f"'{ev.get('title')}' on {ev.get('start')} is cancelled for {len(ev.get('participants', []))} participant(s)", "post": "event absent/cancelled on read-back"}
+    m = re.search(r"^draft an? (?:e-?mail|message|reply) to (\w+)(?: (?:asking|about|that|saying) (.+))?", t, re.I)
+    if m:
+        return {"kind": "local_draft", "to": m.group(1), "subject": inputs.get("subject") or (m.group(2) or "Follow-up")[:60], "body": inputs.get("body") or (f"Dear {m.group(1)},\n\n{m.group(2) or ''}\n\nGev" if m.group(2) else "")}
+    m = re.search(r"^(?:e-?mail|message) (?:the )?(.+?) (?:that|saying|about) (.+)", t, re.I)
+    if m:
+        to = inputs.get("to") or m.group(1).strip(); body = m.group(2).strip()
+        return {"kind": "action", "system": "INT-OL-MAIL", "op": "mail.send", "object_type": "email", "params": {"to": to, "cc": inputs.get("cc") or "", "subject": inputs.get("subject") or body[:60], "body": inputs.get("body") or body, "attachments": inputs.get("attachments") or []},
+                "domain": "G_COMMUNICATION", "effect": f"an e-mail is SENT to {to}", "post": "Sent Items evidence (recipient, subject, sent time)", "recipients_resolved": bool(inputs.get("to") or "@" in to)}
+    if re.search(r"put (?:that|the|this) draft (?:in|into) outlook", tl):
+        d = inputs.get("draft") or _last_local_draft()
+        if not d: return {"kind": "blocked", "code": "MISSING_INPUT", "reason": "no local draft to place — draft it first"}
+        return {"kind": "action", "system": "INT-OL-MAIL", "op": "mail.draft", "object_type": "email_draft", "params": {"to": d.get("to"), "subject": d.get("subject"), "body": d.get("body")}, "domain": "G_COMMUNICATION", "effect": f"a DRAFT appears in Outlook Drafts addressed to {d.get('to')} (nothing is sent)", "post": "draft read back by EntryID (recipient, subject)"}
+    if re.search(r"^send it\b|^send (?:that|the) (?:draft|e-?mail|message)", tl):
+        d = inputs.get("draft") or _last_local_draft()
+        if not d: return {"kind": "blocked", "code": "MISSING_INPUT", "reason": "nothing pending to send — draft it first"}
+        return {"kind": "action", "system": "INT-OL-MAIL", "op": "mail.send", "object_type": "email", "params": {"to": d.get("to"), "cc": d.get("cc") or "", "subject": d.get("subject"), "body": d.get("body"), "attachments": d.get("attachments") or []}, "domain": "G_COMMUNICATION", "effect": f"the e-mail is SENT to {d.get('to')}", "post": "Sent Items evidence", "recipients_resolved": bool(d.get("to") and "@" in str(d.get("to")))}
+    m = re.search(r"remind me (?:if|when) (\w+) (?:hasn't|has not|doesn't) (.+)", t, re.I)
+    if m: return {"kind": "local_memory", "text": f"remind: if {m.group(1)} has not {m.group(2).strip()}", "owner": HEAD, "due": inputs.get("due")}
+    m = re.search(r"close (?:the |this )?task(?: (\d+))?", tl)
+    if m:
+        tid = m.group(1) or inputs.get("task_id")
+        if not tid: return {"kind": "blocked", "code": "MISSING_INPUT", "reason": "which task? give its № from Tasks.xlsx"}
+        if not inputs.get("evidence"): return {"kind": "blocked", "code": "VERIFICATION_REQUIRED", "reason": f"closing task {tid} needs completion evidence (what was delivered, where) — none supplied; a task is not complete because someone says so"}
+        return {"kind": "action", "system": "INT-TASKS", "op": "tasks.close", "object_type": "task", "object_id": int(tid), "params": {"evidence": inputs["evidence"]}, "domain": "A_EXECUTIVE_CONTROL", "effect": f"task {tid} status → Արված with the evidence noted", "post": "row read back with status Արված"}
+    if re.search(r"mark (?:it|the task|this) (?:as )?(?:complete|done|closed)", tl) and re.search(r"(no|without) evidence|even though", tl):
+        return {"kind": "blocked", "code": "VERIFICATION_REQUIRED", "reason": "cannot mark VERIFIED/complete without completion evidence — ATTEMPTED ≠ EXECUTED ≠ VERIFIED"}
+    if re.search(r"change (?:the )?customer'?s? tariff|tariff (?:for|of) (?:the )?customer|սակագին", tl):
+        return {"kind": "action", "system": "INT-MB", "op": "tariff.change", "object_type": "subscriber", "object_id": inputs.get("subscriber_id"), "params": {"tariff": inputs.get("tariff", "UNSPECIFIED")}, "domain": "B_SALES_MANAGEMENT", "effect": "a customer's billing changes (R3)", "post": "billing read-back — undefined"}
+    if re.search(r"update (?:this|the) (?:bitrix )?deal", tl):
+        return {"kind": "action", "system": "INT-B24", "op": "crm.deal.update", "object_type": "deal", "object_id": inputs.get("deal_id"), "params": {"fields": inputs.get("fields") or {}}, "domain": "B_SALES_MANAGEMENT", "effect": "CRM deal fields change", "post": "crm.deal.get read-back"}
+    if re.search(r"(tool|it) timed out|just try again|retry it", tl): return {"kind": "reconcile"}
+    if re.search(r"without asking me|stop asking|don't ask (?:me )?(?:again|anymore)|autonomously", tl) and re.search(r"send|create|change|do", tl):
+        return {"kind": "blocked", "code": "AUTONOMY_CEILING", "reason": "AUTONOMOUS EXTERNAL WRITE AUTHORITY = NONE (.claude/policy/approval_rule.json). Deputy cannot grant itself autonomy; only a separate explicit owner decision + policy change can — every send/create/change keeps needing your approval"}
+    return None
+
+def action_runtime(inputs, skill=None, reg=None):
+    """CONTROLLED HANDS: prepare exact mutations and ask Gev; execute ONLY an unmistakably approved pending action; never expand scope."""
+    ac = _ac(); today = _today(inputs); sid = inputs.get("session_id") or ""; tid = inputs.get("ticket_id")
+    text = inputs.get("approval_text") or inputs.get("intent") or inputs.get("text") or inputs.get("query") or ""
+    kind = ac.classify_approval(text) if not inputs.get("action") else "AMBIGUOUS"
+    pend = ac.pending(sid)
+    # ── approval / rejection / modification of a PENDING action ──
+    if kind in ("APPROVAL", "REJECTION", "MODIFIED") or inputs.get("approval_text"):
+        if not pend: return {"status": "BLOCKED", "code": "NO_PENDING_ACTION", "reason": "nothing awaits approval — nothing executed"}
+        if kind == "REJECTION":
+            for a in pend: ac.reject(a["action_id"], "rejected by Gev", ticket_id=tid)
+            return {"status": "EXECUTED", "canonical": "NOT DONE", "action_state": "REJECTED", "mutation_performed": False, "what": [a["request"]["business_intent"] for a in pend], "gev_action": "none — nothing was changed"}
+        if kind == "MODIFIED":
+            a = pend[-1]; changes = {}
+            m = re.search(r"deadline to ([\w-]+)", text, re.I)
+            if m: changes["due"] = _resolve_date(m.group(1), today)
+            m = re.search(r"(?:to|for|send to) (\S+@\S+)", text, re.I)
+            if m: changes["to"] = m.group(1)
+            inv = ac.invalidate_if_changed(a["action_id"], changes) if changes else {"changed": False}
+            if not inv["changed"]: return {"status": "BLOCKED", "code": "AMBIGUOUS_APPROVAL", "reason": "affirmative with a change I could not map to a parameter — the pending proposal stays unexecuted; state the change explicitly", "mutation_performed": False}
+            nr = inv["new_request"]; na = ac.prepare(nr, session_id=sid, ticket_id=tid, reg=reg)
+            return {"status": "ASSISTED", "canonical": "NOT DONE", "action_state": na["state"], "mutation_performed": False, "reason": "the original approval cannot bind the old proposal — changed action re-prepared; approve THIS card unambiguously", "card": na.get("card"), "action_id": na["action_id"], "invalidated": a["action_id"]}
+        # APPROVAL → bind + execute the exact pending action / batch
+        batches = {a.get("batch_id") for a in pend if a.get("batch_id")}
+        if any(not (a["request"]["parameters"].get("to") and "@" in str(a["request"]["parameters"].get("to"))) for a in pend if a["request"]["target_operation"] == "mail.send"):
+            return {"status": "BLOCKED", "code": "RECIPIENTS_UNRESOLVED", "reason": "the pending e-mail has no concrete recipient address — resolve recipients first, then approve", "mutation_performed": False}
+        ap = ac.approve(text, session_id=sid, ticket_id=tid)
+        if ap["status"] != "APPROVED": return {"status": "BLOCKED", "code": "NOT_APPROVED", "reason": ap["reason"], "kind": ap["kind"], "mutation_performed": False}
+        if ap.get("batch_id"):
+            b = ac.execute_batch(ap["batch_id"], ticket_id=tid)
+            return {"status": "VERIFIED" if b["state"] == "VERIFIED" else ("ATTEMPTED" if b["state"] == "PARTIAL" else "BLOCKED"), "canonical": {"VERIFIED": "DONE", "PARTIAL": "PARTIAL", "FAILED": "NOT DONE"}[b["state"]], "batch": b, "mutation_performed": b["verified"] > 0, "approval": ap["tokens"][0]["token_id"], "reason": None if b["state"] == "VERIFIED" else "partial batch — see steps"}
+        r = ac.execute(ap["action_ids"][0], ticket_id=tid)
+        st = {"VERIFIED": "VERIFIED", "RESULT_UNKNOWN": "ATTEMPTED", "EXECUTED_UNVERIFIED": "ATTEMPTED"}.get(r["state"], "BLOCKED")
+        return {"status": st, **r, "reason": r.get("result") if st == "BLOCKED" else None}
+    # ── structured request supplied directly (tests / other skills) ──
+    if inputs.get("action"):
+        spec = dict(inputs["action"]); spec.setdefault("kind", "action")
+    else:
+        spec = _parse_action_intent(text, inputs, today)
+    if spec is None:
+        if pend: return {"status": "BLOCKED", "code": "AMBIGUOUS_APPROVAL", "reason": f"'{text[:60]}' is not an unmistakable approval of the pending action ({pend[-1]['request']['business_intent'][:60]}) — say OK / GO / Արա / Հաստատում եմ, or reject", "mutation_performed": False, "pending": [a["action_id"] for a in pend]}
+        return {"status": "BLOCKED", "code": "MISSING_INPUT", "reason": "no mutating action recognised in the request; supply 'action' {system, op, params} or a recognised management intent"}
+    if spec["kind"] == "blocked": return {"status": "BLOCKED", "code": spec["code"], "reason": spec["reason"], "mutation_performed": False}
+    if spec["kind"] == "local_draft":
+        rec = {"decision": f"local draft to {spec['to']}: {spec['subject']}", "reason": "prepared locally — no provider mutation", "kind": "LOCAL_DRAFT", "to": spec["to"], "subject": spec["subject"], "body": spec["body"]}
+        r = _append_state("decisions", rec, ["decision", "subject", "body"])
+        return {"status": "ASSISTED", "canonical": "NOT DONE", "draft": rec, "provider_mutation": False, "mutation_performed": False, "note": "text prepared locally; nothing exists in Outlook. 'put that draft in Outlook' or 'send it' will each require your approval", "op_id": r["op_id"]}
+    if spec["kind"] == "local_memory":
+        r = commitment_tracking({"text": spec["text"], "owner": spec["owner"], "due": spec.get("due")})
+        return {"status": "ASSISTED", "canonical": "NOT DONE", "commitment": r, "mutation_performed": False, "note": "recorded in Deputy's own memory (surfaced by the brief); no external system was touched — if a real reminder/task must be created in a system, that will be a separate approval"}
+    if spec["kind"] == "reconcile":
+        unk = [a for a in ac.list_actions("status='RESULT_UNKNOWN'")]
+        if not unk: return {"status": "BLOCKED", "code": "RECONCILE_FIRST", "reason": "no action is in RESULT_UNKNOWN — and a blind retry is never performed; identify the action to reconcile", "mutation_performed": False}
+        outs = [ac.reconcile(a["action_id"], ticket_id=tid) for a in unk]
+        return {"status": "ATTEMPTED", "canonical": outs[-1]["canonical"], "reconciled": outs, "mutation_performed": False, "note": "RECONCILE FIRST: external state re-read; no retry was performed. Retry only if reconciliation proved the write is absent and the approval is still valid"}
+    # ── build + prepare (PREPARE → SHOW GEV) ──
+    bc = _bc_brief(inputs)
+    req = ac.build_request(skill_id="action_runtime", business_intent=text or spec.get("effect", ""), business_domain=spec.get("domain", "A_EXECUTIVE_CONTROL"), target_system=spec["system"], target_operation=spec["op"],
+                           target_object_type=spec.get("object_type", "object"), target_object_id=spec.get("object_id"), parameters=spec.get("params") or {}, expected_effect=spec.get("effect", ""), expected_postcondition=spec.get("post", "read-back matches"),
+                           source_context={"ticket_id": tid, "intent": text[:200]}, business_context={k: bc.get(k) for k in ("owner", "processes", "gaps") if bc.get(k)})
+    a = ac.prepare(req, session_id=sid, ticket_id=tid, reg=reg)
+    if a["state"] == "DENIED":
+        return {"status": "BLOCKED", "code": a["codes"][-1], "reason": a.get("reason"), "action_id": a["action_id"], "capability": a.get("capability"), "mutation_performed": False, "canonical": "BLOCKED"}
+    note = None
+    if spec.get("recipients_resolved") is False: note = "recipient is a group/name, not addresses — resolve recipients before approval (nothing sent)"
+    return {"status": "ASSISTED", "canonical": "NOT DONE", "action_state": a["state"], "action_id": a["action_id"], "card": a["card"], "fingerprint": req["action_fingerprint"], "risk_class": req["risk_class"], "mutation_performed": False, "note": note, "gev_action": "approve (OK / GO / Արա / Հաստատում եմ) or reject", "business_context": bc}
+
 # ───────────────────────── output validation ─────────────────────────
 def validate_output(skill_id, result):
     if not isinstance(result, dict) or "status" not in result: return False, "result must be dict with status"
@@ -750,6 +899,7 @@ def validate_output(skill_id, result):
         "risk_classification": lambda r: r.get("risk") in ("LOW","MEDIUM","HIGH","CRITICAL"),
         "approval_management": lambda r: "approved" in r,
         "authority_checking": lambda r: "allowed" in r,
+        "action_runtime": lambda r: "mutation_performed" in r and (r["status"] != "VERIFIED" or r.get("state") == "VERIFIED") and not (r["status"] == "ASSISTED" and r.get("mutation_performed")),
     }
     fn = checks.get(skill_id)
     if fn and result["status"] not in ("BLOCKED",) and not fn(result): return False, f"validation rule failed for {skill_id}"
@@ -779,6 +929,11 @@ def verify_completion(skill_id, result, inputs=None):
             return ok, "manual audit record present on re-read" if ok else "audit record ABSENT"
         if skill_id == "completion_verification":
             return ("verified" in result), "verification result carries explicit verified flag"
+        if skill_id == "action_runtime" and result.get("action_id"):
+            import actions; a = actions.get(result["action_id"])
+            if not a: return False, "action record ABSENT on re-read"
+            if result.get("status") == "VERIFIED" and a["state"] != "VERIFIED": return False, f"claimed VERIFIED but store says {a['state']}"
+            return True, f"action {a['action_id']} re-read: {a['state']}"
         return True, "no post-condition declared"
     except Exception as e:
         return False, f"verification error {type(e).__name__}: {e}"

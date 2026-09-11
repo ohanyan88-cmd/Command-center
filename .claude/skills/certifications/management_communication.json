@@ -29,18 +29,16 @@
  "concurrency_tests": [],
  "enforcement_tests": [],
  "evals": [
-  "eval:f_write_rejected",
   "eval:outgoing_voice"
  ],
  "routing_evals": [
-  "eval:r_email_tool",
   "eval:r_send_finance",
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T00:44:37",
- "fingerprint": "4f80d3dfec1636c679728f22",
- "core_fingerprint": "054b5e18ba1d5ff9",
+ "certified_at": "2026-09-12T01:55:38",
+ "fingerprint": "3e57b15c4ebce0839d64a4db",
+ "core_fingerprint": "ff70cd82ecc16905",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -53,7 +51,8 @@
   "test_business",
   "test_boundary",
   "test_integrations",
-  "test_portability"
+  "test_portability",
+  "test_actions"
  ],
  "audit_infrastructure": false
 }

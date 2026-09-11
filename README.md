@@ -90,12 +90,34 @@ Business Operating Model՝ `.claude/business/`, երկու շերտ. **CORE** (I
 
 | Integration | Համակարգ | Auth | Կարդում է | Գրում է | Վիճակ |
 |:---|:---|:---|:---|:---|:---|
-| `INT-TASKS` | Tasks.xlsx (կանոնական ռեեստր) | լոկալ ֆայլ | tasks.list | — | certify-ով |
-| `INT-OL-CAL` | Outlook desktop օրացույց (սեփականատիրոջ housenet.am mailbox) | Windows session + integrity-pinned `outlook_read.ps1` | calendar.events | — | certify-ով |
-| `INT-OL-MAIL` | Outlook desktop փոստ | նույնը | mail.list · mail.search (header + ≤600 նիշ preview) | — | certify-ով |
-| `INT-B24` | Bitrix24 REST | read-scoped inbound webhook (repo-ից դուրս) | crm.deals/leads/stages/activities · tasks.list · users · identity — GET-only allowlist | — | DECLARED, մինչև webhook |
-| `INT-MB` | MikroBill | UNKNOWN (interface չի գույքագրված) | — | — | DECLARED |
+| `INT-TASKS` | Tasks.xlsx (կանոնական ռեեստր) | լոկալ ֆայլ | tasks.list | tasks.create/update/assign/close/reopen/note (միայն Action Runtime-ով, Գև-ի հաստատմամբ) | certify-ով |
+| `INT-OL-CAL` | Outlook desktop օրացույց (սեփականատիրոջ housenet.am mailbox) | Windows session + integrity-pinned `outlook_read.ps1` | calendar.events | calendar.create/update/cancel (Action Runtime) | certify-ով |
+| `INT-OL-MAIL` | Outlook desktop փոստ | նույնը | mail.list · mail.search (header + ≤600 նիշ preview) | mail.draft (provider-side) · mail.send (Action Runtime) | certify-ով |
+| `INT-B24` | Bitrix24 REST | read-scoped inbound webhook (repo-ից դուրս) | crm.deals/leads/stages/activities · tasks.list · users · identity — GET-only allowlist | tasks.create · crm.deal.update · crm.activity.create (Action Runtime; NOT_CONFIGURED մինչև webhook) | DECLARED, մինչև webhook |
+| `INT-MB` | MikroBill | UNKNOWN (interface չի գույքագրված) | — | tariff.change · subscriber.suspend՝ **WRITE NOT CERTIFIED / UNAVAILABLE** (R3) | DECLARED |
 
-Կանոններ՝ `write_ops` ամեն տեղ դատարկ է. գրող intent-ը (SEND_EMAIL, CREATE_EVENT, UPDATE_DEAL, DELETE_TASK, CHANGE_TARIFF, UPDATE_CUSTOMER…) կառուցվածքով արգելվում է՝ `layer.capability()` → AUTHORITY_EXCEEDED/WRITE_DISABLED, gate → TOOL_UNAVAILABLE. աղբյուրների հեղինակությունը **կոնֆիգուրացված է** (`registry.FACT_AUTHORITY`, նաև core `sources.json → live_sources`), նույն մակարդակի երկու live աղբյուրի անհամաձայնություն = SOURCE_CONFLICT (չի միաձուլվում). freshness-ը միշտ երևում է, թարմության կանոն չկա՝ չի հորինվում. health (AVAILABLE · DEGRADED · UNAVAILABLE · AUTH_FAILED · PERMISSION_DENIED · SCHEMA_CHANGED · NOT_CONFIGURED) + վերջին հաջող ընթերցում՝ `.claude/state/integrations_health.json`, Daily Brief-ը անհասանելի կրիտիկական աղբյուրը **բարձրաձայն** է ասում. փոստից քաղվածը միայն CANDIDATE_OPEN_LOOP է (ACTION · DECISION · DELEGATE · MONITOR · FYI · IGNORE), ոչ մշտական փաստ. secrets՝ `~/.command-center/integrations/<ID>.json` կամ `CC_<ID>_<KEY>` env, երբեք repo/audit (LEAK_PREVENTED). աուդիտում՝ ինչ հարցվեց (op, param keys, count), ոչ payload։ Վկայագրում՝ `python .claude/integrations/integration.py certify` → DECLARED → CONFIGURED → CONNECTED → VERIFIED_READ → RELIABLE_READ (≥10 իրական ընթերցում ≥2 օրում), ապացույցներով (auth, scope, write_rejected, schema, freshness, failure matrix, provenance, sensitive boundary). `skill.py release`-ը այն սպառում է։ Հրամաններ՝ `integration.py status | query <id> <op> | probe | brief | capability "<intent>"`։
+Կանոններ՝ ընթերցող շերտի `write_ops` ամեն տեղ դատարկ է (գրելը միայն ստորև նկարագրված Action Runtime-ով է). գրող intent-ը (SEND_EMAIL, CREATE_EVENT, UPDATE_DEAL, DELETE_TASK, CHANGE_TARIFF, UPDATE_CUSTOMER…) կառուցվածքով արգելվում է՝ `layer.capability()` → AUTHORITY_EXCEEDED/WRITE_DISABLED, gate/engine → `action_runtime` (ոչ թե գործիք). աղբյուրների հեղինակությունը **կոնֆիգուրացված է** (`registry.FACT_AUTHORITY`, նաև core `sources.json → live_sources`), նույն մակարդակի երկու live աղբյուրի անհամաձայնություն = SOURCE_CONFLICT (չի միաձուլվում). freshness-ը միշտ երևում է, թարմության կանոն չկա՝ չի հորինվում. health (AVAILABLE · DEGRADED · UNAVAILABLE · AUTH_FAILED · PERMISSION_DENIED · SCHEMA_CHANGED · NOT_CONFIGURED) + վերջին հաջող ընթերցում՝ `.claude/state/integrations_health.json`, Daily Brief-ը անհասանելի կրիտիկական աղբյուրը **բարձրաձայն** է ասում. փոստից քաղվածը միայն CANDIDATE_OPEN_LOOP է (ACTION · DECISION · DELEGATE · MONITOR · FYI · IGNORE), ոչ մշտական փաստ. secrets՝ `~/.command-center/integrations/<ID>.json` կամ `CC_<ID>_<KEY>` env, երբեք repo/audit (LEAK_PREVENTED). աուդիտում՝ ինչ հարցվեց (op, param keys, count), ոչ payload։ Վկայագրում՝ `python .claude/integrations/integration.py certify` → DECLARED → CONFIGURED → CONNECTED → VERIFIED_READ → RELIABLE_READ (≥10 իրական ընթերցում ≥2 օրում), ապացույցներով (auth, scope, write_rejected, schema, freshness, failure matrix, provenance, sensitive boundary). `skill.py release`-ը այն սպառում է։ Հրամաններ՝ `integration.py status | query <id> <op> | probe | brief | capability "<intent>"`։
+
+## Ձեռքեր — Action Runtime (Mission 4.2, AUTONOMOUS EXTERNAL WRITE AUTHORITY = NONE)
+
+`.claude/skills/actions.py` + `action_runtime` հմտություն + `.claude/integrations/capabilities.py` և write adapter-ներ (`adapter_tasks_write.py`, `adapter_outlook_write.py` + integrity-pinned `outlook_write.ps1`, `adapter_bitrix24_write.py`)։ Օրենքը՝ `.claude/policy/approval_rule.json` (մեկ տեղում, չի կրկնօրինակվում)։
+
+```
+INTENT → PREPARE (capability · authority · duplicate · precondition · fingerprint · idempotency key)
+      → ԳԵՎ-Ի ՔԱՐՏ  «READY FOR YOUR APPROVAL … Nothing has been changed yet. Approve?»
+      → APPROVAL  միայն OK / GO / Արա / Հաստատում եմ  (մեկանգամյա տոկեն · 24ժ · կապված ճշգրիտ fingerprint-ին · batch = ճշգրիտ ցանկ)
+      → EXECUTE  (actions.lock · stale-state վերընթերցում → STALE_CONFLICT · audit-first, AUDIT_UNAVAILABLE = չի կատարվում)
+      → VERIFY   (անկախ read-back; API success ≠ ավարտ)  → REPORT  DONE / NOT DONE / PARTIAL / BLOCKED / RESULT_UNKNOWN
+```
+
+| Վիճակ | Նշանակում է |
+|:---|:---|
+| APPROVAL_REQUIRED / DENIED | պատրաստ է կամ մերժված կանոնով (CAPABILITY_UNAVAILABLE · NOT_CONFIGURED · AUTHORITY_EXCEEDED · DUPLICATE · ALREADY_EXISTS · TARGET_NOT_FOUND) — ոչինչ չի փոխվել |
+| APPROVED → EXECUTING → EXECUTED_UNVERIFIED → VERIFIED | տոկենը սպառվում է առաջին կատարումից; VERIFIED = read-back-ը համընկնում է հաստատված գործողությանը |
+| REJECTED | Գև-ը մերժեց, կամ թիրախը փոխվել էր քարտից հետո (STALE_CONFLICT), կամ տոկենը՝ ժամկետանց/այլ գործողության |
+| RESULT_UNKNOWN | provider-ը չպատասխանեց → RECONCILE FIRST (FOUND → verify, ABSENT → retry թույլատրելի, UNDETERMINED → Գև-ի որոշում); կույր retry չկա |
+| PARTIAL | batch-ի մի մասն է կատարվել — ազնիվ ցուցակ, rollback չի ձևացվում |
+
+Հնարավորությունների ռեեստր (`capabilities.table()`)՝ DECLARED → IMPLEMENTED → CONFIGURED → CONNECTED → VERIFIED_READ → **VERIFIED_WRITE** (միայն `.claude/state/durable/write_certifications.json`-ից՝ Գև-ի հաստատած իրական գրառում) / UNAVAILABLE։ Idempotency-ն restart-ից հետո էլ պահպանվում է (`.claude/state/durable/actions.jsonl` → hardened store)։ Թեստեր՝ `test_actions` (governance · idempotency/failure · verification · Tasks adapter temp copy-ի վրա · capability/routing), eval բաժին G (18 վարքային սցենար)։ Թեստերն ու eval-ները **երբեք** իրական Tasks.xlsx-ին կամ Outlook-ին չեն դիպչում (env `COMMAND_CENTER_TASKS_XLSX` + sha guard, FakeProvider)։
 
 Python runtime՝ դետերմինիստիկ. ամեն hook, CLI, test, eval և release աշխատում է `<root>/.venv`-ով (`.claude/runtime/` — `python_runtime.py` shim, `hook.sh` launcher, `requirements.txt` manifest + `requirements.lock`), PATH-ի `python`-ը դեր չունի։ `.venv`-ը git-ում չէ. վերակառուցում՝ `py -3 .claude/runtime/python_runtime.py bootstrap`։

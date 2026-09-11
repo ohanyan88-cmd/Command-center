@@ -164,3 +164,11 @@
 - `bootstrap.py` (15 քայլ, idempotent), `tree_manifest.py` (policy-ից գեներացվող canonical manifest 71 entry + checksums 185 ֆայլ + parity), `state_snapshot.py`, `secure_recovery.py`։ Scanner 2.0՝ արգելում է միայն RESTRICTED (credential/key/connection string/webhook code), բիզնես տեղեկատվությունը՝ awareness։
 - Թեստեր՝ test_portability 14 (clean clone + կրկնակի bootstrap), release 301 test, 77 eval, maturity անփոփոխ։ Business fingerprint-ը այլևս mtime չի պարունակում (նույն core fingerprint ուրիշ մեքենայում)։
 - Ուշադրություն՝ repo-ն PUBLIC է (Գև-ի որոշում)։ Push-ից հետո բիզնես փաստաթղթերը (աշխատավարձ, անուններ, չաթեր) հանրային են։ Private դարձնելը՝ միայն Գև-ի հաստատումով։
+
+## 2026-09-12 · Mission 4.2 — Controlled Hands (Action Runtime, ինքնավարություն 0)
+- Մեկ կանոնական Action Runtime (`.claude/skills/actions.py`, հմտություն `action_runtime`)՝ PREPARE → Գև-ի քարտ → բացահայտ հաստատում (մեկանգամյա տոկեն, fingerprint-ին կապված) → EXECUTE (lock, stale-state, audit-first) → անկախ VERIFY → REPORT։ Օրենքը մնաց `.claude/policy/approval_rule.json`-ում՝ անփոփոխ։
+- Գրող adapter-ներ՝ Tasks.xlsx (create/update/assign/close/reopen/note, read-back-ով), Outlook calendar/mail (`outlook_write.ps1`, integrity-pinned; local draft ≠ provider draft ≠ send), Bitrix24 (POST allowlist, ազնիվ NOT_CONFIGURED), MikroBILL՝ WRITE NOT CERTIFIED / UNAVAILABLE։ Հնարավորությունների ռեեստր՝ `capabilities.py`։
+- Engine՝ գրող intent-ները այլևս «անհասանելի գործիք» չեն, ուղղորդվում են action_runtime (63 հմտություն)։ Հաստատման/մերժման տեքստը՝ նույն հմտությանը («cancel X» = գործողություն, ոչ մերժում)։
+- Դիմացկունություն՝ `actions` աղյուսակը durable export/import-ում (idempotency-ն restart-ից հետո), manifest 72 entry։
+- ⚠ Միջադեպ (փակված)՝ test-ի առաջին վազքը իրական Tasks.xlsx-ում ստեղծել/փոփոխել էր «TEST — hands certification» տողը (adapter-ը լռելյայն կանոնական ռեեստրն էր վերցնում)։ Վերականգնվեց git-ից (15 առաջադրանք, TEST տող չկա); արմատային ուղղում՝ `register_path` պարամետր + env guard + sha ստուգում (թեստ/eval այլևս ֆիզիկապես չեն կարող դիպչել իրական ռեեստրին)։
+- Live գրելու վկայագրում՝ ՉԻ ԿԱՏԱՐՎԵԼ. սպասում է Գև-ի բացահայտ հաստատմանը (READY FOR LIVE CERTIFICATION քարտ)։

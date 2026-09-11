@@ -33,7 +33,7 @@ class F01_EveryBlockedCode(unittest.TestCase):
     @covers("sales_funnel_analysis", "pipeline_management", kinds=("failure",))
     def test_TOOL_UNAVAILABLE(self):
         g = one(["sales_funnel_analysis"], {"sales_data": [{"x": 1}]}); self.assertEqual(g["blocked"][0]["code"], "TOOL_UNAVAILABLE")
-        p = engine.resolve(REG, "send email to arman"); g2 = engine.gate(REG, p, {"content": "hi"}); self.assertTrue(any(b["code"] == "TOOL_UNAVAILABLE" for b in g2["blocked"]))
+        p = engine.resolve(REG, "call the api and post it"); g2 = engine.gate(REG, p, {"content": "hi"}); self.assertTrue(any(b["code"] == "TOOL_UNAVAILABLE" for b in g2["blocked"]))
         self.assertEqual(engine.run_skill(REG, "pipeline_management", {"sales_data": []})["status"], "BLOCKED")
     @covers("pipeline_management", kinds=("failure",))
     def test_NOT_OPERATIONAL(self):
