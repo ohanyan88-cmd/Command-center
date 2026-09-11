@@ -62,6 +62,25 @@ def certify(core, overlay, root=ROOT, d=HERE, registry=None, check_git=True):
     ok("source_fingerprints_current", fp)
     try: ok("extraction_invariants", bb.invariant_checks(root) if not fp else ["skipped: sources changed/missing"])
     except Exception as e: ok("extraction_invariants", [f"{type(e).__name__}: {e}"])
+    # live registers: a STRUCTURE-scoped source is a LIVE OPERATIONAL SOURCE — it must be declared LIVE_REGISTER and bound to the
+    # live integration its facts are read through (provenance/freshness live in the read layer, never in a snapshot); nothing else may use STRUCTURE scope
+    lp = []
+    for s in core["sources"]["sources"]:
+        sc, kd = s.get("fingerprint_scope", "CONTENT"), s.get("source_kind", "EXTRACTED")
+        if sc == "STRUCTURE" or kd == "LIVE_REGISTER":
+            if sc != "STRUCTURE" or kd != "LIVE_REGISTER": lp.append(f"{s['source_id']}: LIVE_REGISTER ⇔ STRUCTURE scope (got kind={kd}, scope={sc})")
+            li = s.get("live_integration")
+            if not li: lp.append(f"{s['source_id']}: live register without live_integration"); continue
+            try:
+                sys.path.insert(0, str(HERE.parent / "integrations")); import registry as ir
+                spec = ir.INTEGRATIONS.get(li)
+                if not spec: lp.append(f"{s['source_id']}: live_integration {li} not in the integration registry")
+                elif (spec.get("authority") or {}).get("business_source") != s["source_id"]: lp.append(f"{s['source_id']}: {li} does not declare business_source {s['source_id']}")
+                elif not spec.get("read_ops"): lp.append(f"{s['source_id']}: {li} has no read operation — live facts unreadable")
+            except Exception as e: lp.append(f"{s['source_id']}: integration registry unavailable: {type(e).__name__}: {e}")
+            se = snap.get(s["source_id"], {})
+            if se and se.get("scope") != "STRUCTURE": lp.append(f"{s['source_id']}: snapshot scope {se.get('scope')} ≠ STRUCTURE (rebuild the model)")
+    ok("live_registers_bound", lp)
     cf = bb.fingerprint(core)
     ok("core_fingerprint_matches", [] if cf == core["sources"]["meta"]["core_fingerprint"] else [f"core fingerprint {cf} ≠ stamped {core['sources']['meta']['core_fingerprint']}"])
     if overlay:
@@ -73,7 +92,7 @@ def certify(core, overlay, root=ROOT, d=HERE, registry=None, check_git=True):
         pol = sensitive_scan.load_policy()
         for n in bm_schema.CORE_FILES:
             rp_ += [f"{n}.json:{f['line']} {f['rule']} [{f['class']}]" for f in sensitive_scan.scan_content(f".claude/business/{n}.json", json.dumps(core[n], ensure_ascii=False, indent=1), pol, names=[p["name"] for p in (overlay or {}).get("persons", []) if p["id"] != "@P0"])]
-        for py in sorted(d.glob("bm_*.py")) + [d / "build_business_model.py", d / "certify_business.py"]:
+        for py in sorted(d.glob("bm_*.py")) + [x for x in (d / "build_business_model.py", d / "certify_business.py", HERE / "build_business_model.py", HERE / "certify_business.py") if x.exists()]:   # authoring code lives in HERE; d may be a temp model dir
             rp_ += [f"{py.name}:{f['line']} {f['rule']} [{f['class']}]" for f in sensitive_scan.scan_content(f".claude/business/{py.name}", py.read_text(encoding='utf-8'), pol, names=[p["name"] for p in (overlay or {}).get("persons", []) if p["id"] != "@P0"])]
     except ImportError: rp_.append("sensitive_scan unavailable")
     bc = set()

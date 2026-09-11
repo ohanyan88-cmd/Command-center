@@ -22,6 +22,12 @@
   "test_integrations.I06_Secrets.test_secrets_live_outside_git_and_repo_carries_none",
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
   "test_integrations.I12_AuditAndPrivacy.test_cache_is_minimal_and_in_state_dir",
+  "test_live_data.L04_DriftClassification.test_checksum_drift_alone_is_detected_and_classified",
+  "test_live_data.L04_DriftClassification.test_classify_path_is_deterministic",
+  "test_live_data.L04_DriftClassification.test_drift_states_clean_sync_release_unclassified",
+  "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
+  "test_live_data.L05_LiveDataSync.test_sync_refuses_product_model_source_unknown_and_wrong_branch",
+  "test_live_data.L06_RecoveryContract.test_policy_manifest_and_gitignore_carry_the_live_data_contract",
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_gitignore_matches_the_durability_model",
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
   "test_portability.P03_DurableState.test_workspace_export_exists_and_carries_no_secret",
@@ -31,6 +37,9 @@
  ],
  "failure_tests": [
   "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
+  "test_live_data.L04_DriftClassification.test_checksum_drift_alone_is_detected_and_classified",
+  "test_live_data.L04_DriftClassification.test_drift_states_clean_sync_release_unclassified",
+  "test_live_data.L05_LiveDataSync.test_sync_refuses_product_model_source_unknown_and_wrong_branch",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
   "test_skills.T04_Authority.test_sensitivity"
  ],
@@ -47,6 +56,9 @@
   "test_integrations.I01_Registry.test_outlook_reader_is_pinned_and_has_no_write_member",
   "test_integrations.I06_Secrets.test_secret_never_leaks_into_envelope_health_cache_or_audit",
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
+  "test_live_data.L04_DriftClassification.test_drift_states_clean_sync_release_unclassified",
+  "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
+  "test_live_data.L05_LiveDataSync.test_sync_refuses_product_model_source_unknown_and_wrong_branch",
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak"
  ],
@@ -60,6 +72,7 @@
   "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
   "test_integrations.I01_Registry.test_outlook_reader_is_pinned_and_has_no_write_member",
   "test_integrations.I06_Secrets.test_secret_never_leaks_into_envelope_health_cache_or_audit",
+  "test_live_data.L05_LiveDataSync.test_sync_refuses_product_model_source_unknown_and_wrong_branch",
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak"
  ],
@@ -70,6 +83,8 @@
   "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
   "test_integrations.I06_Secrets.test_secret_never_leaks_into_envelope_health_cache_or_audit",
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
+  "test_live_data.L04_DriftClassification.test_drift_states_clean_sync_release_unclassified",
+  "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak"
  ],
  "authority_tests": [
@@ -78,6 +93,7 @@
  "completion_verification": [
   "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
+  "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
   "test_skills.T04_Authority.test_sensitivity"
  ],
  "concurrency_tests": [],
@@ -87,7 +103,7 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T02:45:54",
+ "certified_at": "2026-09-12T03:11:54",
  "fingerprint": "90f741282cbe964f7785e32d",
  "core_fingerprint": "ff70cd82ecc16905",
  "result": "PASS",
@@ -103,7 +119,8 @@
   "test_boundary",
   "test_integrations",
   "test_portability",
-  "test_actions"
+  "test_actions",
+  "test_live_data"
  ],
  "audit_infrastructure": true
 }

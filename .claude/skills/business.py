@@ -64,6 +64,13 @@ def _sha(p):
         for chunk in iter(lambda: f.read(1 << 20), b""): h.update(chunk)
     return h.hexdigest()
 
+def _structure_sha(p, s):
+    """STRUCTURE fingerprint of a LIVE register — the one definition lives in the builder (no second fingerprint system)."""
+    import sys as _sys; d = str(HERE.parent / "business")
+    if d not in _sys.path: _sys.path.insert(0, d)
+    import build_business_model as bb
+    return bb.source_fingerprint({"source_id": "?", "fingerprint_scope": "STRUCTURE", "structure": s.get("structure") or {}}, p)["sha256"]
+
 def model_state(m=None):
     """CURRENT · STALE_MODEL (a current source changed) · SOURCE_MISSING · UNCERTIFIED — with per-source detail."""
     m = m or load()
@@ -75,6 +82,11 @@ def model_state(m=None):
         if s.get("currency") != "CURRENT": continue
         p = root / s["path"]
         if not p.exists(): missing.append(sid); continue
+        if s.get("scope") == "STRUCTURE":                                                      # LIVE register: only its structure binds the model; rows are live data read through the integration layer
+            try:
+                if _structure_sha(p, s) != s.get("sha256"): changed.append(sid)
+            except Exception: changed.append(sid)                                               # unreadable structure = fail closed (STALE_MODEL)
+            continue
         st = p.stat()
         if st.st_size == s.get("size") and int(st.st_mtime) == s.get("mtime"): continue        # unchanged (cheap check)
         if _sha(p) != s.get("sha256"): changed.append(sid)

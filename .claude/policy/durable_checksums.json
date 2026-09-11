@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-12T02:46:07",
+ "generated_at": "2026-09-12T03:12:07",
  "algorithm": "sha256",
  "files": {
   ".claude/business/bm_company.py": {
@@ -23,24 +23,24 @@
    "size": 25352
   },
   ".claude/business/bm_schema.py": {
-   "sha256": "49cb951cde91a5bca4ac0297b61e7422129a50ec590eae3e1213b6080135251c",
-   "size": 2944
+   "sha256": "db3a4c652fd5885c6b67bdb382e0ab067c76b11b364171213e1b40f928dd429b",
+   "size": 2998
   },
   ".claude/business/bm_sources.py": {
-   "sha256": "fcda1891274e7e6a7e163d1e4b530d7db9e7a1e31a5449a04fe83f51ce958a5b",
-   "size": 12927
+   "sha256": "b7fe631e710d1ba89d1274b2dce135f6f32612149ae01302cc814cf31d9a7fa6",
+   "size": 14558
   },
   ".claude/business/bm_targets.py": {
    "sha256": "d1bbfe2f92bb75e81fc26f60f1175cbca9dc9812b8d8cb46f36fbce9112b9323",
    "size": 7711
   },
   ".claude/business/build_business_model.py": {
-   "sha256": "aabe8489754e9703fb11f0f7b258c7ae7e497cad53c899882c38b24047c02235",
-   "size": 32129
+   "sha256": "71577f5afc5d8632dae0cd848f3ec8cd40de7c31bc3e9fe54b90978b3aa4c27e",
+   "size": 34499
   },
   ".claude/business/certify_business.py": {
-   "sha256": "004442b84d803df82431c03edbbd08b3115d39d1aeab80be26df22f20139b0e1",
-   "size": 8736
+   "sha256": "82743d98c81c7f6690114045a9fb3340c2315cde6c3ae31c9a3458befec20081",
+   "size": 10615
   },
   ".claude/business/overlay/ov_commercials.py": {
    "sha256": "f1ec793a2c9eb7d5a93fef820839933ffaf77336350db7be90acdbfa99d8f73b",
@@ -75,12 +75,12 @@
    "size": 4939
   },
   ".claude/hooks/brief.py": {
-   "sha256": "aa949a3ddf7cb11a93ae28cdd14f46610c38fec6b66ad9e4cc7c64bb3f08510c",
-   "size": 9793
+   "sha256": "255552f4df3e3ebc69b6108f77f9461729d69aa7dee45881d1318ccc06589e7b",
+   "size": 10905
   },
   ".claude/hooks/gate.py": {
-   "sha256": "a97fb12aa6f298004efb87358f66d17986ea4e84e823eeb2e096f00e260a14de",
-   "size": 17211
+   "sha256": "ceca0b1b3e39464db2fcd9d58285c58f485c69e7796d3e2cae82d2cba2d57fcc",
+   "size": 17221
   },
   ".claude/hooks/workspace_guard.py": {
    "sha256": "839def22fe3dc7061ea596cc4bfec3c88de7caefb65d17b07a1a239bc639cc99",
@@ -175,20 +175,24 @@
    "size": 9321
   },
   ".claude/policy/tree_manifest.py": {
-   "sha256": "213f0d6d9c6eb3ee84c9a432ab84e4a541cba8d41c96dc7169a227f9af05b5a5",
-   "size": 16979
+   "sha256": "43a32e848b97d6a0d6e235aee506c8e06447aeca6b6ba85016d45e40eb07ef3e",
+   "size": 21213
   },
   ".claude/policy/validate_workspace.py": {
    "sha256": "c6343c63c4cdda12f591ffcef88f1003cb1f6108e20466ca209c687bd48f2cbc",
    "size": 25036
   },
   ".claude/policy/workspace_policy.json": {
-   "sha256": "32baf6806f7314ad877661d43a1ec783f204e7935d3c62fd7a73746ec51dd745",
-   "size": 26990
+   "sha256": "9c381344714a98e8bf51bf82fd0581534f7e15b3cab70890ea9822318603690c",
+   "size": 28704
   },
   ".claude/policy/workspace_tree_manifest.json": {
-   "sha256": "2c9c83622006337a31fb966a56011fb35e4eae034a843d2d02365029c1a24760",
+   "sha256": "a78640be87f3b26462ff8d3adca8cd7c80a7de84ca998af52919cad1cb4f90c5",
    "size": 17504
+  },
+  ".claude/runtime/data_sync.py": {
+   "sha256": "e19e9b06b2fd805006895d2a8fe4669522b6fa3fdeaf83e08f51130279b8ddaf",
+   "size": 12144
   },
   ".claude/runtime/hook.sh": {
    "sha256": "835aebda6290cbddd067e647b84f79a6c4c7bcba8c45e2ba3c0ca583e5453405",
@@ -219,12 +223,12 @@
    "size": 57309
   },
   ".claude/skills/business.py": {
-   "sha256": "63f554f0be9a5308f7512238e1bac3da23ec7962b1a6b96fb20064a29bcd2650",
-   "size": 27993
+   "sha256": "643751d77f1cbd0457bf14fb8572dc355d049d51b60c8c41c06659374bf53dac",
+   "size": 28899
   },
   ".claude/skills/certify.py": {
-   "sha256": "8f23397b439dab5421ba3ba33709f63afa2d781d9287b2728b6e832aa383ea27",
-   "size": 9879
+   "sha256": "6c04ee10910d0dae2bbee91a4cad45e9b901d0dd3ede366c3c6795f39268a95e",
+   "size": 9897
   },
   ".claude/skills/engine.py": {
    "sha256": "499609c1d7a0353aa0eeec1bfed5b2e57abf6dc87cdc5e79946f701f68e2015b",
@@ -235,8 +239,8 @@
    "size": 81221
   },
   ".claude/skills/skill.py": {
-   "sha256": "3bbefd02934af4cf0e539975afb8cd42a8a1c7a74bcf95765033124a4d5005f9",
-   "size": 12263
+   "sha256": "5c173eac5e723ea920a3c64c72a6d4b1372781e6decbccad389951b8c36b5776",
+   "size": 12913
   },
   ".claude/skills/store.py": {
    "sha256": "742e9c77201ba03b9e2f58a31bd66d283c8051aac490bf2c8f173fe96a200f2f",
@@ -274,9 +278,13 @@
    "sha256": "453ca9d8f4c7e1fc0305a2006ece2c45d4f32cf6905c02ed1b53112fa81454a1",
    "size": 59229
   },
+  ".claude/tests/test_live_data.py": {
+   "sha256": "bfd2a69e1931aec80a357a7838756a84b01616943f1a698687cc63c870f5975c",
+   "size": 27345
+  },
   ".claude/tests/test_portability.py": {
-   "sha256": "f42fadcffc9b9af4bb215637e60e34b473f8a5b9c389b5abc4d3863d050c2a86",
-   "size": 21109
+   "sha256": "1a9ca7d19c66fd63248806315650f7bedd7b8dfe8b6c3652ca14770c708eae27",
+   "size": 22096
   },
   ".claude/tests/test_runtime.py": {
    "sha256": "3a669223d227e008608f1da529622ff9ab50bb094d43e1184b8dfb239df0d2a3",
@@ -499,16 +507,16 @@
    "size": 2541
   },
   "CLAUDE.md": {
-   "sha256": "bd2c90cfed22b485c58fd01f6ea5fe974dcbb059fb3cac6fc9886e6d128faa72",
-   "size": 18980
+   "sha256": "de7dfa8c34bc258dd498f373abbb8681ed51333b8144b0e02c9811f59b5b5188",
+   "size": 19797
   },
   "Journal.md": {
-   "sha256": "d7658f59a412db2d80c1dc4049c43465f8bd2da3cb38d916a564f2a628b25659",
-   "size": 31054
+   "sha256": "25600cca7229e55febd561261d283dd0a03f69be9363e518ee500b4cad46ffd9",
+   "size": 32856
   },
   "README.md": {
-   "sha256": "42e4aac60852e325c7bd026c550dfa1920c4124ce0c6f03ef47ad72654958d76",
-   "size": 19872
+   "sha256": "db908e4ee2fef2dfa390dab87da4a657e1b60e56c89f561dff27f8c375ef163c",
+   "size": 21757
   },
   "Tasks.xlsx": {
    "sha256": "bb33a6d71f1e36368ee6786044aef242dfbb7c46184c172971b75307a6c50d00",

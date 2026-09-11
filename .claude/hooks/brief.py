@@ -34,6 +34,17 @@ try:
     else: print("\n  🧱 workspace contract ✓")
 except Exception as e: print(f"\n  🧱 workspace validator unavailable ({type(e).__name__}: {e}) — fail closed: consider the tree UNVERIFIED")
 
+# 0b) durability drift — is GitHub main current? (LIVE DATA SYNC vs PRODUCT RELEASE; never pretend the repo is synced)
+try:
+    sys.path.insert(0, str(ROOT / ".claude" / "runtime")); import data_sync
+    dr = data_sync.plan(ROOT); ch = dr["changes"]; cd = dr["checksum_drift"]
+    if dr["state"] == "CLEAN": print("  🔄 GitHub sync ✓ (clean, ahead 0)")
+    else:
+        detail = " · ".join(f"{k} {', '.join(pathlib.Path(p).name for p in v[:3])}{'…' if len(v) > 3 else ''}" for k, v in list(ch.items()) + [(f"checksum:{k}", v) for k, v in cd.items()])
+        hint = {"SYNC_REQUIRED": "վազեցրու skill.py sync", "RELEASE_REQUIRED": "product/model փոփոխություն — skill.py release", "UNCLASSIFIED": "անհայտ ուղի — ոչինչ չի sync-վում, ստուգիր"}[dr["state"]]
+        print(f"  🔄 GitHub ՉԻ ՀԱՄԱԺԱՄԱՆԱԿԵՑՎԱԾ — {dr['state']}" + (f" · ahead {dr['ahead']}" if dr.get("ahead") else "") + f" · {detail} → {hint}")
+except Exception as e: print(f"  🔄 sync state unavailable ({type(e).__name__}: {e}) — consider GitHub NOT current")
+
 # 1) inbox
 inbox = ROOT / "00_Inbox"
 items = [f for f in os.listdir(inbox) if f != "Input.md"] if inbox.is_dir() else []

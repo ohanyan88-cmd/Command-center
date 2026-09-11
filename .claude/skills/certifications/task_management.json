@@ -10,6 +10,10 @@
   "test_integrations.A03_TaskAuthorityScope.test_cross_system_link_keeps_both_statuses_and_flags_divergence",
   "test_integrations.A03_TaskAuthorityScope.test_scoped_hierarchies",
   "test_integrations.I07_HealthAndTasks.test_task_register_real_read_records_real_health",
+  "test_live_data.L01_StructureFingerprint.test_row_mutations_keep_the_structure_fingerprint_and_the_loader_happy",
+  "test_live_data.L02_ModelBinding.test_task_row_mutations_never_invalidate_the_certified_core",
+  "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
+  "test_portability.P06_CleanCloneBootstrap.test_recovery_carries_the_latest_synced_live_register_and_the_same_static_model",
   "test_skills.T05_Execution.test_task_management",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -47,7 +51,8 @@
   "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success",
   "test_integrations.A01_ConfidentialCache.test_persistent_register_cache_has_hard_expiry_on_startup",
   "test_integrations.A02_AuditFailClosed.test_real_read_withheld_when_audit_cannot_be_persisted_or_reread",
-  "test_integrations.I07_HealthAndTasks.test_schema_drift_and_missing_file_fail_closed"
+  "test_integrations.I07_HealthAndTasks.test_schema_drift_and_missing_file_fail_closed",
+  "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean"
  ],
  "adversarial": [
   "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
@@ -68,7 +73,8 @@
   "test_hardening.H05_ChainFailureInjection.test_validation_failure_is_not_success",
   "test_integrations.A01_ConfidentialCache.test_persistent_register_cache_has_hard_expiry_on_startup",
   "test_integrations.A02_AuditFailClosed.test_real_read_withheld_when_audit_cannot_be_persisted_or_reread",
-  "test_integrations.I07_HealthAndTasks.test_schema_drift_and_missing_file_fail_closed"
+  "test_integrations.I07_HealthAndTasks.test_schema_drift_and_missing_file_fail_closed",
+  "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean"
  ],
  "authority_tests": [
   "test_failclosed.F01_EveryBlockedCode.test_APPROVAL_REQUIRED",
@@ -79,6 +85,9 @@
  "completion_verification": [
   "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
   "test_integrations.I07_HealthAndTasks.test_task_register_real_read_records_real_health",
+  "test_live_data.L02_ModelBinding.test_task_row_mutations_never_invalidate_the_certified_core",
+  "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
+  "test_portability.P06_CleanCloneBootstrap.test_recovery_carries_the_latest_synced_live_register_and_the_same_static_model",
   "test_skills.T05_Execution.test_task_management",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -96,7 +105,7 @@
   "test_skills.T02_Router.test_dependency_order"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T02:45:54",
+ "certified_at": "2026-09-12T03:11:54",
  "fingerprint": "58d8f04353dfe17cfab7c146",
  "core_fingerprint": "ff70cd82ecc16905",
  "result": "PASS",
@@ -112,7 +121,8 @@
   "test_boundary",
   "test_integrations",
   "test_portability",
-  "test_actions"
+  "test_actions",
+  "test_live_data"
  ],
  "audit_infrastructure": false
 }

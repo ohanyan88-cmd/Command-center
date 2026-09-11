@@ -73,12 +73,22 @@ python bootstrap.py            # կամ py -3 bootstrap.py — idempotent, ոչ�
 |:---|:---|:---|
 | `CLAUDE.md · README.md · Tasks.xlsx · Journal.md · Actions.md · bootstrap.py`, `00_Inbox…05_Archive` (բոլոր բիզնես փաստաթղթերը, աղբյուրները, արխիվները) | Git (VERSION_DIRECTLY) | clone. դատարկ պանակները՝ `.gitkeep`-ով |
 | Business Operating Model՝ core `bm_*.py` **և** overlay `overlay/ov_*.py` | Git (VERSION_DIRECTLY, Գև-ի որոշմամբ) | clone → `build_business_model.py` (generated json/md՝ REGENERATE) |
-| Deputy-ի դիմացկուն հիշողություն՝ commitments, decisions, audit, observations | Git՝ `.claude/state/durable/*.jsonl` (`state_snapshot.py export`, release-ում ավտոմատ) | bootstrap → `state_snapshot.py import` (idempotent, op_id-ով, կրկնություն չկա) |
+| Deputy-ի դիմացկուն հիշողություն՝ commitments, decisions, audit, actions, observations | Git՝ `.claude/state/durable/*.jsonl` (`state_snapshot.py export`՝ `skill.py sync`-ում և release-ում ավտոմատ) | bootstrap → `state_snapshot.py import` (idempotent, op_id-ով, կրկնություն չկա) |
 | Արտաքին համակարգերի credential-ներ (`~/.command-center/integrations/*.json`) | Git՝ `.secure/credentials.gpg` (GnuPG AES-256) + `.secure/manifest.json` (անուններ/checksum, ոչ արժեք) | bootstrap → `secure_recovery.py restore`, **միայն** վերականգնման բանալով |
 | Runtime (`.venv`), generated model/certification | REGENERATE | bootstrap |
 | SQLite store, journal, locks, integration cache/health, audit mirror, `settings.local.json`, `desktop.ini` | EPHEMERAL / MACHINE_LOCAL | չի versioned, վերստեղծվում է |
 
 **Մեկ արտաքին գաղտնիք՝ վերականգնման բանալին** `~/.command-center/recovery.key` (կամ `COMMAND_CENTER_RECOVERY_KEY_FILE`)։ Երբեք Git-ում, log-ում, audit-ում, տերմինալում։ Գև՝ պահիր պատճենը password manager-ում կամ արտաքին սարքի վրա (ֆայլի բովանդակությունը՝ մեկ տող)։ Առանց բանալու՝ ամեն ինչ վերականգնվում է, բացի արտաքին credential-ներից (ինտեգրումները մնում են NOT_CONFIGURED և դա ասվում է բարձրաձայն)։
+
+**Երկու ուղի, մեխանիկապես տարանջատված (policy `durability.live_data`, 1.7.0).**
+
+| Ինչ փոխվեց | Դաս | Ուղի |
+|:---|:---|:---|
+| `Tasks.xlsx` տող (create/assign/due/status/close/reopen/note), `Journal.md`, `00_Inbox/Input.md`, բիզնես փաստաթուղթ, որը մոդելի extraction աղբյուր չէ, `.claude/state/durable/*`, `durable_checksums.json` | LIVE DATA / DOCUMENT / DURABLE_STATE / INTEGRITY_META | **`skill.py sync`** — classify → durable state export → ստատիկ մոդելը դեռ վկայագրվա՞ծ է (առանց rebuild) → checksums refresh → commit միայն այդ ուղիները → push → origin ստուգում |
+| Կոդ, policy, hooks, skills, tests, `bm_*.py`/overlay, extraction աղբյուր (S01…S16 բացի S09-ից), ռեեստրի **կառուցվածք** (sheet/header) | PRODUCT / MODEL_SOURCE / RELEASE_ARTIFACT | **`skill.py release`** (rebuild → certify → validate → eval → checksums) |
+| Անհայտ ուղի | UNKNOWN | fail closed — ոչինչ չի sync-վում |
+
+`Tasks.xlsx`-ը **LIVE OPERATIONAL SOURCE** է (S09 · `source_kind: LIVE_REGISTER` · `fingerprint_scope: STRUCTURE`)՝ մոդելը կապված է միայն նրա կառուցվածքին (թերթ + header բլոկ), տողերը կարդացվում են live՝ INT-TASKS-ով (retrieved_at/freshness ամեն ընթերցման)։ Տողի փոփոխությունը core fingerprint-ը չի փոխում, STALE_MODEL չի առաջացնում, rebuild/certification/release չի պահանջում։ Drift-ը ամեն սեսիա երևում է Daily Brief-ում (`🔄 GitHub sync ✓` կամ `ՉԻ ՀԱՄԱԺԱՄԱՆԱԿԵՑՎԱԾ — SYNC_REQUIRED/RELEASE_REQUIRED/UNCLASSIFIED`), `tree_manifest.py drift`-ով՝ ձեռքով։
 
 Կանոնական ծառի պայմանագիր՝ `.claude/policy/workspace_tree_manifest.json` (գեներացվում է policy-ից `tree_manifest.py build --write`-ով, validator-ը ստուգում է համապատասխանությունը և ֆիզիկական գոյությունը), checksum-ներ՝ `.claude/policy/durable_checksums.json`։ Parity՝ `tree_manifest.py snapshot` աղբյուրում և վերականգնվածում → `tree_manifest.py parity a b`։ Scanner-ի սեմանտիկա (2.0)՝ **արգելում է միայն RESTRICTED** (credential, token, գաղտնաբառ, private key, բանալի, connection string); բիզնես տեղեկատվությունը (անուններ, աշխատավարձ, փաստաթղթեր) CONFIDENTIAL awareness է՝ versioned Գև-ի որոշմամբ։ `.secure/`՝ գաղտնագրված artifact-ի պանակն է. `_TEMP_WORK_COLLECTION/`՝ ժամանակավոր staging, չի versioned մինչև Գև-ի review-ն։
 

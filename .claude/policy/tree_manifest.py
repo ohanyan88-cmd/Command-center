@@ -181,6 +181,58 @@ def parity(src, dst):
     return {"source_required": len(src["required"]), "restored_required": len(dst["required"]), "missing_required": miss_req, "missing_durable_files": missing_files, "changed_durable_files": changed, "unexpected_extra_files": extra,
             "pass": not (miss_req or missing_files or changed or extra)}
 
+# ───────────────────────── drift classification: LIVE DATA SYNC vs PRODUCT RELEASE (policy durability.live_data) ─────────────────────────
+DRIFT_STATES = ("CLEAN", "SYNC_REQUIRED", "RELEASE_REQUIRED", "UNCLASSIFIED")
+SYNC_CLASSES = ("LIVE_DATA", "DOCUMENT", "DURABLE_STATE", "INTEGRITY_META")          # persisted by skill.py sync (data only)
+RELEASE_CLASSES = ("PRODUCT", "MODEL_SOURCE", "RELEASE_ARTIFACT")                   # only skill.py release may certify + persist these
+BUSINESS_DIRS = ("00_Inbox", "01_Active", "02_Reference", "03_Completed", "04_Sources", "05_Archive")
+
+def _git_out(args, root):
+    import subprocess
+    r = subprocess.run(["git"] + list(args), cwd=str(root), capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if r.returncode != 0: raise RuntimeError((r.stderr or r.stdout).strip()[:300])
+    return r.stdout
+
+def live_data_spec(pol=None):
+    ld = (pol or load_policy()).get("durability", {}).get("live_data", {})
+    return {"files": list(ld.get("live_data_files", [])), "state_dirs": list(ld.get("live_state_dirs", [])), "meta": list(ld.get("integrity_metadata", []))}
+
+def classify_path(rel, spec=None, model_sources=()):
+    """One deterministic class per path: LIVE_DATA · DOCUMENT · DURABLE_STATE · INTEGRITY_META (sync) — MODEL_SOURCE · PRODUCT ·
+    RELEASE_ARTIFACT (release) — UNKNOWN (fail closed). A declared CONTENT-scoped business-model source is MODEL_SOURCE even inside a business folder."""
+    spec = spec or live_data_spec(); r = rel.replace("\\", "/").strip("/")
+    if r in spec["meta"]: return "INTEGRITY_META"
+    if r in spec["files"]: return "LIVE_DATA"
+    if any(r == d.strip("/") or r.startswith(d.strip("/") + "/") for d in spec["state_dirs"]): return "DURABLE_STATE"
+    if r in {m.replace("\\", "/") for m in model_sources}: return "MODEL_SOURCE"
+    if _churn(r): return "RELEASE_ARTIFACT"
+    top = r.split("/")[0]
+    if top in BUSINESS_DIRS: return "DOCUMENT"
+    if r.startswith(".claude/") or r.startswith(".secure/") or r in DURABLE_ROOT_FILES or r in (".gitignore", ".gitattributes"): return "PRODUCT"
+    return "UNKNOWN"
+
+def classify_drift(root=ROOT, model_sources=(), pol=None):
+    """Deterministic state of the working tree vs the last commit and vs the stored checksums:
+       CLEAN — nothing to persist and no unpushed commit · SYNC_REQUIRED — only live data / documents / durable state / integrity metadata differ
+       (or commits are not pushed) · RELEASE_REQUIRED — product, model-authoring or extraction-source change · UNCLASSIFIED — an unknown path (fail closed)."""
+    root = pathlib.Path(root); spec = live_data_spec(pol); changes, stale = {}, {}
+    for line in _git_out(["status", "--porcelain", "--untracked-files=all"], root).splitlines():
+        if not line.strip(): continue
+        path = line[3:].strip()
+        for p in (path.split(" -> ") if " -> " in path else [path]): changes.setdefault(classify_path(p.strip('"'), spec, model_sources), []).append(p.strip('"'))
+    cs = verify_checksums(root)
+    for f in cs["changed"] + cs["missing"] + cs["new"]: stale.setdefault(classify_path(f, spec, model_sources), []).append(f)
+    ahead = behind = None
+    try: a, b = _git_out(["rev-list", "--left-right", "--count", "HEAD...@{upstream}"], root).split(); ahead, behind = int(a), int(b)
+    except Exception: pass
+    if changes.get("UNKNOWN") or stale.get("UNKNOWN"): state = "UNCLASSIFIED"
+    elif any(changes.get(k) or stale.get(k) for k in RELEASE_CLASSES): state = "RELEASE_REQUIRED"
+    elif changes or stale or (ahead or 0) > 0: state = "SYNC_REQUIRED"
+    else: state = "CLEAN"
+    try: branch = _git_out(["branch", "--show-current"], root).strip()
+    except Exception: branch = None
+    return {"state": state, "changes": {k: sorted(v) for k, v in changes.items()}, "checksum_drift": {k: sorted(v) for k, v in stale.items()}, "ahead": ahead, "behind": behind, "branch": branch}
+
 def main(argv):
     cmd = argv[0] if argv else "check"; root = ROOT
     if "--root" in argv: root = pathlib.Path(argv[argv.index("--root") + 1])
@@ -204,6 +256,8 @@ def main(argv):
         if out: pathlib.Path(out).write_text(json.dumps(s, ensure_ascii=False, indent=1), encoding="utf-8"); print(f"snapshot: {s['counts']} → {out}")
         else: print(json.dumps(s["counts"]))
         return 0
+    if cmd == "drift":
+        d = classify_drift(root); print(json.dumps(d, ensure_ascii=False, indent=1)); return {"CLEAN": 0, "SYNC_REQUIRED": 1, "RELEASE_REQUIRED": 2, "UNCLASSIFIED": 3}[d["state"]]
     if cmd == "parity" and len(argv) >= 3:
         a = json.loads(pathlib.Path(argv[1]).read_text(encoding="utf-8")); b = json.loads(pathlib.Path(argv[2]).read_text(encoding="utf-8")); r = parity(a, b)
         print(json.dumps(r, ensure_ascii=False, indent=1)); return 0 if r["pass"] else 1

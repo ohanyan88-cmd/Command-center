@@ -1,5 +1,5 @@
 {
-  "policy_version": "1.6.0",
+  "policy_version": "1.7.0",
   "workspace_name": "Command-center",
   "identity": {
     "name": "Deputy",
@@ -878,6 +878,28 @@
         ".claude/state/skill_state.db (+wal/shm), journal.jsonl, tickets, integrations_cache/health json, *.lock, .claude/audit/skill_audit.jsonl mirror (the store export is the durable form)",
         "_TEMP_WORK_COLLECTION (staging, pending Gev's review)"
       ]
+    },
+    "live_data": {
+      "rule": "LIVE OPERATIONAL DATA (the task register, the journal, the inbox text) and Deputy's durable runtime state change every day. They are versioned directly (durability law) but they are NOT product/model inputs: a change requires only the lightweight LIVE DATA SYNC (skill.py sync) — never a business-model rebuild, a certification or a release. Everything else that is versioned is PRODUCT (code, policy, hooks, skills, tests, business-model authoring bm_*.py/overlay, extraction sources) and changes only through skill.py release.",
+      "live_data_files": [
+        "Tasks.xlsx",
+        "Journal.md",
+        "00_Inbox/Input.md"
+      ],
+      "live_state_dirs": [
+        ".claude/state/durable"
+      ],
+      "integrity_metadata": [
+        ".claude/policy/durable_checksums.json"
+      ],
+      "business_documents": "00_Inbox … 05_Archive documents that are not declared business-model extraction sources are DOCUMENT data (sync); a declared CONTENT-scoped source (bm_sources.py) is a MODEL_SOURCE (release)",
+      "sync": "python .claude/skills/skill.py sync [--dry-run] [--no-push]  (classify drift → export durable state → static model still certified? → refresh checksums → commit only the classified paths → push → verify origin)",
+      "drift_states": {
+        "CLEAN": "nothing to persist, GitHub main is current",
+        "SYNC_REQUIRED": "live data / durable state / integrity metadata changed or commits not pushed — run skill.py sync",
+        "RELEASE_REQUIRED": "product, model-authoring or extraction-source change — run skill.py release",
+        "UNCLASSIFIED": "unknown path changed — fail closed, nothing is synced"
+      }
     }
   }
 }

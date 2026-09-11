@@ -1,6 +1,6 @@
 {
  "manifest_version": "1.0",
- "policy_version": "1.6.0",
+ "policy_version": "1.7.0",
  "workspace": "Command-center",
  "durable_dirs": [
   "00_Inbox",

@@ -9,6 +9,8 @@
   "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
   "test_integrations.I03_Envelope.test_normalized_envelope_provenance_freshness_and_cache",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
+  "test_live_data.L02_ModelBinding.test_task_row_mutations_never_invalidate_the_certified_core",
+  "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness",
   "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_skills.T05_Execution.test_daily_briefing",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
@@ -85,6 +87,8 @@
   "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
   "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted",
+  "test_live_data.L02_ModelBinding.test_task_row_mutations_never_invalidate_the_certified_core",
+  "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness",
   "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_skills.T05_Execution.test_daily_briefing",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
@@ -102,7 +106,7 @@
   "test_skills.T02_Router.test_dependency_order"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T02:45:54",
+ "certified_at": "2026-09-12T03:11:54",
  "fingerprint": "433002c59ba3d983f180f3f3",
  "core_fingerprint": "ff70cd82ecc16905",
  "result": "PASS",
@@ -118,7 +122,8 @@
   "test_boundary",
   "test_integrations",
   "test_portability",
-  "test_actions"
+  "test_actions",
+  "test_live_data"
  ],
  "audit_infrastructure": false
 }
