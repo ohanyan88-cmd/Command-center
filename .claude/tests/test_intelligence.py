@@ -23,6 +23,8 @@ def setUpModule():
     engine.STATE_DIR = TMP / "state-iso"; (TMP / "state-iso").mkdir(parents=True, exist_ok=True); store.reset()
     p = TMP / "state-iso" / "integrations_health.json"
     if p.exists(): p.unlink()
+    os.environ["COMMAND_CENTER_TASKS_XLSX"] = str(GUARD)                                # re-applied at run time: another suite imported later may have pointed the guard elsewhere
+    os.environ.pop("COMMAND_CENTER_INTEGRATIONS_FIXTURE", None); layer._FIXTURE.update(path=None, mtime=None, data=None)
 def tearDownModule():
     os.environ.pop("COMMAND_CENTER_INTEGRATIONS_FIXTURE", None); layer._FIXTURE.update(path=None, mtime=None, data=None)
     if REAL_SHA and hashlib.sha256(REAL.read_bytes()).hexdigest() != REAL_SHA: raise AssertionError("TEST SUITE MUTATED THE REAL Tasks.xlsx — forbidden")
