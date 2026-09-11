@@ -1,0 +1,21 @@
+{
+ "INT-TASKS": {
+  "tasks.create": {
+   "action_id": "ACT-ef5fb6b5d0",
+   "verified_at": "2026-09-12T02:26:28",
+   "evidence": {
+    "comment": "Mission 4.2 live certification · harmless · Gev-approved · cleanup = close/remove this row",
+    "due": "2026-09-12",
+    "id": 16,
+    "owner": "Գև",
+    "row": 28,
+    "status": "Չսկսված",
+    "title": "TEST — Deputy live write certification (delete after)",
+    "approval_token": "APR-1e833fce2ef9",
+    "approved_by": "Gev",
+    "approved_at": "2026-09-12T02:06:06",
+    "ticket_id": "8297f25baf"
+   }
+  }
+ }
+}

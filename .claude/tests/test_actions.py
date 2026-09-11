@@ -58,10 +58,10 @@ class H01_Governance(unittest.TestCase):
         self.assertEqual(executors.action_runtime({"text": "draft an email to Arman asking why the report is late", "session_id": "s1"}, REG["_index"][AR], REG)["provider_mutation"], False)
     @covers(AR, *GOV, kinds=("authority", "adversarial", "unit"))
     def test_approval_text_recognition(self):
-        for t in ("OK", "ok", "GO", "Go.", "Արա", "Հաստատում եմ", "yes", "approved"): self.assertEqual(A.classify_approval(t), "APPROVAL", t)
-        for t in ("looks good", "sounds fine", "maybe", "ok?", "what do you think", "", "OK, what's overdue?", "I like it"): self.assertNotEqual(A.classify_approval(t), "APPROVAL", t)
+        for t in ("OK", "ok", "GO", "Go.", "Արա", "Հաստատում եմ", "yes", "approved", "այո", "օք", "Օք", "գո", "օկ", "գօ", "օք."): self.assertEqual(A.classify_approval(t), "APPROVAL", t)   # Armenian-letter OK/GO added by Gev 2026-09-12
+        for t in ("looks good", "sounds fine", "maybe", "ok?", "what do you think", "", "OK, what's overdue?", "I like it", "օք?", "օք լավ է", "գո ինչ կա"): self.assertNotEqual(A.classify_approval(t), "APPROVAL", t)
         for t in ("no", "cancel", "stop", "ոչ", "մի արա"): self.assertEqual(A.classify_approval(t), "REJECTION", t)
-        self.assertEqual(A.classify_approval("GO, but change the deadline to Monday"), "MODIFIED")
+        self.assertEqual(A.classify_approval("GO, but change the deadline to Monday"), "MODIFIED"); self.assertEqual(A.classify_approval("օք, բայց ժամկետը փոխիր"), "MODIFIED")
         p = fresh(); a = A.prepare(_req(), session_id="s2")
         for t in ("looks good", "maybe", "ok?"):
             self.assertEqual(A.approve(t, session_id="s2")["status"], "NOT_APPROVED"); self.assertEqual(A.get(a["action_id"])["state"], "APPROVAL_REQUIRED")
@@ -219,8 +219,13 @@ class H05_CapabilityAndSkill(unittest.TestCase):
         rows = {(r["integration_id"], r["operation"]): r for r in CAP.table()}
         self.assertEqual(rows[("INT-MB", "tariff.change")]["level"], "UNAVAILABLE"); self.assertEqual(rows[("INT-MB", "tariff.change")]["risk_class"], "R3")
         self.assertIn(rows[("INT-B24", "crm.deal.update")]["level"], ("IMPLEMENTED", "DECLARED")); self.assertTrue(all(r["gev_approval_required"] for r in rows.values() if r["read_or_write"] == "write"))
+        certs = CAP._write_certs()
         for k, r in rows.items():
-            if r["read_or_write"] == "write": self.assertNotEqual(r["level"], "VERIFIED_WRITE", f"{k}: no Gev-approved live write has certified this yet")
+            if r["read_or_write"] != "write": continue
+            c = certs.get(k[0], {}).get(k[1])
+            if r["level"] == "VERIFIED_WRITE":                      # only a durable, Gev-approved, VERIFIED live write may certify — never a test or a code path
+                self.assertIsNotNone(c, f"{k}: VERIFIED_WRITE without durable certification evidence"); self.assertTrue(c.get("action_id", "").startswith("ACT-"), k); self.assertEqual(c["evidence"].get("approved_by"), "Gev", k)
+            else: self.assertFalse(c and r["runtime_available"], f"{k}: certification recorded and runtime available, yet level is {r['level']}")   # (in this suite health lives in a temp state dir → not connected)
         import adapter_outlook_write as W; self.assertEqual(W.writer_problems(), [])
     @covers(AR, *GOV, kinds=("routing", "unit"))
     def test_routing_and_executor_boundaries(self):
