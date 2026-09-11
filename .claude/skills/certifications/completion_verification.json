@@ -1,9 +1,9 @@
 {
  "skill_id": "completion_verification",
  "skill_version": "1.2.0",
- "maturity_level": "L1",
+ "maturity_level": "L4",
  "declared_maturity": "L4",
- "computed_maturity": "L1",
+ "computed_maturity": "L4",
  "tests": [
   "test_actions.H01_Governance.test_ambiguous_pending_target_fails_closed",
   "test_actions.H01_Governance.test_approval_text_recognition",
@@ -63,6 +63,7 @@
   "test_portability.P04_SecureRecovery.test_workspace_artifact_manifest_has_no_values_and_key_is_external",
   "test_portability.P05_MachineSpecificAndPaths.test_machine_dependencies_are_declared",
   "test_portability.P05_MachineSpecificAndPaths.test_no_dependence_on_the_original_absolute_path",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key",
   "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore",
   "test_skills.T07_VerificationAudit.test_completion_verification"
@@ -150,6 +151,7 @@
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
@@ -215,6 +217,7 @@
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_entry_point_outside_venv_fails_closed_without_bootstrap",
@@ -247,6 +250,7 @@
   "test_integrations.I09_MeetingPrepAndOpenLoops.test_open_loops_extract_candidates_not_facts",
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore",
   "test_skills.T07_VerificationAudit.test_completion_verification"
  ],
@@ -317,13 +321,11 @@
   "test_enforcement.E06_MaintenanceRoutingBoundary.test_system_prompt_with_business_words_is_not_routed_to_sales",
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
- "failed_tests": [
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
- ],
- "certified_at": "2026-09-12T02:13:20",
+ "failed_tests": [],
+ "certified_at": "2026-09-12T02:29:55",
  "fingerprint": "3aa0ce72599433ce52632217",
  "core_fingerprint": "ff70cd82ecc16905",
- "result": "FAIL",
+ "result": "PASS",
  "suites": [
   "test_skills",
   "test_store",
