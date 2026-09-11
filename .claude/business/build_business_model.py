@@ -304,7 +304,12 @@ def build_overlay(snap, overlay_dir=OVERLAY_DIR):
 
 # ───────────────────────── stage 6: fingerprint ─────────────────────────
 def _content(obj):
-    return {k: v for k, v in obj.items() if k != "meta"}
+    """Semantic content for fingerprinting: metadata and machine-specific file mtimes are excluded (a clone on another PC must
+    produce the SAME core fingerprint from the same sources — Mission 4.1 portability)."""
+    out = {k: v for k, v in obj.items() if k != "meta"}
+    if isinstance(out.get("source_snapshot"), dict):
+        out["source_snapshot"] = {sid: {kk: vv for kk, vv in s.items() if kk != "mtime"} for sid, s in out["source_snapshot"].items()}
+    return out
 
 def fingerprint(files):
     return hashlib.sha256(json.dumps({n: _content(o) for n, o in sorted(files.items())}, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")).hexdigest()[:32]

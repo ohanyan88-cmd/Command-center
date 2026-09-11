@@ -121,7 +121,7 @@ def check_path(path, pol, root=DEFAULT_ROOT, is_dir=None):
     sem = pol["semantics"]
     # semantic placement
     if not is_dir:
-        if _matches_any(name, sem["code_markers"]["patterns"]) and not any(rel.startswith(a + "/") for a in sem["code_markers"]["must_live_under"]):
+        if _matches_any(name, sem["code_markers"]["patterns"]) and rel not in sem["code_markers"].get("root_exceptions", []) and not any(rel.startswith(a + "/") for a in sem["code_markers"]["must_live_under"]):
             v.append(f"{rel}: code may only live under {sem['code_markers']['must_live_under']}")
         if _matches_any(name, sem["runtime_markers"]["patterns"]) and not any(rel.startswith(a + "/") for a in sem["runtime_markers"]["must_live_under"]):
             v.append(f"{rel}: runtime/state file may only live under {sem['runtime_markers']['must_live_under']}")
@@ -239,8 +239,9 @@ def validate_tree(root=DEFAULT_ROOT, pol=None, policy_path=POLICY_PATH):
                 if any(part in pol["generated_exclusions"]["ignored_dir_names"] for part in rel.split("/")): continue
                 problems.append(f"duplicate canonical artifact for {cf}: {rel}")
     # reference vs completed: same base document in both
-    ref = {p.name: p for p in (root / "02_Reference").rglob("*") if p.is_file()} if (root / "02_Reference").is_dir() else {}
-    comp = {p.name for p in (root / "03_Completed").rglob("*") if p.is_file()} if (root / "03_Completed").is_dir() else set()
+    anywhere = set(pol["reserved_technical_names"].get("anywhere_files", []))          # .gitkeep placeholders are not documents
+    ref = {p.name: p for p in (root / "02_Reference").rglob("*") if p.is_file() and p.name not in anywhere} if (root / "02_Reference").is_dir() else {}
+    comp = {p.name for p in (root / "03_Completed").rglob("*") if p.is_file() and p.name not in anywhere} if (root / "03_Completed").is_dir() else set()
     for n in ref.keys() & comp: problems.append(f"{n}: exists in both 02_Reference and 03_Completed (one canonical location)")
     # markdown links
     for md in pol["links"]["check_markdown_links_in"]:
@@ -262,7 +263,21 @@ def validate_tree(root=DEFAULT_ROOT, pol=None, policy_path=POLICY_PATH):
             if f not in txt: problems.append(f"README.md does not mention required file {f}")
     problems += check_identity(root, pol)
     problems += check_boundary(root)
+    problems += check_tree_manifest(root, pol)
     return sorted(set(problems))
+
+def check_tree_manifest(root, pol):
+    """Canonical tree manifest (derived from this policy) must be current and every required path must physically exist."""
+    try:
+        import tree_manifest as tm
+    except ImportError: return ["tree_manifest.py unavailable"]
+    problems = []
+    try:
+        problems += tm.check_manifest(pathlib.Path(root) / ".claude" / "policy" / "workspace_tree_manifest.json", pol)
+        miss = tm.verify(root, tm.build(pol))
+        problems += [f"required canonical path missing: {m} (documentation is not enough — it must exist)" for m in miss]
+    except Exception as e: problems.append(f"tree manifest check failed: {type(e).__name__}: {e}")
+    return problems
 
 def check_boundary(root):
     """Sensitive-data boundary: versionable business-model core carries no CONFIDENTIAL/RESTRICTED content; the git index tracks
@@ -274,14 +289,17 @@ def check_boundary(root):
     try:
         pol = ss.load_policy(); root = pathlib.Path(root)
         core = sorted((root / ".claude" / "business").glob("bm_*.py")) + [p for p in ((root / ".claude" / "business" / "build_business_model.py"), (root / ".claude" / "business" / "certify_business.py"), (root / ".claude" / "skills" / "business.py")) if p.exists()]
+        bc = ss.blocking_classes(pol)
         for rel, fs in ss.scan_paths(core, root=root, pol=pol, names=ss.overlay_names(root / ".claude" / "business" / "overlay.json")).items():
-            problems.append(f"{rel}: CONFIDENTIAL/RESTRICTED content in the versionable core ({fs[0]['rule']})")
+            for f in fs:
+                if f["class"] in bc: problems.append(f"{rel}: RESTRICTED content in the versionable core ({f['rule']})")
+                elif f["rule"] == "person_name_from_overlay": problems.append(f"{rel}: person name in the CORE (people live in the overlay as @P tokens)")
         if (root / ".git").is_dir():
             import subprocess
             out = subprocess.run(["git", "ls-files"], cwd=str(root), capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.split()
             for rel in out:
                 cls, why = ss.classify_path(rel, pol)
-                if cls in ("CONFIDENTIAL", "RESTRICTED"): problems.append(f"{rel}: tracked by git but classified {cls} ({why})")
+                if cls in bc: problems.append(f"{rel}: tracked by git but classified {cls} ({why}) — credentials never in plaintext")
             if not ss.hooks_installed(root): problems.append("git boundary hooks missing — python .claude/policy/sensitive_scan.py --install-hooks")
     except Exception as e: problems.append(f"boundary check failed: {type(e).__name__}: {e}")
     return problems

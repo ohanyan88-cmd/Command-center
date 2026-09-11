@@ -1,1 +1,13 @@
+# Command-center — binary business documents must never be text-normalized; text files keep their native line endings.
 * -text
+*.xlsx binary
+*.xlsm binary
+*.docx binary
+*.pptx binary
+*.pdf binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gpg binary
+*.db binary

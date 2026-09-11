@@ -1,31 +1,44 @@
-# ── Business/personal data stays OUT of the repository (repo = Deputy's system only) ──
-# Գև-ի աշխատանքային ֆայլերը (WhatsApp, xlsx, docx, օրագիր) չեն հրապարակվում։
-00_Inbox/
-01_Active/
-02_Reference/
-03_Completed/
-04_Sources/
-05_Archive/
-Tasks.xlsx
-Journal.md
-Actions.md
-desktop.ini
+# ═══ Command-center .gitignore — durability model (Mission 4.1): GitHub + recovery key → complete workspace ═══
+# Business documents, registers, sources, archives, the Business Operating Model (core AND overlay) and Deputy's durable
+# state export ARE versioned. Only genuinely non-repository artifacts are ignored. Access credentials never enter Git in
+# plaintext — mechanically enforced by .claude/policy/sensitive_scan.py (RESTRICTED = blocked), not by this file.
 
-# ── Project Python runtime (rebuilt from .claude/runtime/requirements.lock) — never versioned ──
+# ── regenerated runtime (bootstrap.py rebuilds from .claude/runtime/requirements.lock) ──
 .venv/
-
-# ── Business Operating Model: CORE (bm_*.py, schema, builder, certifier) IS versioned; the SENSITIVE OVERLAY and every
-#    generated model file are local only. Mechanically enforced by .claude/policy/sensitive_scan.py (pre-commit/pre-push) ──
-.claude/business/overlay/
-.claude/business/*.json
-.claude/business/Business-model.md
-
-# ── Integration layer: code + fixed reader ARE versioned; generated certification/cache files are local only ──
-.claude/integrations/*.json
-
-# ── Runtime state (hardened store, audit mirror, tickets, quarantine) — never versioned ──
-.claude/state/
-.claude/audit/
 **/__pycache__/
 *.pyc
+
+# ── ephemeral Deputy runtime state (the durable export is .claude/state/durable/, versioned) ──
+.claude/state/*
+!.claude/state/durable/
+!.claude/state/durable/**
+.claude/audit/
+
+# ── regenerated artifacts (deterministic; bootstrap rebuilds and re-certifies) ──
+.claude/business/*.json
+.claude/business/Business-model.md
+.claude/integrations/*.json
+
+# ── plaintext / decrypted credential material (never; recovery goes through .secure/credentials.gpg) ──
+.secure/*.plain*
+.secure/*.dec*
+.secure/*.tmp
+.secure/*.tar
+*.key
+*.pem
+.env
+.env.*
 .claude/settings.local.json
+
+# ── machine garbage, locks, temp ──
+desktop.ini
+Thumbs.db
+~$*
+*.lock
+*.tmp
+*.bak
+*.orig
+*.swp
+
+# ── temporary staging of collected work material — pending Gev's review, then integrated or dropped ──
+_TEMP_WORK_COLLECTION/

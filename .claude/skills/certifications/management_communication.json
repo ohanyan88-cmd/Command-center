@@ -38,7 +38,7 @@
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-11T23:29:20",
+ "certified_at": "2026-09-12T00:44:37",
  "fingerprint": "4f80d3dfec1636c679728f22",
  "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
@@ -52,7 +52,8 @@
   "test_runtime",
   "test_business",
   "test_boundary",
-  "test_integrations"
+  "test_integrations",
+  "test_portability"
  ],
  "audit_infrastructure": false
 }

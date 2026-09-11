@@ -24,6 +24,17 @@ def clean_tree():
         for sub in dc.get("fixed_subdirs", []): (base / sub).mkdir(exist_ok=True)
         for rf in dc.get("required_files", []): (base / rf).write_text(ident_line if rf.endswith(".md") else "", encoding="utf-8")
     (d / "00_Inbox" / "Input.md").write_text("# inbox\n", encoding="utf-8")
+    # Mission 4.1: the policy-derived tree manifest is part of the contract — every required path must physically exist
+    import tree_manifest as tm
+    for e in tm.build(pol)["entries"]:
+        if not e["required"] or e["path"] == ".git": continue
+        tp = d / e["path"]
+        if e["kind"] == "directory": tp.mkdir(parents=True, exist_ok=True)
+        elif not tp.exists():
+            tp.parent.mkdir(parents=True, exist_ok=True)
+            tp.write_text("{}" if tp.suffix == ".json" else (ident_line if tp.suffix == ".md" else ""), encoding="utf-8")
+    (d / ".claude" / "policy" / "workspace_tree_manifest.json").write_text(json.dumps(tm.build(pol)), encoding="utf-8")
+    (d / ".claude" / "audit").mkdir(parents=True, exist_ok=True); (d / ".claude" / "audit" / "skill_audit.jsonl").write_text("", encoding="utf-8")
     return d
 
 def problems(d): return vw.validate_tree(d, POLICY)

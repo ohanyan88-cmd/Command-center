@@ -6,9 +6,10 @@
   python .claude/policy/sensitive_scan.py --paths a b c            # working-tree files (validator / certification)
   python .claude/policy/sensitive_scan.py --install-hooks          # writes .git/hooks/pre-commit + pre-push (idempotent)
 
-A file is BLOCKED when its path matches a CONFIDENTIAL/RESTRICTED path rule, its content matches a content rule, or it
-contains a person name known from the local sensitive overlay (never stored here). Allow rules are narrow and explicit.
-Exit 1 on any finding (fail closed). Applies regardless of repository visibility."""
+Mission 4.1 semantics: a file is BLOCKED only when a finding's class is in policy.blocking_classes (RESTRICTED: active access
+credentials, tokens, passwords, private keys, recovery keys, credential-bearing connection strings). CONFIDENTIAL findings
+(business documents, names from the overlay, PII patterns) are reported as AWARENESS — business information is versioned by
+Gev's explicit decision; it is not an access credential. Exit 1 only on blocking findings. Applies regardless of repository visibility."""
 import sys, os, re, json, pathlib, subprocess, fnmatch
 try: sys.stdout.reconfigure(encoding="utf-8")
 except Exception: pass
@@ -31,6 +32,16 @@ def overlay_names(overlay_path=OVERLAY_JSON):
         for n in [p.get("name")] + list(p.get("aliases", [])):
             if n and len(n) >= 3: names.append(n)
     return sorted(set(names), key=len, reverse=True)
+
+def blocking_classes(pol): return set(pol.get("blocking_classes", ["RESTRICTED"]))
+
+def blocking(rep, pol):
+    """Only the findings whose class blocks (RESTRICTED by policy)."""
+    bc = blocking_classes(pol); out = {}
+    for rel, fs in rep.items():
+        b = [f for f in fs if f["class"] in bc]
+        if b: out[rel] = b
+    return out
 
 def classify_path(rel, pol):
     rel = rel.replace("\\", "/")
@@ -102,7 +113,7 @@ def scan_range(rng, root=ROOT, pol=None, names=None):
     return report
 
 HOOK_PRE_COMMIT = """#!/usr/bin/env bash
-# Command-center boundary: CONFIDENTIAL/RESTRICTED data never enters the repository (installed by sensitive_scan.py --install-hooks)
+# Command-center boundary: RESTRICTED material (credentials, keys, secrets) never enters the repository (installed by sensitive_scan.py --install-hooks)
 R="$(git rev-parse --show-toplevel)"
 P="$R/.venv/Scripts/python.exe"; [ -x "$P" ] || P="$R/.venv/bin/python"; [ -x "$P" ] || P=python
 exec "$P" "$R/.claude/policy/sensitive_scan.py" --staged
@@ -135,12 +146,16 @@ def hooks_installed(root=ROOT):
     hooks = pathlib.Path(root) / ".git" / "hooks"
     return all((hooks / n).exists() and "sensitive_scan.py" in (hooks / n).read_text(encoding="utf-8", errors="replace") for n in ("pre-commit", "pre-push"))
 
-def report(rep, title):
-    if not rep: print(f"✓ boundary clean — {title}"); return 0
-    print(f"⛔ BOUNDARY VIOLATION — {title}: {len(rep)} file(s) carry CONFIDENTIAL/RESTRICTED data")
-    for rel, fs in rep.items():
-        for f in fs[:5]: print(f"   {rel}:{f['line']}  [{f['class']}] {f['rule']}  {f['sample']}")
-    print("   → keep it in the sensitive overlay / local registers; never in the repository (see .claude/policy/data_classification.json)")
+def report(rep, title, pol=None):
+    pol = pol or load_policy(); block = blocking(rep, pol)
+    aware = {rel: [f for f in fs if f["class"] not in blocking_classes(pol)] for rel, fs in rep.items()}
+    aware = {k: v for k, v in aware.items() if v}
+    if aware: print(f"ℹ awareness — {title}: {len(aware)} file(s) carry CONFIDENTIAL business information (versioned by decision; not blocked)")
+    if not block: print(f"✓ boundary clean — {title}" + (f" ({len(aware)} awareness)" if aware else "")); return 0
+    print(f"⛔ BOUNDARY VIOLATION — {title}: {len(block)} file(s) carry RESTRICTED material (credentials / keys / secrets)")
+    for rel, fs in block.items():
+        for f in fs[:5]: print(f"   {rel}:{f['line']}  [{f['class']}] {f['rule']}  {'<sample withheld>' if f['rule'].startswith(('secret', 'connection', 'bitrix', 'gpg')) else f['sample']}")
+    print("   → active access credentials never enter Git in plaintext: keep them in ~/.command-center and package them with secure_recovery.py backup")
     return 1
 
 def main(argv):

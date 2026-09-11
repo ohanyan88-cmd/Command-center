@@ -21,7 +21,12 @@ sys.path.insert(0, str(HERE.parent / "runtime")); import python_runtime; python_
 sys.path.insert(0, str(HERE))
 OVERLAY_DIR = HERE / "overlay"
 OVERLAY_JSON = HERE / "overlay.json"
-KEY_FILE = pathlib.Path(os.environ.get("COMMAND_CENTER_BACKUP_KEY") or (pathlib.Path.home() / ".command-center" / "overlay-backup.key"))
+def _default_key():
+    """ONE external recovery key (Mission 4.1): recovery.key; the pre-4.1 overlay-backup.key is honoured as a fallback."""
+    home = pathlib.Path(os.environ.get("COMMAND_CENTER_HOME") or (pathlib.Path.home() / ".command-center"))
+    rk = pathlib.Path(os.environ.get("COMMAND_CENTER_RECOVERY_KEY_FILE") or (home / "recovery.key"))
+    return rk if rk.exists() or not (home / "overlay-backup.key").exists() else home / "overlay-backup.key"
+KEY_FILE = pathlib.Path(os.environ.get("COMMAND_CENTER_BACKUP_KEY") or _default_key())
 BACKUP_DIR = pathlib.Path(os.environ.get("COMMAND_CENTER_BACKUP_DIR") or (pathlib.Path.home() / ".command-center" / "backups"))
 FORMAT = "overlay-backup/1 · tar(ustar, utf-8) · gpg --symmetric AES256 (s2k iterated) · manifest.json sha256 per file"
 

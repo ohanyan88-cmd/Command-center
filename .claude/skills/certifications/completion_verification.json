@@ -6,7 +6,7 @@
  "computed_maturity": "L4",
  "tests": [
   "test_boundary.S01_Classification.test_classes_defined_and_not_one_bucket",
-  "test_boundary.S01_Classification.test_path_rules_classify_overlay_and_generated_as_non_versionable",
+  "test_boundary.S01_Classification.test_path_rules_classify_awareness_vs_blocking",
   "test_boundary.S02_ContentDetection.test_real_core_files_are_clean",
   "test_boundary.S02_ContentDetection.test_safe_core_content_allowed",
   "test_boundary.S02_ContentDetection.test_salary_and_subscriber_leakage_detected",
@@ -44,6 +44,20 @@
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
   "test_integrations.I12_AuditAndPrivacy.test_audit_records_what_was_queried_not_the_payload",
   "test_integrations.I12_AuditAndPrivacy.test_cache_is_minimal_and_in_state_dir",
+  "test_portability.P01_TreeManifest.test_manifest_is_derived_from_policy_and_current",
+  "test_portability.P01_TreeManifest.test_out_of_date_manifest_is_detected",
+  "test_portability.P02_EmptyDirectoriesAndGitignore.test_every_required_directory_survives_a_git_clone",
+  "test_portability.P02_EmptyDirectoriesAndGitignore.test_gitignore_matches_the_durability_model",
+  "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
+  "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
+  "test_portability.P03_DurableState.test_workspace_export_exists_and_carries_no_secret",
+  "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
+  "test_portability.P04_SecureRecovery.test_workspace_artifact_manifest_has_no_values_and_key_is_external",
+  "test_portability.P05_MachineSpecificAndPaths.test_machine_dependencies_are_declared",
+  "test_portability.P05_MachineSpecificAndPaths.test_no_dependence_on_the_original_absolute_path",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
+  "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key",
+  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore",
   "test_skills.T07_VerificationAudit.test_completion_verification"
  ],
  "failure_tests": [
@@ -67,6 +81,8 @@
   "test_integrations.I08_DailyBriefLive.test_layer_down_is_explicit",
   "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted",
   "test_integrations.I10_Reconciliation.test_fact_authority_conflict_and_precedence",
+  "test_portability.P01_TreeManifest.test_out_of_date_manifest_is_detected",
+  "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
   "test_skills.T07_VerificationAudit.test_completion_verification_blocked_paths"
  ],
  "hardening_cases": [
@@ -108,6 +124,11 @@
   "test_integrations.I07_HealthAndTasks.test_schema_drift_and_missing_file_fail_closed",
   "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted",
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
+  "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
+  "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
+  "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
+  "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_entry_point_outside_venv_fails_closed_without_bootstrap",
@@ -135,7 +156,10 @@
   "test_integrations.I01_Registry.test_outlook_reader_is_pinned_and_has_no_write_member",
   "test_integrations.I02_ReadOnlyBoundary.test_bitrix_client_refuses_every_non_read_method",
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate",
-  "test_integrations.I06_Secrets.test_secret_never_leaks_into_envelope_health_cache_or_audit"
+  "test_integrations.I06_Secrets.test_secret_never_leaks_into_envelope_health_cache_or_audit",
+  "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
+  "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
+  "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key"
  ],
  "failure_injection": [
   "test_boundary.S03_GitStagingBoundary.test_pre_commit_hook_installed_and_blocks_commit",
@@ -157,6 +181,9 @@
   "test_integrations.I07_HealthAndTasks.test_schema_drift_and_missing_file_fail_closed",
   "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted",
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
+  "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
+  "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_entry_point_outside_venv_fails_closed_without_bootstrap",
@@ -176,6 +203,9 @@
   "test_integrations.I09_MeetingPrepAndOpenLoops.test_meeting_pack_from_live_calendar_with_related_context",
   "test_integrations.I09_MeetingPrepAndOpenLoops.test_open_loops_extract_candidates_not_facts",
   "test_integrations.I11_Certification.test_states_follow_evidence_and_fixture_reads_never_certify",
+  "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
+  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore",
   "test_skills.T07_VerificationAudit.test_completion_verification"
  ],
  "concurrency_tests": [
@@ -225,7 +255,7 @@
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-11T23:29:20",
+ "certified_at": "2026-09-12T00:44:37",
  "fingerprint": "74e5207dc728b7b1871b7bdc",
  "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
@@ -239,7 +269,8 @@
   "test_runtime",
   "test_business",
   "test_boundary",
-  "test_integrations"
+  "test_integrations",
+  "test_portability"
  ],
  "audit_infrastructure": true
 }

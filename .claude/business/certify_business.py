@@ -76,7 +76,11 @@ def certify(core, overlay, root=ROOT, d=HERE, registry=None, check_git=True):
         for py in sorted(d.glob("bm_*.py")) + [d / "build_business_model.py", d / "certify_business.py"]:
             rp_ += [f"{py.name}:{f['line']} {f['rule']} [{f['class']}]" for f in sensitive_scan.scan_content(f".claude/business/{py.name}", py.read_text(encoding='utf-8'), pol, names=[p["name"] for p in (overlay or {}).get("persons", []) if p["id"] != "@P0"])]
     except ImportError: rp_.append("sensitive_scan unavailable")
-    ok("no_restricted_in_core", rp_)
+    bc = set()
+    try: bc = sensitive_scan.blocking_classes(pol)
+    except Exception: bc = {"RESTRICTED"}
+    ok("no_restricted_in_core", [x for x in rp_ if any(f"[{c}]" in x for c in bc)])
+    ok("core_uses_person_tokens", [x for x in rp_ if "person_name_from_overlay" in x])
     # git boundary: index must not carry overlay/generated files; hooks installed
     gp, hp = [], []
     if check_git and (root / ".git").exists():
@@ -86,7 +90,7 @@ def certify(core, overlay, root=ROOT, d=HERE, registry=None, check_git=True):
             pol = sensitive_scan.load_policy()
             for rel in out:
                 cls, why = sensitive_scan.classify_path(rel, pol)
-                if cls in ("CONFIDENTIAL", "RESTRICTED"): gp.append(f"{rel} is tracked but classified {cls}")
+                if cls in sensitive_scan.blocking_classes(pol): gp.append(f"{rel} is tracked but classified {cls} (credential material)")
             if not sensitive_scan.hooks_installed(root): hp.append("pre-commit/pre-push boundary hooks not installed (run sensitive_scan.py --install-hooks)")
         except Exception as e: gp.append(f"git check failed: {e}")
     ok("versioned_core_clean", gp); ok("git_boundary_hooks_installed", hp)

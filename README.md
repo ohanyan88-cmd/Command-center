@@ -57,6 +57,31 @@ HouseNet ՍՊԸ · ամեն աշխատանքային օրը սկսվում է ա
 
 Հրամաններ՝ `python .claude/policy/validate_workspace.py` · `python .claude/skills/skill.py release` · `python .claude/skills/skill.py status`։
 
+## Դիմացկունություն — GitHub + մեկ վերականգնման բանալի = ամբողջական Command-center
+
+**Օրենք.** Կարևոր լոկալ-միայն ճշմարտություն չկա։ Այն, ինչ վաղը պետք է Deputy-ին կամ Գև-ին, կա՛մ (1) ուղիղ versioned է Git-ում, կա՛մ (2) versioned է որպես գաղտնագրված վերականգնման artifact, կա՛մ (3) դետերմինիստիկ վերակառուցվում է versioned բովանդակությունից։ Միայն ephemeral կամ մեքենային կապված տվյալն է լոկալ։
+
+Նոր համակարգիչ →
+```
+git clone https://github.com/ohanyan88-cmd/Command-center.git
+cd Command-center
+python bootstrap.py            # կամ py -3 bootstrap.py — idempotent, ոչինչ չի ջնջում/չի վերագրում
+```
+`bootstrap.py`՝ արմատ · նախապայմաններ (Python ≥3.11, git, gpg) · կանոնական պանակներ · `.venv` + pinned կախվածություններ · գաղտնագրված credential-ների վերականգնում (եթե բանալին կա) · Deputy-ի դիմացկուն state-ի import · boundary hooks · Business Model rebuild (sources → extract → build → validate → certify) · workspace + tree-manifest validation · checksums · business/integration certification · skill validation (`--release`՝ ամբողջական release) · վերջնական READY/NOT READY։
+
+| Ինչ | Որտեղ | Ինչպես է վերականգնվում |
+|:---|:---|:---|
+| `CLAUDE.md · README.md · Tasks.xlsx · Journal.md · Actions.md · bootstrap.py`, `00_Inbox…05_Archive` (բոլոր բիզնես փաստաթղթերը, աղբյուրները, արխիվները) | Git (VERSION_DIRECTLY) | clone. դատարկ պանակները՝ `.gitkeep`-ով |
+| Business Operating Model՝ core `bm_*.py` **և** overlay `overlay/ov_*.py` | Git (VERSION_DIRECTLY, Գև-ի որոշմամբ) | clone → `build_business_model.py` (generated json/md՝ REGENERATE) |
+| Deputy-ի դիմացկուն հիշողություն՝ commitments, decisions, audit, observations | Git՝ `.claude/state/durable/*.jsonl` (`state_snapshot.py export`, release-ում ավտոմատ) | bootstrap → `state_snapshot.py import` (idempotent, op_id-ով, կրկնություն չկա) |
+| Արտաքին համակարգերի credential-ներ (`~/.command-center/integrations/*.json`) | Git՝ `.secure/credentials.gpg` (GnuPG AES-256) + `.secure/manifest.json` (անուններ/checksum, ոչ արժեք) | bootstrap → `secure_recovery.py restore`, **միայն** վերականգնման բանալով |
+| Runtime (`.venv`), generated model/certification | REGENERATE | bootstrap |
+| SQLite store, journal, locks, integration cache/health, audit mirror, `settings.local.json`, `desktop.ini` | EPHEMERAL / MACHINE_LOCAL | չի versioned, վերստեղծվում է |
+
+**Մեկ արտաքին գաղտնիք՝ վերականգնման բանալին** `~/.command-center/recovery.key` (կամ `COMMAND_CENTER_RECOVERY_KEY_FILE`)։ Երբեք Git-ում, log-ում, audit-ում, տերմինալում։ Գև՝ պահիր պատճենը password manager-ում կամ արտաքին սարքի վրա (ֆայլի բովանդակությունը՝ մեկ տող)։ Առանց բանալու՝ ամեն ինչ վերականգնվում է, բացի արտաքին credential-ներից (ինտեգրումները մնում են NOT_CONFIGURED և դա ասվում է բարձրաձայն)։
+
+Կանոնական ծառի պայմանագիր՝ `.claude/policy/workspace_tree_manifest.json` (գեներացվում է policy-ից `tree_manifest.py build --write`-ով, validator-ը ստուգում է համապատասխանությունը և ֆիզիկական գոյությունը), checksum-ներ՝ `.claude/policy/durable_checksums.json`։ Parity՝ `tree_manifest.py snapshot` աղբյուրում և վերականգնվածում → `tree_manifest.py parity a b`։ Scanner-ի սեմանտիկա (2.0)՝ **արգելում է միայն RESTRICTED** (credential, token, գաղտնաբառ, private key, բանալի, connection string); բիզնես տեղեկատվությունը (անուններ, աշխատավարձ, փաստաթղթեր) CONFIDENTIAL awareness է՝ versioned Գև-ի որոշմամբ։ `.secure/`՝ գաղտնագրված artifact-ի պանակն է. `_TEMP_WORK_COLLECTION/`՝ ժամանակավոր staging, չի versioned մինչև Գև-ի review-ն։
+
 Business Operating Model՝ `.claude/business/`, երկու շերտ. **CORE** (INTERNAL, versioned)՝ `bm_*.py` authoring, `bm_schema.py`, `bm_targets.py`, `build_business_model.py`, `certify_business.py` — դերեր առանց վարձատրության, գործընթացներ, ownership ըստ ԴԵՐԻ, KPI-ներ, վերահսկվող targets/thresholds, playbooks, routines, gaps, աղբյուրների metadata, մարդիկ միայն `@P` token-ներով; **SENSITIVE OVERLAY** (CONFIDENTIAL, միայն լոկալ)՝ `overlay/ov_*.py` → `overlay.json` (անուն ↔ token, դեր ↔ մարդ, աշխատավարձ, առևտրային թվեր, ապացույցներ)։ Գեներացված `*.json`/`Business-model.md`/`certification.json`՝ լոկալ։ Pipeline՝ sources → extract → validate → core → overlay → fingerprint → certify (schema 2.0, model_version, source snapshot; STALE_MODEL/SOURCE_MISSING հայտնաբերում)։ Սահմանը մեխանիկական է՝ `.claude/policy/data_classification.json` (PUBLIC/INTERNAL/CONFIDENTIAL/RESTRICTED) + `sensitive_scan.py` (pre-commit/pre-push hooks, validator, certification)։ Engine-ը ամեն governed գործարկման մեջ ներարկում է business context (playbook, KPI, process, owner ROLE → CURRENT PERSON միայն CONFIRMED assignment-ով, sources, model identity, gap codes՝ OWNER_UNKNOWN · KPI_DEFINITION_MISSING · PROCESS_UNDEFINED · TARGET_UNKNOWN · APPROVAL_RULE_UNKNOWN · SOURCE_CONFLICT · STALE_MODEL · SOURCE_CHANGED · SOURCE_MISSING · BUSINESS_CONTEXT_MISSING)։ Չատից եկած գիտելիքը միայն OBSERVATION է (state store), core-ը չի փոխում. promotion՝ OBSERVATION → PROPOSED → CONFIRMED → APPROVED → SUPERSEDED։ Private Git-ը secrets database չէ. սահմանը գործում է անկախ repo-ի visibility-ից։
 
 ## Live աղբյուրներ — ինտեգրման շերտ (ՄԻԱՅՆ ԿԱՐԴԱԼ)

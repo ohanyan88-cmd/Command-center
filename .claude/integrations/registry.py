@@ -8,7 +8,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 
 REQUIRED_FIELDS = ("integration_id", "system", "purpose", "auth", "data_accessible", "classification", "authority", "freshness", "owner_role",
-                   "read_ops", "write_ops", "required_certification_ops", "availability", "failure_behavior", "adapter", "critical", "expected_identity", "unblock")
+                   "read_ops", "write_ops", "required_certification_ops", "availability", "failure_behavior", "adapter", "critical", "expected_identity", "unblock", "machine_dependency")
 
 # Integrity pin of the fixed read-only Outlook reader (sha256 of outlook_read.ps1). The adapter refuses a modified reader.
 OUTLOOK_READER_SHA256 = "9494203c5b60877c2b060204e6473cbe68c7fe65a65126f7747f263cf857ea30"
@@ -24,7 +24,7 @@ INTEGRATIONS = {
   "freshness": {"max_age_seconds": 14 * 24 * 3600, "cache_ttl_seconds": 30, "persist": True, "rule": "skill registry source_policy: tracker older than 14 days → STALE_SOURCE (acknowledged, not silent); persisted cache expires hard after 30s"},
   "owner_role": "Վաճառքի և գործառնական ղեկավար (Gev) — hand-edited register", "read_ops": {"tasks.list": {"kind": "task", "params": ["open_only", "status", "owner"]}}, "write_ops": [], "required_certification_ops": ["tasks.list"],
   "availability": "whenever the workspace is mounted", "failure_behavior": "file missing → UNAVAILABLE; header drift → SCHEMA_CHANGED (fail closed, no partial parse)",
-  "adapter": "adapter_tasks", "critical": True, "expected_identity": {"path": "Tasks.xlsx", "sheet": "ԱՌԱՋԱԴՐԱՆՔՆԵՐ"}, "unblock": None},
+  "adapter": "adapter_tasks", "critical": True, "expected_identity": {"path": "Tasks.xlsx", "sheet": "ԱՌԱՋԱԴՐԱՆՔՆԵՐ"}, "unblock": None, "machine_dependency": None},
  "INT-OL-CAL": {
   "integration_id": "INT-OL-CAL", "system": "Outlook desktop calendar (MAPI, signed-in Windows profile)", "purpose": "Today's and upcoming meetings: time, title, participants, location, description preview, online link — for the Daily Brief, meeting preparation, deadline awareness and schedule conflicts.",
   "auth": {"mechanism": "Outlook desktop session of the signed-in Windows user, read through the fixed PowerShell reader outlook_read.ps1 (integrity-pinned); no token, no password handled by Deputy", "secrets": []},
@@ -32,7 +32,8 @@ INTEGRATIONS = {
   "authority": {"rank": 4, "name": "LIVE_SYSTEM", "business_source": None, "note": "authoritative for meeting time/participants ONLY as configured in FACT_AUTHORITY"},
   "freshness": dict(_NO_FRESHNESS_RULE), "owner_role": "Gev (mailbox owner)", "read_ops": {"calendar.events": {"kind": "meeting", "params": ["from", "to", "limit"]}}, "write_ops": [], "required_certification_ops": ["calendar.events"],
   "availability": "only while classic Outlook is running on this PC in the same Windows session", "failure_behavior": "Outlook not reachable → UNAVAILABLE (last successful read reported); reader modified → READ_ONLY_VIOLATION; wrong mailbox → WRONG_TENANT; pwsh missing → TOOL_UNAVAILABLE",
-  "adapter": "adapter_outlook", "critical": True, "expected_identity": {"mailbox_domain": "housenet.am"}, "unblock": "classic Outlook running and signed in as the owner on this PC (New Outlook has no MAPI/COM surface)"},
+  "adapter": "adapter_outlook", "critical": True, "expected_identity": {"mailbox_domain": "housenet.am"}, "unblock": "classic Outlook running and signed in as the owner on this PC (New Outlook has no MAPI/COM surface)",
+  "machine_dependency": "classic Outlook desktop session signed in as the owner (Windows, same user session, pwsh)"},
  "INT-OL-MAIL": {
   "integration_id": "INT-OL-MAIL", "system": "Outlook desktop mailbox (MAPI, signed-in Windows profile)", "purpose": "Read/search permitted mail (Inbox, Sent): unanswered requests, commitments, waiting-for, decisions requested, follow-ups, escalations, meeting context — extracted as CANDIDATE_OPEN_LOOP, never as permanent truth.",
   "auth": {"mechanism": "same Outlook session as INT-OL-CAL via outlook_read.ps1 (read-only; never marks read, moves, deletes or sends)", "secrets": []},
@@ -40,7 +41,8 @@ INTEGRATIONS = {
   "authority": {"rank": 2, "name": "EVIDENCE", "business_source": None, "note": "mail is evidence of a request/promise — below the task register and below live systems of record"},
   "freshness": dict(_NO_FRESHNESS_RULE), "owner_role": "Gev (mailbox owner)", "read_ops": {"mail.list": {"kind": "message", "params": ["folder", "since", "limit", "unread_only"]}, "mail.search": {"kind": "message", "params": ["query", "since", "limit", "folder"]}}, "write_ops": [], "required_certification_ops": ["mail.list", "mail.search"],
   "availability": "as INT-OL-CAL", "failure_behavior": "as INT-OL-CAL; body previews are never persisted outside the short-lived cache in .claude/state",
-  "adapter": "adapter_outlook", "critical": False, "expected_identity": {"mailbox_domain": "housenet.am"}, "unblock": "as INT-OL-CAL"},
+  "adapter": "adapter_outlook", "critical": False, "expected_identity": {"mailbox_domain": "housenet.am"}, "unblock": "as INT-OL-CAL",
+  "machine_dependency": "classic Outlook desktop session signed in as the owner (Windows, same user session, pwsh)"},
  "INT-B24": {
   "integration_id": "INT-B24", "system": "Bitrix24 CRM (REST)", "purpose": "Leads, deals, stages, owners, CRM tasks and activities — the system where the real sales pipeline and operational tasks live (SYS-B24).",
   "auth": {"mechanism": "inbound webhook (per-user REST code) or OAuth app token with READ scopes (crm, task, user); GET-only client with a fixed method allowlist", "secrets": ["webhook_url"]},
@@ -52,14 +54,15 @@ INTEGRATIONS = {
   "required_certification_ops": ["identity", "crm.deals", "crm.stages", "tasks.list"],
   "availability": "portal reachable over HTTPS with a valid read-scoped token", "failure_behavior": "no token → NOT_CONFIGURED; expired/invalid token → AUTH_FAILED; insufficient scope → PERMISSION_DENIED; QUERY_LIMIT_EXCEEDED → RATE_LIMITED (DEGRADED); 5xx/network → UNAVAILABLE; non-JSON → MALFORMED_RESPONSE; missing 'result' → SCHEMA_CHANGED; paged 'next' → partial=True; portal host ≠ configured → WRONG_TENANT",
   "adapter": "adapter_bitrix24", "critical": False, "expected_identity": {"portal_domain": "UNKNOWN until configured (config key portal_domain)"},
-  "unblock": "Gev (or the Bitrix24 admin) creates an INBOUND WEBHOOK with read permissions only (CRM, Tasks, Users) and stores it OUTSIDE Git: ~/.command-center/integrations/INT-B24.json {\"webhook_url\": \"https://<portal>.bitrix24.<tld>/rest/<user>/<code>/\", \"portal_domain\": \"<portal>.bitrix24.<tld>\"}; then python .claude/integrations/integration.py certify"},
+  "unblock": "Gev (or the Bitrix24 admin) creates an INBOUND WEBHOOK with read permissions only (CRM, Tasks, Users) and stores it OUTSIDE Git: ~/.command-center/integrations/INT-B24.json {\"webhook_url\": \"https://<portal>.bitrix24.<tld>/rest/<user>/<code>/\", \"portal_domain\": \"<portal>.bitrix24.<tld>\"}; then python .claude/integrations/integration.py certify",
+  "machine_dependency": None},
  "INT-MB": {
   "integration_id": "INT-MB", "system": "MikroBill billing", "purpose": "Subscriber/customer counts, activations, disconnects, tariffs, statuses, balances/revenue, service state, churn indicators — the source of truth for billing (S11).",
   "auth": {"mechanism": "UNKNOWN — no API/DB interface inventoried yet (Open-questions #7, U04)", "secrets": ["dsn_or_api_url", "token_or_password"]}, "data_accessible": ["UNKNOWN until the interface is inventoried"], "classification": "CONFIDENTIAL",
   "authority": {"rank": 5, "name": "SOURCE_OF_TRUTH_BILLING", "business_source": "SYS-MB (S04/S07/S11)", "note": "Gev's position 2026-09-09: MikroBill = source of truth for billing facts"},
   "freshness": dict(_NO_FRESHNESS_RULE), "owner_role": "Բիլինգի և եկամտի ղեկավար (4.1) — person DERIVED @P2", "read_ops": {}, "write_ops": [], "required_certification_ops": [],
   "availability": "UNKNOWN", "failure_behavior": "every query → NOT_CONFIGURED with the exact requirement; no field is mapped until verified",
-  "adapter": "adapter_mikrobill", "critical": False, "expected_identity": None,
+  "adapter": "adapter_mikrobill", "critical": False, "expected_identity": None, "machine_dependency": "UNKNOWN until the interface is inventoried",
   "unblock": "Billing head (role 4.1) / @P1 provides: (1) the interface (read-only DB user with a dedicated read-only role/replica, OR documented REST API + read token), (2) the field/status dictionary (incl. the 8 subscriber statuses, U08), (3) written authorization for Deputy read access; then an adapter with verified field mapping is added and certified"},
 }
 

@@ -130,7 +130,8 @@ def _pii_flags(records):
         import sensitive_scan as ss
         pol = ss.load_policy(); blob = json.dumps(records, ensure_ascii=False, default=str)
         fs = ss.scan_content("live-record", blob, pol, names=[])
-        return sorted({f["rule"] for f in fs if f["class"] == "RESTRICTED" and not f["rule"].startswith("email_")})
+        pii = {"phone_am_mobile", "subscriber_login_id"}                                   # awareness-class PII patterns are still flagged inside live payloads
+        return sorted({f["rule"] for f in fs if (f["class"] in ss.blocking_classes(pol) or f["rule"] in pii) and not f["rule"].startswith("email_")})
     except Exception: return []
 
 def capability(intent_text, integration_id=None):

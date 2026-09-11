@@ -42,7 +42,7 @@
   "eval:r_tariff"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-11T23:29:20",
+ "certified_at": "2026-09-12T00:44:37",
  "fingerprint": "be0c25915a8dd642a19c3c4e",
  "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
@@ -56,7 +56,8 @@
   "test_runtime",
   "test_business",
   "test_boundary",
-  "test_integrations"
+  "test_integrations",
+  "test_portability"
  ],
  "audit_infrastructure": false
 }

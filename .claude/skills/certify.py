@@ -21,7 +21,7 @@ sys.path.insert(0, str(HERE.parent / "runtime")); import python_runtime; python_
 sys.path.insert(0, str(HERE)); sys.path.insert(0, str(TESTS))
 import engine
 
-SUITES = ["test_skills", "test_store", "test_failclosed", "test_hardening", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations"]
+SUITES = ["test_skills", "test_store", "test_failclosed", "test_hardening", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations", "test_portability"]
 KIND_FIELD = {"unit": "tests", "failure": "failure_tests", "adversarial": "hardening_cases", "failure_injection": "hardening_cases",
               "authority": "authority_tests", "completion": "completion_verification", "concurrency": "concurrency_tests",
               "enforcement": "enforcement_tests", "routing": "routing_evals"}

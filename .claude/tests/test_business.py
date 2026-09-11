@@ -242,7 +242,7 @@ class B08_RealModel(unittest.TestCase):
         import certify_business as cb
         core, ov = cb.load_built(); rec = cb.certify(core, ov)
         self.assertEqual(rec["result"], "PASS", {k: v for k, v in rec["checks"].items() if not v["pass"]})
-        for name in ("schema_valid", "provenance_complete", "sensitive_boundary_clean", "no_history_contamination", "ownership_constraints", "conflicts_explicit", "unknowns_explicit", "playbook_references", "kpi_references", "process_references", "source_fingerprints_current", "no_restricted_in_core", "versioned_core_clean", "git_boundary_hooks_installed"):
+        for name in ("schema_valid", "provenance_complete", "sensitive_boundary_clean", "no_history_contamination", "ownership_constraints", "conflicts_explicit", "unknowns_explicit", "playbook_references", "kpi_references", "process_references", "source_fingerprints_current", "no_restricted_in_core", "core_uses_person_tokens", "versioned_core_clean", "git_boundary_hooks_installed"):
             self.assertIn(name, rec["checks"]); self.assertTrue(rec["checks"][name]["pass"], name)
         self.assertEqual(rec["core_fingerprint"], business.load()["sources"]["meta"]["core_fingerprint"])
     @covers(BQ, "source_verification", kinds=("unit", "failure", "failure_injection"))

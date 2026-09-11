@@ -90,7 +90,7 @@
   "test_skills.T02_Router.test_dependency_order"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-11T23:29:20",
+ "certified_at": "2026-09-12T00:44:37",
  "fingerprint": "7cb4726f8f2c53195f811c4f",
  "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
@@ -104,7 +104,8 @@
   "test_runtime",
   "test_business",
   "test_boundary",
-  "test_integrations"
+  "test_integrations",
+  "test_portability"
  ],
  "audit_infrastructure": false
 }

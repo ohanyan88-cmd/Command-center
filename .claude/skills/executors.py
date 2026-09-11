@@ -600,8 +600,8 @@ def memory_retrieval(inputs, skill=None, reg=None):
     q = _norm(inputs.get("query", inputs.get("context", ""))); hits = []
     if not q: return {"status": "BLOCKED", "code": "MISSING_INPUT", "reason": "query missing (what to find)"}
     files = list((ROOT).glob("*.md")) + list((ROOT / ".claude" / "docs").glob("*.md")) + list((ROOT / "01_Active").rglob("*.md")) + [ROOT / "00_Inbox" / "Input.md"]
-    mem = pathlib.Path.home() / ".claude/projects/c--Users-Admin-Desktop-Command-center/memory"
-    if mem.exists(): files += list(mem.glob("*.md"))
+    for mem in (pathlib.Path.home() / ".claude" / "projects").glob("*Command-center*/memory"):      # machine-local Claude memory, wherever this clone lives
+        if mem.is_dir(): files += list(mem.glob("*.md"))
     for f in files:
         try: txt = f.read_text(encoding="utf-8")
         except Exception: continue

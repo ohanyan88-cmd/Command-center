@@ -141,7 +141,7 @@ def main(argv):
         return 0
 
     if cmd == "test":
-        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations"], cwd=str(HERE.parent / "tests"))
+        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations", "test_portability"], cwd=str(HERE.parent / "tests"))
     if cmd == "hardening":
         return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_hardening"], cwd=str(HERE.parent / "tests"))
     if cmd == "eval":
@@ -160,12 +160,20 @@ def main(argv):
         print("\n══════ INTEGRATION CERTIFICATION ══════")
         rc = subprocess.call([sys.executable, str(HERE.parent / "integrations" / "certify_integrations.py")], cwd=str(HERE.parent / "integrations"))
         if rc != 0: print("\nRELEASE STOPPED at integration certification (rc={}) — see .claude/integrations/certification.json".format(rc)); return rc
+        # DURABILITY (Mission 4.1): export durable state, regenerate the tree manifest and refresh durable checksums so Git carries everything
+        print("\n══════ DURABILITY ══════")
+        for step, args in (("state export", [str(HERE.parent / "runtime" / "state_snapshot.py"), "export"]), ("tree manifest", [str(HERE.parent / "policy" / "tree_manifest.py"), "build", "--write"])):
+            rc = subprocess.call([sys.executable] + args, cwd=str(HERE))
+            if rc != 0: print(f"\nRELEASE STOPPED at durability step {step} (rc={rc})"); return rc
         for step, args in (("workspace", [str(HERE.parent / "policy" / "validate_workspace.py")]), ("build", [str(HERE / "build_registry.py")]), ("certify", [str(HERE / "certify.py")]),
                            ("validate", [str(HERE / "skill.py"), "validate"]), ("eval", [str(HERE.parent / "tests" / "evals.py")])):
             print(f"\n══════ {step.upper()} ══════")
             rc = subprocess.call([sys.executable] + args, cwd=str(HERE))
             if rc != 0: print(f"\nRELEASE STOPPED at {step} (rc={rc})"); return rc
-        print("\nRELEASE OK — workspace contract satisfied, registry built, per-skill certified, validated, evals green"); return 0
+        # durable checksums LAST: they must describe the tree as it will be committed (registry + certifications are rewritten by certify)
+        rc = subprocess.call([sys.executable, str(HERE.parent / "policy" / "tree_manifest.py"), "checksums", "--write"], cwd=str(HERE))
+        if rc != 0: print(f"\nRELEASE STOPPED at durability step checksums (rc={rc})"); return rc
+        print("\nRELEASE OK — workspace contract satisfied, registry built, per-skill certified, validated, evals green, durable checksums refreshed"); return 0
     print(__doc__); return 1
 
 if __name__ == "__main__":

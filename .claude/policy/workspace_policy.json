@@ -1,5 +1,5 @@
 {
-  "policy_version": "1.5.0",
+  "policy_version": "1.6.0",
   "workspace_name": "Command-center",
   "identity": {
     "name": "Deputy",
@@ -138,15 +138,17 @@
   },
   "reserved_technical_names": {
     "root_files": [
+      ".gitattributes",
+      ".gitignore",
       "CLAUDE.md",
       "README.md",
-      ".gitignore",
-      ".gitattributes",
+      "bootstrap.py",
       "desktop.ini"
     ],
     "root_dirs": [
       ".claude",
       ".git",
+      ".secure",
       ".venv"
     ],
     "anywhere_files": [
@@ -163,14 +165,16 @@
       "Actions.md",
       ".gitignore",
       ".gitattributes",
-      "desktop.ini"
+      "desktop.ini",
+      "bootstrap.py"
     ],
     "required_files": [
       "CLAUDE.md",
       "README.md",
       "Tasks.xlsx",
       "Journal.md",
-      "Actions.md"
+      "Actions.md",
+      "bootstrap.py"
     ],
     "allowed_dirs": [
       "00_Inbox",
@@ -181,7 +185,9 @@
       "05_Archive",
       ".claude",
       ".git",
-      ".venv"
+      ".venv",
+      "_TEMP_WORK_COLLECTION",
+      ".secure"
     ],
     "required_dirs": [
       "00_Inbox",
@@ -190,7 +196,8 @@
       "03_Completed",
       "04_Sources",
       "05_Archive",
-      ".claude"
+      ".claude",
+      ".secure"
     ],
     "unknown_entries": "fail"
   },
@@ -637,7 +644,9 @@
       "required": true,
       "allowed_extensions": "*",
       "naming_rule": "generated",
-      "subdirs": "controlled"
+      "subdirs": "controlled",
+      "durable_subdir": "durable",
+      "note_durability": "runtime store (SQLite + journal + locks + integration cache/health) is MACHINE-LOCAL/EPHEMERAL; the canonical DURABLE export lives in .claude/state/durable (commitments, decisions, audit, observations) and is versioned; bootstrap imports it idempotently"
     },
     ".claude/audit": {
       "kind": "audit",
@@ -665,13 +674,41 @@
         "secrets are read from the environment or ~/.command-center/integrations, never from the repository",
         "generated *.json stay local (.gitignore + sensitive_scan)"
       ]
+    },
+    ".secure": {
+      "kind": "encrypted-recovery",
+      "purpose": "Encrypted recovery artifacts (active external-system credentials) + plaintext manifest without secret values. Decryptable only with the ONE external recovery key (~/.command-center/recovery.key), which never enters Git.",
+      "canonical": true,
+      "required": true,
+      "subdirs": "forbidden",
+      "naming_rule": "technical",
+      "allowed_files": [
+        "manifest.json",
+        "credentials.gpg",
+        "README.md",
+        ".gitkeep"
+      ],
+      "invariants": [
+        "credentials.gpg is GnuPG symmetric AES-256 (no custom crypto)",
+        "manifest.json lists names/checksums/restore paths only",
+        "no *.plain/*.dec/*.tmp file may persist here"
+      ]
+    },
+    ".claude/state/durable": {
+      "kind": "durable-state-export",
+      "purpose": "Deterministic canonical export of Deputy's durable operating memory (state_snapshot.py export/import).",
+      "canonical": true,
+      "required": true,
+      "subdirs": "forbidden",
+      "naming_rule": "technical"
     }
   },
   "generated_exclusions": {
     "ignored_dir_names": [
       "__pycache__",
       ".git",
-      ".venv"
+      ".venv",
+      "_TEMP_WORK_COLLECTION"
     ],
     "ignored_file_globs": [
       "*.pyc",
@@ -735,6 +772,9 @@
         ".claude/business/overlay",
         "05_Archive",
         ".claude/integrations"
+      ],
+      "root_exceptions": [
+        "bootstrap.py"
       ]
     },
     "runtime_markers": {
@@ -747,7 +787,8 @@
       "must_live_under": [
         ".claude/state",
         ".claude/audit",
-        "05_Archive"
+        "05_Archive",
+        ".claude/state/durable"
       ]
     },
     "test_markers": {
@@ -781,5 +822,62 @@
       ".claude/docs/Job-description.md"
     ],
     "note": "relative links must resolve; anchors and URLs are ignored"
+  },
+  "temporary_staging": {
+    "dir": "_TEMP_WORK_COLLECTION",
+    "since": "2026-09-11",
+    "authorized_by": "Gev",
+    "purpose": "one-off consolidation of scattered work material from this PC before Mission 4.1; staging only — not part of the taxonomy, never committed, removed after Gev's review",
+    "rules": [
+      "contents are not validated against naming rules (ignored subtree)",
+      "gitignored + classified CONFIDENTIAL (sensitive_scan blocks staging)",
+      "no credentials are moved here"
+    ]
+  },
+  "durability": {
+    "law": "No important local-only durable truth. Everything Deputy or Gev needs tomorrow is (1) versioned directly, (2) versioned as an encrypted recovery artifact, or (3) deterministically reproducible from versioned content. Only ephemeral or machine-specific data stays local.",
+    "canonical_repository": "ohanyan88-cmd/Command-center (branch main)",
+    "bootstrap": "python bootstrap.py",
+    "tree_manifest": ".claude/policy/workspace_tree_manifest.json (generated from this policy by tree_manifest.py; validator checks both)",
+    "checksums": ".claude/policy/durable_checksums.json (sha256 of durable files; refreshed by release/bootstrap)",
+    "recovery_key": {
+      "path": "~/.command-center/recovery.key (or COMMAND_CENTER_RECOVERY_KEY_FILE / $COMMAND_CENTER_HOME/recovery.key)",
+      "rule": "the ONE intentionally external secret: never in Git, never printed, never in audit/state; Gev keeps a copy in a password manager or on an external device"
+    },
+    "classes": {
+      "VERSION_DIRECTLY": [
+        "CLAUDE.md",
+        "README.md",
+        "bootstrap.py",
+        "Tasks.xlsx",
+        "Journal.md",
+        "Actions.md",
+        "00_Inbox … 05_Archive (all business documents, sources, archives)",
+        ".claude/business/bm_*.py + overlay/ov_*.py",
+        ".claude/state/durable/*",
+        ".claude/docs, hooks, policy, runtime, skills, tools, tests, integrations (code)",
+        ".secure/manifest.json"
+      ],
+      "VERSION_ENCRYPTED": [
+        ".secure/credentials.gpg (active external-system credentials from ~/.command-center/integrations)"
+      ],
+      "REGENERATE": [
+        ".venv",
+        ".claude/business/*.json + Business-model.md + certification.json",
+        ".claude/integrations/certification.json",
+        "__pycache__",
+        ".claude/skills/registry.json is versioned but rebuilt by release"
+      ],
+      "MACHINE_LOCAL": [
+        ".claude/settings.local.json",
+        "desktop.ini",
+        "~/.command-center/* (recovery key, secret configs, overlay backups)",
+        "Outlook desktop session"
+      ],
+      "EPHEMERAL": [
+        ".claude/state/skill_state.db (+wal/shm), journal.jsonl, tickets, integrations_cache/health json, *.lock, .claude/audit/skill_audit.jsonl mirror (the store export is the durable form)",
+        "_TEMP_WORK_COLLECTION (staging, pending Gev's review)"
+      ]
+    }
   }
 }

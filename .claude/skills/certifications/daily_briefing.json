@@ -9,6 +9,7 @@
   "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
   "test_integrations.I03_Envelope.test_normalized_envelope_provenance_freshness_and_cache",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_skills.T05_Execution.test_daily_briefing",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -46,7 +47,8 @@
   "test_integrations.I03_Envelope.test_failure_keeps_stale_cache_explicit_never_as_current",
   "test_integrations.I04_FailureMatrix.test_every_failure_code_maps_to_a_structured_envelope_and_health",
   "test_integrations.I04_FailureMatrix.test_tool_unavailable_when_powershell_missing",
-  "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted"
+  "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
  ],
  "adversarial": [
   "test_hardening.H01_RegistryFailureInjection.test_bad_authority_rejected",
@@ -69,7 +71,8 @@
   "test_integrations.I03_Envelope.test_failure_keeps_stale_cache_explicit_never_as_current",
   "test_integrations.I04_FailureMatrix.test_every_failure_code_maps_to_a_structured_envelope_and_health",
   "test_integrations.I04_FailureMatrix.test_tool_unavailable_when_powershell_missing",
-  "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted"
+  "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
  ],
  "authority_tests": [
   "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
@@ -82,6 +85,7 @@
   "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
   "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_skills.T05_Execution.test_daily_briefing",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -98,7 +102,7 @@
   "test_skills.T02_Router.test_dependency_order"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-11T23:29:20",
+ "certified_at": "2026-09-12T00:44:37",
  "fingerprint": "81c052a9eb6f06eb786f3186",
  "core_fingerprint": "054b5e18ba1d5ff9",
  "result": "PASS",
@@ -112,7 +116,8 @@
   "test_runtime",
   "test_business",
   "test_boundary",
-  "test_integrations"
+  "test_integrations",
+  "test_portability"
  ],
  "audit_infrastructure": false
 }
