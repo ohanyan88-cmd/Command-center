@@ -171,4 +171,9 @@
 - Engine՝ գրող intent-ները այլևս «անհասանելի գործիք» չեն, ուղղորդվում են action_runtime (63 հմտություն)։ Հաստատման/մերժման տեքստը՝ նույն հմտությանը («cancel X» = գործողություն, ոչ մերժում)։
 - Դիմացկունություն՝ `actions` աղյուսակը durable export/import-ում (idempotency-ն restart-ից հետո), manifest 72 entry։
 - ⚠ Միջադեպ (փակված)՝ test-ի առաջին վազքը իրական Tasks.xlsx-ում ստեղծել/փոփոխել էր «TEST — hands certification» տողը (adapter-ը լռելյայն կանոնական ռեեստրն էր վերցնում)։ Վերականգնվեց git-ից (15 առաջադրանք, TEST տող չկա); արմատային ուղղում՝ `register_path` պարամետր + env guard + sha ստուգում (թեստ/eval այլևս ֆիզիկապես չեն կարող դիպչել իրական ռեեստրին)։
-- Live գրելու վկայագրում՝ ՉԻ ԿԱՏԱՐՎԵԼ. սպասում է Գև-ի բացահայտ հաստատմանը (READY FOR LIVE CERTIFICATION քարտ)։
+- Live գրելու վկայագրում՝ սկզբում ՉԻ ԿԱՏԱՐՎԵԼ (READY FOR LIVE CERTIFICATION քարտ), հետո՝ տես հաջորդ գրառումը։
+
+## 2026-09-12 · Mission 4.2 — առաջին live գրառում + հաստատող բառեր
+- Գև-ի «GO»-ով (ticket 8297f25baf) կատարվեց ACT-ef5fb6b5d0՝ Tasks.xlsx-ում test տող id 16 (row 28) «TEST — Deputy live write certification (delete after)», պատասխանատու Գև։ VERIFIED երեք անկախ ընթերցումով (engine read-back, ինտեգրման շերտ count 15→16, հում sheet XML)։ INT-TASKS tasks.create → VERIFIED_WRITE (`write_certifications.json`)։
+- Cleanup քարտ ACT-0854f55fe0 (task 16 → Արված)՝ պատրաստ, սպասում է հաստատման։ «օք»-ը runtime-ը ճանաչեց AMBIGUOUS՝ fail closed, ոչինչ չկատարվեց։
+- Գև-ի խնդրանքով հաստատող բառերին ավելացվեցին հայատառ `այո` (արդեն կար), `օք`, `օկ`, `գո`, `գօ` (actions.py APPROVAL_RX + MODIFIED նախածանց, թեստերով)։ Runtime-ը այսուհետ ինքն է գրանցում VERIFIED_WRITE-ը, երբ գործողությունը նշված է `source_context.certification`-ով։

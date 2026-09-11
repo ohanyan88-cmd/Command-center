@@ -21,7 +21,7 @@ RISK = {"R0": "local technical / non-business mutation", "R1": "low-impact busin
 RISK_LEVEL = {"R0": "EXECUTE_REVERSIBLE", "R1": "EXECUTE_EXTERNAL", "R2": "EXECUTE_EXTERNAL", "R3": "EXECUTE_MATERIAL"}
 TOKEN_TTL_HOURS = 24
 MATERIAL_KEYS = ("target_system", "target_operation", "target_object_type", "target_object_id", "parameters", "expected_effect", "authority_scope")
-APPROVAL_RX = re.compile(r"^\s*(ok(ay)?|go|yes|approved?|do it|execute|confirm(ed)?|արա|արեք|այո|հաստատում եմ|հաստատեցի|կատարիր|go ahead|ok go|go ok)\s*[.!]*\s*$", re.I)
+APPROVAL_RX = re.compile(r"^\s*(ok(ay)?|go|yes|approved?|do it|execute|confirm(ed)?|արա|արեք|այո|օք|օկ|գո|գօ|հաստատում եմ|հաստատեցի|կատարիր|go ahead|ok go|go ok)\s*[.!]*\s*$", re.I)   # օք/օկ/գո/գօ = Armenian-letter OK/GO (Gev, 2026-09-12)
 MODIFIER_RX = re.compile(r"\b(but|except|instead|however|only if|change|բայց|փոխիր|փոխի|սակայն)\b", re.I)
 REJECT_RX = re.compile(r"^\s*(no|nope|reject(ed)?|don't|do not|ոչ|չէ|մի արա)\b|^\s*(cancel|stop|չեղարկիր|չեղարկի)\s*(it|that|this|the action|էդ|դա)?\s*[.!]*$", re.I)   # 'cancel'/'stop' reject only standalone — "cancel tomorrow's meeting" is an ACTION to prepare
 
@@ -195,7 +195,7 @@ def classify_approval(text):
     if not t: return "AMBIGUOUS"
     if REJECT_RX.match(t): return "REJECTION"
     if APPROVAL_RX.match(t): return "APPROVAL"
-    if re.match(r"^\s*(ok(ay)?|go|yes|արա|այո|հաստատում եմ)\b", t, re.I) and MODIFIER_RX.search(t): return "MODIFIED"
+    if re.match(r"^\s*(ok(ay)?|go|yes|արա|այո|օք|օկ|գո|գօ|հաստատում եմ)\b", t, re.I) and MODIFIER_RX.search(t): return "MODIFIED"
     return "AMBIGUOUS"
 
 def approve(text, *, action_id=None, batch_id=None, session_id=None, by="Gev", ticket_id=None):
@@ -308,6 +308,12 @@ def _verify(a, prov, ticket_id=None):
     if v.get("verified"):
         a["state"] = "VERIFIED"; a["history"].append({"at": _now(), "state": "VERIFIED"}); a["memory"] = _update_memory(a); _save(a)
         _audit({"execution_id": a["action_id"], "ticket_id": ticket_id, "result_status": "VERIFIED", "evidence": v.get("evidence"), "memory": a["memory"]}, required=False)
+        if (req.get("source_context") or {}).get("certification"):          # Gev-approved live certification write → durable VERIFIED_WRITE evidence (never inferred from tests)
+            try:
+                from capabilities import record_write_certification
+                a["certification"] = record_write_certification(req["target_system"], req["target_operation"], a["action_id"], v.get("evidence")); _save(a)
+            except Exception as e:
+                a["codes"].append("CERTIFICATION_NOT_RECORDED"); a["history"].append({"at": _now(), "state": "VERIFIED", "code": "CERTIFICATION_NOT_RECORDED", "reason": str(e)[:200]}); _save(a)
     else:
         a["state"] = "EXECUTED_UNVERIFIED"; a["codes"].append("VERIFICATION_MISMATCH"); a["history"].append({"at": _now(), "state": "EXECUTED_UNVERIFIED", "code": "VERIFICATION_MISMATCH", "reason": v.get("reason")}); _save(a)
         _audit({"execution_id": a["action_id"], "ticket_id": ticket_id, "result_status": "VERIFICATION_FAILED", "reason": v.get("reason")}, required=False)

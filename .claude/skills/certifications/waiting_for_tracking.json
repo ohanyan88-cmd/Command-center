@@ -65,7 +65,7 @@
   "test_skills.T02_Router.test_chain_meeting_prep"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T01:59:22",
+ "certified_at": "2026-09-12T02:13:20",
  "fingerprint": "6a04d9c82b8bb0b24be84ad2",
  "core_fingerprint": "ff70cd82ecc16905",
  "result": "PASS",

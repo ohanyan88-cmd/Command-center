@@ -1,15 +1,14 @@
 {
  "skill_id": "daily_briefing",
  "skill_version": "1.2.0",
- "maturity_level": "L4",
+ "maturity_level": "L1",
  "declared_maturity": "L4",
- "computed_maturity": "L4",
+ "computed_maturity": "L1",
  "tests": [
   "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
   "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
   "test_integrations.I03_Envelope.test_normalized_envelope_provenance_freshness_and_cache",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_skills.T05_Execution.test_daily_briefing",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -47,8 +46,7 @@
   "test_integrations.I03_Envelope.test_failure_keeps_stale_cache_explicit_never_as_current",
   "test_integrations.I04_FailureMatrix.test_every_failure_code_maps_to_a_structured_envelope_and_health",
   "test_integrations.I04_FailureMatrix.test_tool_unavailable_when_powershell_missing",
-  "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
+  "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted"
  ],
  "adversarial": [
   "test_hardening.H01_RegistryFailureInjection.test_bad_authority_rejected",
@@ -71,8 +69,7 @@
   "test_integrations.I03_Envelope.test_failure_keeps_stale_cache_explicit_never_as_current",
   "test_integrations.I04_FailureMatrix.test_every_failure_code_maps_to_a_structured_envelope_and_health",
   "test_integrations.I04_FailureMatrix.test_tool_unavailable_when_powershell_missing",
-  "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
+  "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted"
  ],
  "authority_tests": [
   "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
@@ -85,7 +82,6 @@
   "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
   "test_integrations.I08_DailyBriefLive.test_unavailable_critical_integration_is_reported_not_omitted",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_skills.T05_Execution.test_daily_briefing",
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
@@ -101,11 +97,13 @@
  "routing_evals": [
   "test_skills.T02_Router.test_dependency_order"
  ],
- "failed_tests": [],
- "certified_at": "2026-09-12T01:59:22",
+ "failed_tests": [
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
+ ],
+ "certified_at": "2026-09-12T02:13:20",
  "fingerprint": "433002c59ba3d983f180f3f3",
  "core_fingerprint": "ff70cd82ecc16905",
- "result": "PASS",
+ "result": "FAIL",
  "suites": [
   "test_skills",
   "test_store",
@@ -120,5 +118,5 @@
   "test_portability",
   "test_actions"
  ],
- "audit_infrastructure": false
+ "audit_infrastructure": true
 }
