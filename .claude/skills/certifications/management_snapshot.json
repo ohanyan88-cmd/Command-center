@@ -17,13 +17,15 @@
   "test_intelligence.Q06_SalesOps.test_operations_framework_partial_and_honest",
   "test_intelligence.Q06_SalesOps.test_sales_framework_on_fixture_and_honest_production_refusal",
   "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
   "test_intelligence.Q08_ProductionGuards.test_real_register_read_is_provenanced_and_untouched"
  ],
  "failure_tests": [
   "test_intelligence.Q01_Truthfulness.test_fixture_and_supplied_data_are_never_production_truth",
   "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
   "test_intelligence.Q05_MailCalendar.test_mail_meaningful_items_only_and_evidence_linkage",
-  "test_intelligence.Q06_SalesOps.test_sales_framework_on_fixture_and_honest_production_refusal"
+  "test_intelligence.Q06_SalesOps.test_sales_framework_on_fixture_and_honest_production_refusal",
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register"
  ],
  "hardening_cases": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
@@ -67,7 +69,7 @@
   "eval:r_hy_todo"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:50:37",
+ "certified_at": "2026-09-12T03:54:07",
  "fingerprint": "6056dc14d72a43e290bcd1aa",
  "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",

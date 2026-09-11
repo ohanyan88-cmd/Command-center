@@ -1,9 +1,9 @@
 {
  "skill_id": "authority_checking",
  "skill_version": "1.2.0",
- "maturity_level": "L1",
+ "maturity_level": "L4",
  "declared_maturity": "L4",
- "computed_maturity": "L1",
+ "computed_maturity": "L4",
  "tests": [
   "test_actions.H01_Governance.test_ambiguous_pending_target_fails_closed",
   "test_actions.H01_Governance.test_approval_text_recognition",
@@ -70,6 +70,7 @@
   "test_intelligence.Q06_SalesOps.test_sales_framework_on_fixture_and_honest_production_refusal",
   "test_intelligence.Q07_Governance.test_brief_eod_weekly_and_open_loops_carry_the_management_block",
   "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
   "test_intelligence.Q08_ProductionGuards.test_real_register_read_is_provenanced_and_untouched",
   "test_live_data.L01_StructureFingerprint.test_content_sources_still_bind_by_content",
   "test_live_data.L01_StructureFingerprint.test_row_mutations_keep_the_structure_fingerprint_and_the_loader_happy",
@@ -101,8 +102,10 @@
   "test_portability.P04_SecureRecovery.test_workspace_artifact_manifest_has_no_values_and_key_is_external",
   "test_portability.P05_MachineSpecificAndPaths.test_machine_dependencies_are_declared",
   "test_portability.P05_MachineSpecificAndPaths.test_no_dependence_on_the_original_absolute_path",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key",
   "test_portability.P06_CleanCloneBootstrap.test_recovery_carries_the_latest_synced_live_register_and_the_same_static_model",
+  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore",
   "test_skills.T04_Authority.test_authority_checking_executor"
  ],
  "failure_tests": [
@@ -137,6 +140,7 @@
   "test_intelligence.Q03_ChangeDetectionDurable.test_no_checkpoint_is_honest_and_production_checkpoints_persist",
   "test_intelligence.Q05_MailCalendar.test_mail_meaningful_items_only_and_evidence_linkage",
   "test_intelligence.Q06_SalesOps.test_sales_framework_on_fixture_and_honest_production_refusal",
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
   "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
   "test_live_data.L04_DriftClassification.test_checksum_drift_alone_is_detected_and_classified",
   "test_live_data.L04_DriftClassification.test_drift_states_clean_sync_release_unclassified",
@@ -211,6 +215,7 @@
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
@@ -289,6 +294,7 @@
   "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_entry_point_outside_venv_fails_closed_without_bootstrap",
@@ -340,7 +346,9 @@
   "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness",
   "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_recovery_carries_the_latest_synced_live_register_and_the_same_static_model",
+  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore",
   "test_skills.T04_Authority.test_authority_checking_executor"
  ],
  "concurrency_tests": [
@@ -415,14 +423,11 @@
   "test_enforcement.E06_MaintenanceRoutingBoundary.test_system_prompt_with_business_words_is_not_routed_to_sales",
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
- "failed_tests": [
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
-  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore"
- ],
- "certified_at": "2026-09-12T03:50:37",
+ "failed_tests": [],
+ "certified_at": "2026-09-12T03:54:07",
  "fingerprint": "2c11514c527399959a82afe3",
  "core_fingerprint": "332eefd5f0bb8296",
- "result": "FAIL",
+ "result": "PASS",
  "suites": [
   "test_skills",
   "test_store",

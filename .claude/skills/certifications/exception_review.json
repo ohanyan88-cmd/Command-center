@@ -9,10 +9,12 @@
   "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
   "test_intelligence.Q04_IntelligenceDiscipline.test_cause_kinds_with_evidence",
   "test_intelligence.Q04_IntelligenceDiscipline.test_impact_and_priority_ranking",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register"
  ],
  "failure_tests": [
-  "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named"
+  "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register"
  ],
  "hardening_cases": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
@@ -45,7 +47,7 @@
   "eval:r_hy_worry"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:50:37",
+ "certified_at": "2026-09-12T03:54:07",
  "fingerprint": "c46ef3a7c68dcf69064c1513",
  "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
