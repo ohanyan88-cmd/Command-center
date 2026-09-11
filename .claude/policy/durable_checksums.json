@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-12T03:07:29",
+ "generated_at": "2026-09-12T03:09:58",
  "algorithm": "sha256",
  "files": {
   ".claude/business/bm_company.py": {
@@ -191,8 +191,8 @@
    "size": 17504
   },
   ".claude/runtime/data_sync.py": {
-   "sha256": "c34bf8bd1db7ac99fdcadc8744bd689cd48bc8155c43964169ab8cee70e4d120",
-   "size": 10906
+   "sha256": "e19e9b06b2fd805006895d2a8fe4669522b6fa3fdeaf83e08f51130279b8ddaf",
+   "size": 12144
   },
   ".claude/runtime/hook.sh": {
    "sha256": "835aebda6290cbddd067e647b84f79a6c4c7bcba8c45e2ba3c0ca583e5453405",
@@ -279,8 +279,8 @@
    "size": 59229
   },
   ".claude/tests/test_live_data.py": {
-   "sha256": "110467546a7dd947b1193776b9aaf6f20e4a025a3c0c0a18e101230c36794e3e",
-   "size": 25989
+   "sha256": "bfd2a69e1931aec80a357a7838756a84b01616943f1a698687cc63c870f5975c",
+   "size": 27345
   },
   ".claude/tests/test_portability.py": {
    "sha256": "1a9ca7d19c66fd63248806315650f7bedd7b8dfe8b6c3652ca14770c708eae27",
