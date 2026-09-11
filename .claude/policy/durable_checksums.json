@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-12T00:44:49",
+ "generated_at": "2026-09-12T00:52:04",
  "algorithm": "sha256",
  "files": {
   ".claude/business/bm_company.py": {
@@ -219,8 +219,8 @@
    "size": 48236
   },
   ".claude/tests/test_boundary.py": {
-   "sha256": "e299e8df7b7fe8a461ca1b009427377d599dfc503bcd10d1815f8cf5ecf7df6b",
-   "size": 12365
+   "sha256": "c82a4e79494b97e51abde74c3d79b2339daae65d40aa6c640958e67779c277e4",
+   "size": 12522
   },
   ".claude/tests/test_business.py": {
    "sha256": "d9fb38d0d810d20f5854f978902f2bccca06594ef92248245124415f75b65d40",
@@ -243,8 +243,8 @@
    "size": 59082
   },
   ".claude/tests/test_portability.py": {
-   "sha256": "e8df4f1e691e507b95c41b873b1a23ebac9989d43a800f5e2e4fd2cc7ddb7ad3",
-   "size": 21104
+   "sha256": "f42fadcffc9b9af4bb215637e60e34b473f8a5b9c389b5abc4d3863d050c2a86",
+   "size": 21109
   },
   ".claude/tests/test_runtime.py": {
    "sha256": "3a669223d227e008608f1da529622ff9ab50bb094d43e1184b8dfb239df0d2a3",
