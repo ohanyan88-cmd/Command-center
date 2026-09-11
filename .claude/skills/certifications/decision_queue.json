@@ -1,0 +1,59 @@
+{
+ "skill_id": "decision_queue",
+ "skill_version": "1.2.0",
+ "maturity_level": "L1",
+ "declared_maturity": "L3",
+ "computed_maturity": "L1",
+ "tests": [
+  "test_intelligence.Q02_TaskIntelligence.test_gev_owned_is_not_the_same_as_gev_required",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "failure_tests": [],
+ "hardening_cases": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "adversarial": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "failure_injection": [],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q02_TaskIntelligence.test_gev_owned_is_not_the_same_as_gev_required",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "completion_verification": [
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [],
+ "evals": [
+  "eval:h_gev_queue"
+ ],
+ "routing_evals": [
+  "eval:r_hy_queue"
+ ],
+ "failed_tests": [],
+ "certified_at": "2026-09-12T03:50:37",
+ "fingerprint": "92cc5ae150671243168e6527",
+ "core_fingerprint": "332eefd5f0bb8296",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement",
+  "test_workspace",
+  "test_runtime",
+  "test_business",
+  "test_boundary",
+  "test_integrations",
+  "test_portability",
+  "test_actions",
+  "test_live_data",
+  "test_intelligence"
+ ],
+ "audit_infrastructure": true
+}

@@ -5,6 +5,7 @@
  "declared_maturity": "L2",
  "computed_maturity": "L2",
  "tests": [
+  "test_intelligence.Q04_IntelligenceDiscipline.test_recommendation_structure_and_no_invented_owner_or_date",
   "test_skills.T05_Execution.test_delegation_design"
  ],
  "failure_tests": [
@@ -30,9 +31,9 @@
  "evals": [],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "44c49d388666c10e6ce24d3f",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:50:37",
+ "fingerprint": "478cddf7edceb77e12531681",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -47,7 +48,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": false
 }

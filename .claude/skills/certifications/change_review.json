@@ -1,0 +1,69 @@
+{
+ "skill_id": "change_review",
+ "skill_version": "1.2.0",
+ "maturity_level": "L3",
+ "declared_maturity": "L3",
+ "computed_maturity": "L4",
+ "tests": [
+  "test_intelligence.Q02_TaskIntelligence.test_completed_since_last_check_and_field_changes",
+  "test_intelligence.Q03_ChangeDetectionDurable.test_no_checkpoint_is_honest_and_production_checkpoints_persist",
+  "test_intelligence.Q03_ChangeDetectionDurable.test_open_loops_persist_survive_restart_and_close_on_evidence_only",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "failure_tests": [
+  "test_intelligence.Q03_ChangeDetectionDurable.test_no_checkpoint_is_honest_and_production_checkpoints_persist"
+ ],
+ "hardening_cases": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q03_ChangeDetectionDurable.test_open_loops_persist_survive_restart_and_close_on_evidence_only",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "adversarial": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "failure_injection": [
+  "test_intelligence.Q03_ChangeDetectionDurable.test_open_loops_persist_survive_restart_and_close_on_evidence_only"
+ ],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "completion_verification": [
+  "test_intelligence.Q02_TaskIntelligence.test_completed_since_last_check_and_field_changes",
+  "test_intelligence.Q03_ChangeDetectionDurable.test_no_checkpoint_is_honest_and_production_checkpoints_persist",
+  "test_intelligence.Q03_ChangeDetectionDurable.test_open_loops_persist_survive_restart_and_close_on_evidence_only",
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+ ],
+ "concurrency_tests": [],
+ "enforcement_tests": [],
+ "evals": [
+  "eval:h_what_changed"
+ ],
+ "routing_evals": [
+  "eval:r_en_changed",
+  "eval:r_hy_changed"
+ ],
+ "failed_tests": [],
+ "certified_at": "2026-09-12T03:50:37",
+ "fingerprint": "e95eda25bc74bb6940128eae",
+ "core_fingerprint": "332eefd5f0bb8296",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement",
+  "test_workspace",
+  "test_runtime",
+  "test_business",
+  "test_boundary",
+  "test_integrations",
+  "test_portability",
+  "test_actions",
+  "test_live_data",
+  "test_intelligence"
+ ],
+ "audit_infrastructure": false
+}

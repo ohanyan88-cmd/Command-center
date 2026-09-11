@@ -36,9 +36,9 @@
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "3e57b15c4ebce0839d64a4db",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:50:37",
+ "fingerprint": "4b847a4c7ee0be23d5b6a25a",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -53,7 +53,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": false
 }

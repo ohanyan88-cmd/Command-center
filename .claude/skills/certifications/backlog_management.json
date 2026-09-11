@@ -5,7 +5,8 @@
  "declared_maturity": "L1",
  "computed_maturity": "L1",
  "tests": [
-  "test_business.B08_RealModel.test_real_queries"
+  "test_business.B08_RealModel.test_real_queries",
+  "test_intelligence.Q06_SalesOps.test_operations_framework_partial_and_honest"
  ],
  "failure_tests": [],
  "hardening_cases": [
@@ -24,6 +25,7 @@
  "evals": [
   "eval:b_backlog_playbook",
   "eval:f_live_ops_query",
+  "eval:h_ops_partial",
   "eval:ops_backlog"
  ],
  "routing_evals": [
@@ -31,9 +33,9 @@
   "test_business.B08_RealModel.test_real_queries"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "2bd525292f27bd4565c4d730",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:50:37",
+ "fingerprint": "302f9999c5a147ecff1f0f4a",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -48,7 +50,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": true
 }

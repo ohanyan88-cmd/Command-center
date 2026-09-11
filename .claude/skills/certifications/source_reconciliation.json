@@ -11,6 +11,7 @@
   "test_integrations.A03_TaskAuthorityScope.test_scoped_hierarchies",
   "test_integrations.I10_Reconciliation.test_entity_linking_is_conservative",
   "test_integrations.I10_Reconciliation.test_fact_authority_conflict_and_precedence",
+  "test_intelligence.Q01_Truthfulness.test_conflicting_evidence_surfaced_and_unknowns_stay_unknown",
   "test_skills.T07_VerificationAudit.test_contradiction"
  ],
  "failure_tests": [
@@ -44,9 +45,9 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "d0fc12126c2a29e9c70d34f2",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:50:37",
+ "fingerprint": "9f7c1f0772e2d3ff499b7f1c",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -61,7 +62,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": false
 }

@@ -6,6 +6,7 @@
  "computed_maturity": "L3",
  "tests": [
   "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
+  "test_intelligence.Q04_IntelligenceDiscipline.test_recommendation_structure_and_no_invented_owner_or_date",
   "test_skills.T05_Execution.test_decision_support",
   "test_skills.T08_MultiSkill.test_run_plan_with_supplied_data_partially_executes"
  ],
@@ -44,9 +45,9 @@
   "test_skills.T02_Router.test_chain_sales_decline"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:11:54",
- "fingerprint": "de210c664bdb1d48d5278422",
- "core_fingerprint": "ff70cd82ecc16905",
+ "certified_at": "2026-09-12T03:50:37",
+ "fingerprint": "233f235cbd8d438baa485abe",
+ "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -61,7 +62,8 @@
   "test_integrations",
   "test_portability",
   "test_actions",
-  "test_live_data"
+  "test_live_data",
+  "test_intelligence"
  ],
  "audit_infrastructure": false
 }
