@@ -11,7 +11,7 @@ REQUIRED_FIELDS = ("integration_id", "system", "purpose", "auth", "data_accessib
                    "read_ops", "write_ops", "required_certification_ops", "availability", "failure_behavior", "adapter", "critical", "expected_identity", "unblock", "machine_dependency")
 
 # Integrity pin of the fixed read-only Outlook reader (sha256 of outlook_read.ps1). The adapter refuses a modified reader.
-OUTLOOK_READER_SHA256 = "9494203c5b60877c2b060204e6473cbe68c7fe65a65126f7747f263cf857ea30"
+OUTLOOK_READER_SHA256 = "8e599a14b7877dc5365587053112e1f7e3318e79c3d6b14ff9397507b5d1246c"
 
 # persist=False → CONFIDENTIAL payloads (mail previews, calendar descriptions) live only in process memory with a ttl; never written to disk (audit finding 1)
 _NO_FRESHNESS_RULE = {"max_age_seconds": None, "cache_ttl_seconds": 300, "persist": False, "rule": "UNDEFINED — the Business Operating Model defines no acceptable age for this data; freshness is reported (retrieved_at, LIVE/CACHED/STALE), never judged"}

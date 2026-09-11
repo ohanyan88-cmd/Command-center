@@ -3,9 +3,9 @@
 # and refuses to run a modified reader. Operations: probe · calendar · mail. Output: one JSON document on stdout.
 # Data minimization: bodies are returned only as a short whitespace-collapsed preview (PreviewChars), never attachments.
 param(
-  [Parameter(Mandatory = $true)][ValidateSet("probe", "calendar", "mail")][string]$Op,
+  [Parameter(Mandatory = $true)][ValidateSet("probe", "calendar", "mail", "get")][string]$Op,
   [string]$From = "", [string]$To = "", [int]$Limit = 50, [ValidateSet("Inbox", "Sent")][string]$Folder = "Inbox",
-  [switch]$UnreadOnly, [string]$Search = "", [int]$PreviewChars = 600, [int]$Scan = 400
+  [switch]$UnreadOnly, [string]$Search = "", [int]$PreviewChars = 600, [int]$Scan = 400, [string]$EntryId = ""
 )
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -29,6 +29,15 @@ try {
   $ns = $ol.GetNamespace("MAPI")
   $accounts = @(); foreach ($a in $ns.Accounts) { $addr = [string]$a.SmtpAddress; if (-not $addr) { $addr = [string]$a.SmartAddress }; $accounts += @{ address = $addr; display = [string]$a.DisplayName; type = [int]$a.AccountType } }
   $me = $null; try { $me = @{ name = [string]$ns.CurrentUser.Name; address = [string]$ns.CurrentUser.Address; type = [string]$ns.CurrentUser.Type } } catch {}
+  if ($Op -eq "get") {
+    if (-not $EntryId) { Emit @{ ok = $false; error = "get requires -EntryId"; code = "BAD_PARAMS" }; exit 3 }
+    $x = $null; try { $x = $ns.GetItemFromID($EntryId) } catch { $x = $null }
+    if ($null -eq $x) { Emit @{ ok = $true; op = "get"; retrieved_at = $started; item = $null }; exit 0 }
+    $item = @{ entry_id = [string]$x.EntryID; subject = [string]$x.Subject; class = [int]$x.Class; last_modified = Iso $x.LastModificationTime }
+    if ($x.Class -eq 26) { $item = @{ entry_id = [string]$x.EntryID; subject = [string]$x.Subject; class = 26; last_modified = Iso $x.LastModificationTime; start = Iso $x.Start; end = Iso $x.End; location = [string]$x.Location; required = [string]$x.RequiredAttendees; cancelled = ($x.MeetingStatus -eq 5 -or $x.MeetingStatus -eq 7); recipients = @(Recipients $x) } }
+    if ($x.Class -eq 43) { $item = @{ entry_id = [string]$x.EntryID; subject = [string]$x.Subject; class = 43; last_modified = Iso $x.LastModificationTime; to = [string]$x.To; cc = [string]$x.CC; sent = Iso $x.SentOn; unread = [bool]$x.UnRead; folder = [string]$x.Parent.Name; submitted = [bool]$x.Submitted } }
+    Emit @{ ok = $true; op = "get"; retrieved_at = $started; accounts = $accounts; current_user = $me; item = $item }; exit 0
+  }
   if ($Op -eq "probe") {
     $cals = @()
     try { foreach ($st in $ns.Stores) { try { $cf = $st.GetDefaultFolder(9); $cals += @{ store = [string]$st.DisplayName; folder = [string]$cf.FolderPath; count = [int]$cf.Items.Count } } catch {} } } catch {}

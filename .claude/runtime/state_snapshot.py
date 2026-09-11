@@ -15,8 +15,15 @@ ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE)); import python_runtime; python_runtime.ensure()
 sys.path.insert(0, str(ROOT / ".claude" / "skills"))
 
-DURABLE_TABLES = ("commitments", "decisions", "audit")
-EXTRA_COLS = {"audit": ("execution_id", "skill_id", "result_status")}
+DURABLE_TABLES = ("commitments", "decisions", "audit", "actions")
+EXTRA_COLS = {"audit": ("execution_id", "skill_id", "result_status"), "actions": ("status", "fingerprint", "idempotency_key", "session_id", "batch_id")}
+
+def _index_cols(t, payload):
+    """Indexed columns for a durable row. Actions keep them inside the payload (state / request.*), so they are derived — idempotency must survive a restart."""
+    if t == "actions":
+        rq = payload.get("request") or {}
+        return {"status": payload.get("state"), "fingerprint": rq.get("action_fingerprint"), "idempotency_key": rq.get("idempotency_key"), "session_id": payload.get("session_id") or "", "batch_id": payload.get("batch_id") or ""}
+    return {c: payload[c] for c in EXTRA_COLS.get(t, ()) if c in payload}
 
 def durable_dir(root=ROOT): return pathlib.Path(root) / ".claude" / "state" / "durable"
 
@@ -33,8 +40,7 @@ def export(root=ROOT, log=print):
         lines = []
         for r in rows:
             payload = dict(r); op = payload.get("op_id"); rec = {"op_id": op, "recorded_at": payload.get("recorded_at"), "payload": payload}
-            for c in EXTRA_COLS.get(t, ()):
-                if c in payload: rec[c] = payload[c]
+            rec.update({k: v for k, v in _index_cols(t, payload).items() if v is not None})
             lines.append(rec)
         lines.sort(key=lambda x: (str(x.get("recorded_at") or ""), str(x.get("op_id") or "")))
         (d / f"{t}.jsonl").write_text("".join(_canon(x) + "\n" for x in lines), encoding="utf-8", newline="\n"); counts[t] = len(lines)
@@ -59,7 +65,12 @@ def import_(root=ROOT, log=print):
             except ValueError: bad += 1; continue
             op = rec.get("op_id"); payload = rec.get("payload") or {}
             if not op: bad += 1; continue
-            extra = {c: rec[c] for c in EXTRA_COLS.get(t, ()) if c in rec}
+            extra = {c: rec[c] for c in EXTRA_COLS.get(t, ()) if c in rec} or _index_cols(t, payload)
+            if t == "actions":                                            # mutable rows: restore the exported state (later exports win by recorded_at order)
+                cur = st.get(t, op)
+                if cur is None: st.upsert(t, op, payload, extra_cols=extra or None); new += 1
+                else: dup += 1
+                continue
             r = st.record(t, op, payload, extra_cols=extra or None)
             if r["status"] == "RECORDED": new += 1
             else: dup += 1

@@ -90,8 +90,9 @@ class T02_Router(unittest.TestCase):
         self.assertNotIn("weekly_executive_review", engine.resolve(REG, "why are sales down this week?")["chain"])
         self.assertNotIn("deadline_management", engine.resolve(REG, "the plate is late-ish")["chain"] if False else [])
     def test_tool_intent_attaches_tool_requirement(self):
-        p = engine.resolve(REG, "send email to arman about the report"); self.assertEqual(p["tool_requirements"], ["email"])
-        g = engine.gate(REG, p, {"content": "x"}); self.assertTrue(any(b["code"] == "TOOL_UNAVAILABLE" and b["skill"] == "<tool:email>" for b in g["blocked"]))
+        p = engine.resolve(REG, "send email to arman about the report"); self.assertIn("action_runtime", p["chain"]); self.assertEqual(p["tool_requirements"], [])   # Mission 4.2: a governed write intent, not an unavailable tool
+        p2 = engine.resolve(REG, "run sql query on the db"); self.assertEqual(p2["tool_requirements"], ["database"])
+        g = engine.gate(REG, p2, {}); self.assertTrue(any(b["code"] == "TOOL_UNAVAILABLE" for b in g["blocked"]))
     def test_retired_id_aliases_to_survivor(self):
         self.assertEqual(engine.resolve_alias(REG, "five_whys"), "root_cause_analysis")
         self.assertEqual(engine.resolve_alias(REG, "action_verification"), "completion_verification")

@@ -28,9 +28,9 @@
   "test_business.B08_RealModel.test_real_queries"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T00:44:37",
- "fingerprint": "e6bf5477c8dfeaa32ce797eb",
- "core_fingerprint": "054b5e18ba1d5ff9",
+ "certified_at": "2026-09-12T01:59:22",
+ "fingerprint": "79abde7886efce673871aa47",
+ "core_fingerprint": "ff70cd82ecc16905",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -43,7 +43,8 @@
   "test_business",
   "test_boundary",
   "test_integrations",
-  "test_portability"
+  "test_portability",
+  "test_actions"
  ],
  "audit_infrastructure": true
 }

@@ -232,6 +232,12 @@ def resolve(reg, intent):
     3. Tool intents attach tool requirements (fail closed at the gate: TOOL_UNAVAILABLE) instead of routing to fake tool-skills.
     4. Dependencies are added in topological order."""
     text = _norm(intent); idx = reg["_index"]
+    try:                               # Mission 4.2: 'GO' / 'OK' / 'Արա' / 'no' about a pending action is an approval event, not a business intent
+        import actions
+        if "action_runtime" in idx and actions.classify_approval(intent) in ("APPROVAL", "REJECTION", "MODIFIED"):
+            return {"intent": intent, "primary": "action_runtime", "supporting": [], "chain": ["action_runtime"], "status": "RESOLVED", "domain": "BUSINESS", "chain_name": "approval",
+                    "reasons": ["approval/rejection text → action_runtime (bound to the pending exact action)"], "required_inputs": [], "tool_requirements": []}
+    except Exception: pass
     sysm = system_terms(text)          # 0. domain boundary — system/maintenance work is never business-skill work
     if sysm:
         return {"intent": intent, "primary": None, "supporting": [], "chain": [], "status": "UNRESOLVED", "domain": "SYSTEM", "system_terms": sysm,
@@ -311,8 +317,10 @@ def gate(reg, plan, inputs=None, action_level="ANALYZE", approval_token=None, al
     """Precondition + authority check for every skill in the chain. Fail-closed. Never raises on bad input."""
     inputs = inputs or {}; idx = reg["_index"]; tools = reg["tools_available"]
     if plan.get("status") != "RESOLVED":
-        return {"status": "BLOCKED", "code": "UNRESOLVED", "blocked": [{"skill": None, "code": "MISSING_SKILL", "reason": f"no skill resolved: {plan.get('reasons')}"}],
-                "runnable": [], "assisted": [], "action_level": action_level}
+        missing = [t for t in plan.get("tool_requirements", []) if not tools.get(t)]      # a tool intent with no integrated tool: the specific, fail-closed reason
+        blocked = [{"skill": f"<tool:{t}>", "code": "TOOL_UNAVAILABLE", "reason": f"intent requires tool '{t}' which is not integrated in this runtime"} for t in missing]
+        blocked.append({"skill": None, "code": "MISSING_SKILL", "reason": f"no skill resolved: {plan.get('reasons')}"})
+        return {"status": "BLOCKED", "code": "TOOL_UNAVAILABLE" if missing else "UNRESOLVED", "blocked": blocked, "runnable": [], "assisted": [], "action_level": action_level}
     blocked, runnable, assisted, cache = [], [], [], {}
     for tool in plan.get("tool_requirements", []):
         if not tools.get(tool):

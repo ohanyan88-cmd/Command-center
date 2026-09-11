@@ -92,9 +92,9 @@ class I02_ReadOnlyBoundary(unittest.TestCase):
             e = layer.query(iid, op, {}); self.assertEqual(e["status"], "FAILED"); self.assertEqual(e["code"], "READ_ONLY_VIOLATION", f"{iid} {op}"); self.assertEqual(e["records"], [])
         e = layer.query("INT-OL-MAIL", "mail.nonsense", {}); self.assertEqual(e["code"], "UNKNOWN_OPERATION")
         e = layer.query("INT-OL-MAIL", "mail.list", {}, intent="send an email to the billing head"); self.assertEqual(e["code"], "READ_ONLY_VIOLATION"); self.assertEqual(e["capability"]["write_intent"], "SEND_EMAIL")
-        plan = engine.resolve(REG, "send an email to the billing head about the invoice"); g = engine.gate(REG, plan, {})
-        self.assertTrue(any(b["code"] == "TOOL_UNAVAILABLE" for b in g["blocked"]))
-        plan = engine.resolve(REG, "update the deal stage to won in bitrix"); self.assertIn("bitrix24", plan.get("tool_requirements", []))
+        # Mission 4.2: every write intent has ONE path — the Action Runtime (prepare → Gev approval → execute → verify); the read layer above still refuses writes
+        plan = engine.resolve(REG, "send an email to the billing head about the invoice"); self.assertIn("action_runtime", plan["chain"]); self.assertEqual(plan.get("tool_requirements"), [])
+        plan = engine.resolve(REG, "update the deal stage to won in bitrix"); self.assertEqual(plan["chain"], ["action_runtime"])
     @covers(*GOV, kinds=("unit", "adversarial"))
     def test_bitrix_client_refuses_every_non_read_method(self):
         cfg = {"webhook_url": "https://example.invalid/rest/1/abcdefghijkl/"}

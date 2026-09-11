@@ -23,6 +23,8 @@ TABLES = {
     "decisions":   "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, payload TEXT NOT NULL, checksum TEXT NOT NULL",
     "audit":       "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, execution_id TEXT, skill_id TEXT, result_status TEXT, payload TEXT NOT NULL, checksum TEXT NOT NULL",
     "tickets":     "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, updated_at TEXT NOT NULL, session_id TEXT, status TEXT, payload TEXT NOT NULL, checksum TEXT NOT NULL",
+    # Mission 4.2 — governed mutations (Action Runtime): one row per action, mutable state via upsert; idempotency_key/fingerprint indexed by query
+    "actions":     "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, status TEXT, fingerprint TEXT, idempotency_key TEXT, session_id TEXT, batch_id TEXT, payload TEXT NOT NULL, checksum TEXT NOT NULL",
     "meta":        "key TEXT PRIMARY KEY, value TEXT",
 }
 

@@ -42,9 +42,9 @@
   "eval:r_broken_promise"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T00:44:37",
- "fingerprint": "87ebfddf8622ffb34bf9a399",
- "core_fingerprint": "054b5e18ba1d5ff9",
+ "certified_at": "2026-09-12T01:59:22",
+ "fingerprint": "e1c30423be7f32a791c58f95",
+ "core_fingerprint": "ff70cd82ecc16905",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -57,7 +57,8 @@
   "test_business",
   "test_boundary",
   "test_integrations",
-  "test_portability"
+  "test_portability",
+  "test_actions"
  ],
  "audit_infrastructure": false
 }

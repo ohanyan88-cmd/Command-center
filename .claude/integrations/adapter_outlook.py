@@ -74,6 +74,10 @@ def _identity(d, iid):
     elif dom: ident["verified"] = False; ident["note"] = "mailbox address not exposed by the profile — identity UNVERIFIED (display names only)"
     return ident
 
+def get_item(entry_id):
+    """Read-back of ONE item by EntryID through the fixed read-only reader (used by write verification)."""
+    d = _run(["-Op", "get", "-EntryId", str(entry_id)]); _identity(d, "INT-OL-CAL"); return d.get("item")
+
 def probe():
     d = _run(["-Op", "probe"])
     return {"version": d.get("version"), "inbox_count": d.get("inbox_count"), "calendar_count": d.get("calendar_count"), "calendars": d.get("calendars"), "identity": _identity(d, "INT-OL-CAL"), "retrieved_at": d.get("retrieved_at")}
