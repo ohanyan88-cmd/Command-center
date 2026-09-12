@@ -11,7 +11,8 @@ ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE))
 for d in ("integrations", "skills", "runtime", "policy"): sys.path.insert(0, str(ROOT / ".claude" / d))
 from testing import covers
-import engine, store, executors, actions as A, capabilities as CAP, layer, registry, health, intelligence as IQ, adapter_outlook_write as W
+import engine, store, executors, actions as A, capabilities as CAP, layer, registry, health, intelligence as IQ, adapter_outlook_write as W, adapter_outlook as _R
+adapter_read = _R.read
 
 TMP = pathlib.Path(tempfile.mkdtemp(prefix="ccolw_")); engine.STATE_DIR = TMP / "state"; (TMP / "state").mkdir(parents=True, exist_ok=True); store.reset()
 REG = engine.load_registry(); T = "2026-09-12"; GOV = ("authority_checking", "approval_management", "completion_verification", "audit_logging"); AR = "action_runtime"
@@ -150,17 +151,28 @@ class O02b_SendTheReviewedDraft(unittest.TestCase):
         self.assertEqual(executors._parse_action_intent("send it", {}, datetime.date.fromisoformat(T))["kind"], "blocked")
     @covers(AR, "completion_verification", *GOV, kinds=("unit", "failure", "failure_injection"))
     def test_adapter_send_of_a_draft_is_verified_only_when_it_left_drafts_and_is_in_sent(self):
-        saved = (W._get, W._sent_evidence)
+        saved = (W._get, W._sent_evidence, adapter_read)
         try:
-            W._sent_evidence = lambda params: {"id": "S1", "subject": DRAFT["subject"], "to": DRAFT["to"]}
+            W._sent_evidence = lambda params, since=None: {"id": "S1", "subject": DRAFT["subject"], "to": DRAFT["to"]}
             W._get = lambda eid: None; v = W.verify("mail.send", dict(DRAFT, target_object_id="E1"), {"id": "E1"}); self.assertTrue(v["verified"]); self.assertTrue(v["evidence"]["left_drafts"])
             W._get = lambda eid: {"entry_id": eid, "folder": "Drafts", "submitted": False, "class": 43}; v2 = W.verify("mail.send", dict(DRAFT, target_object_id="E1"), {"id": "E1"}); self.assertFalse(v2["verified"]); self.assertIn("still in Drafts", v2["reason"])
-            W._sent_evidence = lambda params: None; W._get = lambda eid: None; v3 = W.verify("mail.send", dict(DRAFT, target_object_id="E1"), {"id": "E1"}); self.assertFalse(v3["verified"])
+            W._sent_evidence = lambda params, since=None: None; W._get = lambda eid: None; v3 = W.verify("mail.send", dict(DRAFT, target_object_id="E1"), {"id": "E1"}); self.assertFalse(v3["verified"])
+            # an OLDER Sent item with the same subject never verifies a new send: the real _sent_evidence filters by the execution start time
+            W._sent_evidence = saved[1]
+            import adapter_outlook as R
+            R.read = lambda op, params=None, cfg=None, integration_id=None: {"records": [{"source_record_id": "OLD", "subject": DRAFT["subject"], "to": DRAFT["to"], "sent": "2026-09-12T04:39:28", "received": "2026-09-12T04:39:00"}]}
+            self.assertIsNone(W._sent_evidence(DRAFT, since="2026-09-12T05:14:00")); self.assertEqual(W._sent_evidence(DRAFT, since=None)["id"], "OLD")
+            v4 = W.verify("mail.send", dict(DRAFT, target_object_id="E1"), {"id": "E1", "at": "2026-09-12T05:14:00"}); self.assertFalse(v4["verified"]); self.assertIn("since the execution started", v4["reason"])
+            R.read = lambda op, params=None, cfg=None, integration_id=None: {"records": [{"source_record_id": "OLD", "subject": DRAFT["subject"], "to": DRAFT["to"], "sent": "2026-09-12T04:39:28"}, {"source_record_id": "NEW", "subject": DRAFT["subject"], "to": DRAFT["to"], "sent": "2026-09-12T05:14:05"}]}
+            v5 = W.verify("mail.send", dict(DRAFT, target_object_id="E1"), {"id": "E1", "at": "2026-09-12T05:14:00"}); self.assertTrue(v5["verified"]); self.assertEqual(v5["evidence"]["sent"]["id"], "NEW")
+            R.read = saved[2]
             # reconciliation: a draft that already left Drafts is 'already sent' → no second send
-            W._get = lambda eid: {"entry_id": eid, "folder": "Sent Items", "submitted": True, "class": 43}; W._sent_evidence = lambda params: {"id": "S1"}; self.assertTrue(W.find_existing("mail.send", dict(DRAFT, target_object_id="E1"))["sent_draft"])
+            W._get = lambda eid: {"entry_id": eid, "folder": "Sent Items", "submitted": True, "class": 43}; W._sent_evidence = lambda params, since=None: {"id": "S1"}; self.assertTrue(W.find_existing("mail.send", dict(DRAFT, target_object_id="E1"))["sent_draft"])
             W._get = lambda eid: {"entry_id": eid, "folder": "Drafts", "submitted": False, "class": 43}; self.assertIsNone(W.find_existing("mail.send", dict(DRAFT, target_object_id="E1")))
             pre = W.precondition("mail.send", {"target_object_id": "E1"}); self.assertEqual(pre["object"]["folder"], "Drafts"); self.assertFalse(pre["object"]["submitted"])
-        finally: W._get, W._sent_evidence = saved
+        finally:
+            W._get, W._sent_evidence = saved[0], saved[1]
+            import adapter_outlook as R; R.read = saved[2]
         self.assertEqual(W.writer_problems(), [], "writer pin must match the shipped writer")
 
 class O03_ReadOnlyIntelligence(unittest.TestCase):
