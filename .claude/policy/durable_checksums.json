@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-12T04:00:03",
+ "generated_at": "2026-09-12T04:30:32",
  "algorithm": "sha256",
  "files": {
   ".claude/business/bm_company.py": {
@@ -103,8 +103,8 @@
    "size": 7952
   },
   ".claude/integrations/adapter_outlook_write.py": {
-   "sha256": "517d1269f58ba0b5648115229c12d26b22757979abeb3b314f8efb39d418dc7e",
-   "size": 8572
+   "sha256": "b25240ec51ad9ba0b65a9e91203a47462f8ff685bc5d44c61fa5bdba1c226f54",
+   "size": 9089
   },
   ".claude/integrations/adapter_tasks.py": {
    "sha256": "f4e29a490f1611a44157ada94d8276010f25c730301d75b0fcd803c0aaee5593",
@@ -227,8 +227,8 @@
    "size": 28899
   },
   ".claude/skills/certify.py": {
-   "sha256": "6a92a5bf2959b6df6a7323fd6aff2f6eeebcf7b575089f98cff8412bacf325da",
-   "size": 9932
+   "sha256": "3317057a683a62895ee720c396899c146c34d0d1571169736a73b0d8e5c5b2a3",
+   "size": 9954
   },
   ".claude/skills/engine.py": {
    "sha256": "499609c1d7a0353aa0eeec1bfed5b2e57abf6dc87cdc5e79946f701f68e2015b",
@@ -243,8 +243,8 @@
    "size": 73542
   },
   ".claude/skills/skill.py": {
-   "sha256": "0118edd8a01dce6a649ca408b9b314f681609083d7278c1aa75c9ea5fd34cc48",
-   "size": 12934
+   "sha256": "694021dea621b7c9405f7d7ab46d7e103839a2bb9c6cf43602496b6fd223021d",
+   "size": 12956
   },
   ".claude/skills/store.py": {
    "sha256": "6acc4e71edc5650fb43f0760891263c7f3d15d07134e6f0e167ed46dff1e6a8a",
@@ -289,6 +289,10 @@
   ".claude/tests/test_live_data.py": {
    "sha256": "717d16b844e1802c642d21a17e8b8e2748db35b3e0f52c33db44571048dd94e0",
    "size": 27525
+  },
+  ".claude/tests/test_outlook_write.py": {
+   "sha256": "b3dd40fa1ddd3e36c6077a1f4cec149ce37451486e8c1cb5081ce7eaef5bbd71",
+   "size": 17998
   },
   ".claude/tests/test_portability.py": {
    "sha256": "1a9ca7d19c66fd63248806315650f7bedd7b8dfe8b6c3652ca14770c708eae27",

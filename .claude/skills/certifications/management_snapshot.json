@@ -18,7 +18,9 @@
   "test_intelligence.Q06_SalesOps.test_sales_framework_on_fixture_and_honest_production_refusal",
   "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
   "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
-  "test_intelligence.Q08_ProductionGuards.test_real_register_read_is_provenanced_and_untouched"
+  "test_intelligence.Q08_ProductionGuards.test_real_register_read_is_provenanced_and_untouched",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth",
+  "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer"
  ],
  "failure_tests": [
   "test_intelligence.Q01_Truthfulness.test_fixture_and_supplied_data_are_never_production_truth",
@@ -31,24 +33,29 @@
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
   "test_intelligence.Q01_Truthfulness.test_stale_is_not_live_and_cached_is_labelled",
   "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth"
  ],
  "adversarial": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth"
  ],
  "failure_injection": [
   "test_intelligence.Q01_Truthfulness.test_stale_is_not_live_and_cached_is_labelled",
-  "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named"
+  "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth"
  ],
  "authority_tests": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
   "test_intelligence.Q02_TaskIntelligence.test_gev_owned_is_not_the_same_as_gev_required",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer"
  ],
  "completion_verification": [
   "test_intelligence.Q02_TaskIntelligence.test_overdue_due_today_blocked_ownerless_and_provenance",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer"
  ],
  "concurrency_tests": [],
  "enforcement_tests": [],
@@ -69,7 +76,7 @@
   "eval:r_hy_todo"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:59:47",
+ "certified_at": "2026-09-12T04:30:16",
  "fingerprint": "6056dc14d72a43e290bcd1aa",
  "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
@@ -87,7 +94,8 @@
   "test_portability",
   "test_actions",
   "test_live_data",
-  "test_intelligence"
+  "test_intelligence",
+  "test_outlook_write"
  ],
  "audit_infrastructure": false
 }

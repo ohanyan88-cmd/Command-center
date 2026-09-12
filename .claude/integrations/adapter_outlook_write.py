@@ -114,6 +114,10 @@ def verify(op, params, result):
         if not it: return {"verified": False, "reason": f"item {eid} not found on read-back", "evidence": None}
         checks = {"subject": params.get("subject"), "start": params.get("start"), "end": params.get("end")} if op.startswith("calendar") else {"subject": params.get("subject"), "to": ";".join(params["to"]) if isinstance(params.get("to"), list) else params.get("to")}
         diffs = {k: (v, it.get(k)) for k, v in checks.items() if v and str(it.get(k, ""))[:len(str(v))].lower() != str(v).lower()}
-        return {"verified": not diffs, "reason": ("field mismatch: " + ", ".join(diffs)) if diffs else "read-back matches", "evidence": {"id": eid, **{k: it.get(k) for k in ("subject", "start", "end", "to", "location")}}}
+        if op == "mail.draft":                                                   # a draft is verified only as a DRAFT: in the Drafts folder and never submitted — provider success alone proves nothing
+            if "draft" not in str(it.get("folder", "")).lower(): diffs["folder"] = ("Drafts", it.get("folder"))
+            if it.get("submitted"): diffs["submitted"] = (False, True)
+        return {"verified": not diffs, "reason": ("field mismatch: " + ", ".join(diffs)) if diffs else "read-back matches" + (" (Drafts, unsent)" if op == "mail.draft" else ""),
+                "evidence": {"id": eid, **{k: it.get(k) for k in ("subject", "start", "end", "to", "location", "folder", "submitted", "unread", "last_modified") if k in it}}}
     except IntegrationError as e:
         return {"verified": False, "reason": f"read-back unavailable ({e.code}) — cannot verify", "evidence": None}
