@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-12T07:02:24",
+ "generated_at": "2026-09-12T07:08:31",
  "algorithm": "sha256",
  "files": {
   ".claude/business/bm_company.py": {
@@ -259,8 +259,8 @@
    "size": 28899
   },
   ".claude/skills/certify.py": {
-   "sha256": "1885c43dec9ca4aa6c8fee7975b32d1fbdabfd0ede8363a20214089d3a51d51d",
-   "size": 9967
+   "sha256": "84daf304e01a38db856ea4acd696374dcee0635246338f1b6fc7f2672c459288",
+   "size": 9878
   },
   ".claude/skills/channels.py": {
    "sha256": "c6c5eb9593d0a676b24c0554a40488ef79a4c0340c1d97edf06b090dffd3913d",
