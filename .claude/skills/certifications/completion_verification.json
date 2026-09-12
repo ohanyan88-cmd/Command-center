@@ -91,6 +91,16 @@
   "test_live_data.L05_LiveDataSync.test_sync_refuses_product_model_source_unknown_and_wrong_branch",
   "test_live_data.L06_RecoveryContract.test_policy_manifest_and_gitignore_carry_the_live_data_contract",
   "test_live_data.L06_RecoveryContract.test_real_workspace_drift_is_reported_never_hidden",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth",
+  "test_outlook_write.O01_TruthAndIdentity.test_identity_verification_and_wrong_tenant",
+  "test_outlook_write.O01_TruthAndIdentity.test_unavailable_mail_and_calendar_are_honest",
+  "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
+  "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval",
+  "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result",
+  "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
+  "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer",
   "test_portability.P01_TreeManifest.test_manifest_is_derived_from_policy_and_current",
   "test_portability.P01_TreeManifest.test_out_of_date_manifest_is_detected",
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_every_required_directory_survives_a_git_clone",
@@ -147,6 +157,11 @@
   "test_live_data.L04_DriftClassification.test_drift_states_clean_sync_release_unclassified",
   "test_live_data.L05_LiveDataSync.test_sync_never_exports_a_store_that_is_behind_the_versioned_durable_history",
   "test_live_data.L05_LiveDataSync.test_sync_refuses_product_model_source_unknown_and_wrong_branch",
+  "test_outlook_write.O01_TruthAndIdentity.test_identity_verification_and_wrong_tenant",
+  "test_outlook_write.O01_TruthAndIdentity.test_unavailable_mail_and_calendar_are_honest",
+  "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
+  "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
   "test_portability.P01_TreeManifest.test_out_of_date_manifest_is_detected",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
   "test_skills.T07_VerificationAudit.test_completion_verification_blocked_paths"
@@ -211,6 +226,13 @@
   "test_live_data.L05_LiveDataSync.test_sync_never_exports_a_store_that_is_behind_the_versioned_durable_history",
   "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
   "test_live_data.L05_LiveDataSync.test_sync_refuses_product_model_source_unknown_and_wrong_branch",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth",
+  "test_outlook_write.O01_TruthAndIdentity.test_unavailable_mail_and_calendar_are_honest",
+  "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
+  "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result",
+  "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
+  "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
@@ -249,6 +271,10 @@
   "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
   "test_live_data.L02_ModelBinding.test_live_register_binding_is_certified_not_assumed",
   "test_live_data.L05_LiveDataSync.test_sync_refuses_product_model_source_unknown_and_wrong_branch",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth",
+  "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
+  "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key"
@@ -290,6 +316,10 @@
   "test_live_data.L04_DriftClassification.test_drift_states_clean_sync_release_unclassified",
   "test_live_data.L05_LiveDataSync.test_sync_never_exports_a_store_that_is_behind_the_versioned_durable_history",
   "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth",
+  "test_outlook_write.O01_TruthAndIdentity.test_unavailable_mail_and_calendar_are_honest",
+  "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result",
+  "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
   "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
@@ -309,7 +339,11 @@
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate",
   "test_intelligence.Q02_TaskIntelligence.test_gev_owned_is_not_the_same_as_gev_required",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval",
+  "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer"
  ],
  "completion_verification": [
   "test_actions.H01_Governance.test_batch_approval_is_exact_and_partial_is_honest",
@@ -336,6 +370,11 @@
   "test_live_data.L02_ModelBinding.test_task_row_mutations_never_invalidate_the_certified_core",
   "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness",
   "test_live_data.L05_LiveDataSync.test_sync_persists_data_only_and_leaves_the_tree_clean",
+  "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
+  "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval",
+  "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_recovery_carries_the_latest_synced_live_register_and_the_same_static_model",
@@ -345,7 +384,8 @@
  "concurrency_tests": [
   "test_actions.H02_IdempotencyAndFailure.test_concurrent_execution_writes_once_and_restart_keeps_idempotency",
   "test_integrations.A05_Concurrency.test_parallel_register_reads_keep_cache_and_health_consistent",
-  "test_integrations.A05_Concurrency.test_parallel_threads_and_processes_keep_every_success"
+  "test_integrations.A05_Concurrency.test_parallel_threads_and_processes_keep_every_success",
+  "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result"
  ],
  "enforcement_tests": [
   "test_actions.H03_Verification.test_audit_chain_is_complete_and_secretless",
@@ -411,7 +451,7 @@
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:59:47",
+ "certified_at": "2026-09-12T04:30:16",
  "fingerprint": "86f1b0f6b879932273b2d8e9",
  "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
@@ -429,7 +469,8 @@
   "test_portability",
   "test_actions",
   "test_live_data",
-  "test_intelligence"
+  "test_intelligence",
+  "test_outlook_write"
  ],
  "audit_infrastructure": true
 }

@@ -5,6 +5,7 @@
  "declared_maturity": "L2",
  "computed_maturity": "L3",
  "tests": [
+  "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval",
   "test_skills.T08_MultiSkill.test_communication_quality"
  ],
  "failure_tests": [
@@ -21,9 +22,11 @@
  "failure_injection": [],
  "authority_tests": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
-  "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
+  "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate",
+  "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval"
  ],
  "completion_verification": [
+  "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval",
   "test_skills.T08_MultiSkill.test_communication_quality"
  ],
  "concurrency_tests": [],
@@ -36,7 +39,7 @@
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:59:47",
+ "certified_at": "2026-09-12T04:30:16",
  "fingerprint": "4b847a4c7ee0be23d5b6a25a",
  "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
@@ -54,7 +57,8 @@
   "test_portability",
   "test_actions",
   "test_live_data",
-  "test_intelligence"
+  "test_intelligence",
+  "test_outlook_write"
  ],
  "audit_infrastructure": false
 }

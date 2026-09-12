@@ -11,6 +11,8 @@
   "test_live_data.L01_StructureFingerprint.test_schema_changes_change_the_structure_fingerprint",
   "test_live_data.L02_ModelBinding.test_extracted_model_source_change_still_invalidates",
   "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth",
+  "test_outlook_write.O01_TruthAndIdentity.test_identity_verification_and_wrong_tenant",
   "test_skills.T07_VerificationAudit.test_source_verification",
   "test_workspace.W01_Tree.test_valid_clean_tree_passes"
  ],
@@ -24,6 +26,7 @@
   "test_failclosed.F02_NeverMisrepresented.test_blocked_never_carries_result_data_as_success",
   "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
   "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
+  "test_outlook_write.O01_TruthAndIdentity.test_identity_verification_and_wrong_tenant",
   "test_skills.T07_VerificationAudit.test_source_verification"
  ],
  "hardening_cases": [
@@ -36,12 +39,14 @@
   "test_hardening.H04_AdversarialInputs.test_path_traversal_does_not_escape_root_silently",
   "test_live_data.L01_StructureFingerprint.test_schema_changes_change_the_structure_fingerprint",
   "test_live_data.L02_ModelBinding.test_extracted_model_source_change_still_invalidates",
-  "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary"
+  "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth"
  ],
  "adversarial": [
   "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
-  "test_hardening.H04_AdversarialInputs.test_path_traversal_does_not_escape_root_silently"
+  "test_hardening.H04_AdversarialInputs.test_path_traversal_does_not_escape_root_silently",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth"
  ],
  "failure_injection": [
   "test_business.B08_RealModel.test_extraction_invariants_green_and_tamper_detected",
@@ -50,7 +55,8 @@
   "test_hardening.H02_SourceFailureInjection.test_stale_source_blocks_unless_acknowledged",
   "test_live_data.L01_StructureFingerprint.test_schema_changes_change_the_structure_fingerprint",
   "test_live_data.L02_ModelBinding.test_extracted_model_source_change_still_invalidates",
-  "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary"
+  "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
+  "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth"
  ],
  "authority_tests": [
   "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
@@ -66,7 +72,7 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:59:47",
+ "certified_at": "2026-09-12T04:30:16",
  "fingerprint": "c3523d86e5da6a06cebe6d8e",
  "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
@@ -84,7 +90,8 @@
   "test_portability",
   "test_actions",
   "test_live_data",
-  "test_intelligence"
+  "test_intelligence",
+  "test_outlook_write"
  ],
  "audit_infrastructure": false
 }

@@ -38,7 +38,7 @@
   "eval:r_hy_queue"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:59:47",
+ "certified_at": "2026-09-12T04:30:16",
  "fingerprint": "92cc5ae150671243168e6527",
  "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
@@ -56,7 +56,8 @@
   "test_portability",
   "test_actions",
   "test_live_data",
-  "test_intelligence"
+  "test_intelligence",
+  "test_outlook_write"
  ],
  "audit_infrastructure": false
 }

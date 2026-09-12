@@ -13,7 +13,14 @@
   "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
   "test_actions.H05_CapabilityAndSkill.test_capability_registry_is_honest",
   "test_actions.H05_CapabilityAndSkill.test_routing_and_executor_boundaries",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
+  "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval",
+  "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result",
+  "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
+  "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer"
  ],
  "failure_tests": [
   "test_actions.H01_Governance.test_batch_approval_is_exact_and_partial_is_honest",
@@ -22,7 +29,10 @@
   "test_actions.H02_IdempotencyAndFailure.test_timeout_reconcile_first_and_blind_retry_prohibited",
   "test_actions.H03_Verification.test_provider_success_is_never_completion",
   "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
-  "test_actions.H04_TasksWriteAdapter.test_stale_row_and_locked_workbook"
+  "test_actions.H04_TasksWriteAdapter.test_stale_row_and_locked_workbook",
+  "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
+  "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint"
  ],
  "hardening_cases": [
   "test_actions.H01_Governance.test_approval_binds_to_exact_action_and_parameter_change_invalidates",
@@ -35,13 +45,21 @@
   "test_actions.H03_Verification.test_provider_success_is_never_completion",
   "test_actions.H04_TasksWriteAdapter.test_stale_row_and_locked_workbook",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
+  "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result",
+  "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
+  "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint"
  ],
  "adversarial": [
   "test_actions.H01_Governance.test_approval_binds_to_exact_action_and_parameter_change_invalidates",
   "test_actions.H01_Governance.test_approval_text_recognition",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
+  "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint"
  ],
  "failure_injection": [
   "test_actions.H01_Governance.test_approval_binds_to_exact_action_and_parameter_change_invalidates",
@@ -51,7 +69,9 @@
   "test_actions.H02_IdempotencyAndFailure.test_stale_state_provider_failures_and_audit_unavailable",
   "test_actions.H02_IdempotencyAndFailure.test_timeout_reconcile_first_and_blind_retry_prohibited",
   "test_actions.H03_Verification.test_provider_success_is_never_completion",
-  "test_actions.H04_TasksWriteAdapter.test_stale_row_and_locked_workbook"
+  "test_actions.H04_TasksWriteAdapter.test_stale_row_and_locked_workbook",
+  "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result",
+  "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent"
  ],
  "authority_tests": [
   "test_actions.H01_Governance.test_ambiguous_pending_target_fails_closed",
@@ -61,7 +81,11 @@
   "test_actions.H01_Governance.test_no_approval_no_execution_and_reads_stay_free",
   "test_actions.H01_Governance.test_replay_expiry_rejection_and_risk_classes",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval",
+  "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer"
  ],
  "completion_verification": [
   "test_actions.H01_Governance.test_batch_approval_is_exact_and_partial_is_honest",
@@ -70,10 +94,16 @@
   "test_actions.H02_IdempotencyAndFailure.test_timeout_reconcile_first_and_blind_retry_prohibited",
   "test_actions.H03_Verification.test_provider_success_is_never_completion",
   "test_actions.H04_TasksWriteAdapter.test_create_assign_close_reopen_with_readback",
-  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime"
+  "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
+  "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval",
+  "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result",
+  "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer"
  ],
  "concurrency_tests": [
-  "test_actions.H02_IdempotencyAndFailure.test_concurrent_execution_writes_once_and_restart_keeps_idempotency"
+  "test_actions.H02_IdempotencyAndFailure.test_concurrent_execution_writes_once_and_restart_keeps_idempotency",
+  "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result"
  ],
  "enforcement_tests": [
   "test_actions.H03_Verification.test_audit_chain_is_complete_and_secretless"
@@ -105,7 +135,7 @@
   "test_actions.H05_CapabilityAndSkill.test_routing_and_executor_boundaries"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T03:59:47",
+ "certified_at": "2026-09-12T04:30:16",
  "fingerprint": "8182980e405b17f41913ea44",
  "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
@@ -123,7 +153,8 @@
   "test_portability",
   "test_actions",
   "test_live_data",
-  "test_intelligence"
+  "test_intelligence",
+  "test_outlook_write"
  ],
  "audit_infrastructure": true
 }
