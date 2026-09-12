@@ -21,40 +21,54 @@
  "INT-OL-MAIL": {
   "mail.draft": {
    "action_id": "ACT-2a34741598",
-   "verified_at": "2026-09-12T04:34:04",
+   "verified_at": "2026-09-12T04:49:44",
    "evidence": {
-    "id": "00000000798228EC5B7EB94D84CD7A75BC3AC9D9070034AD76187591974DBF6C4F76951C873A01000000000000003C56836AF6C22C4F9E7BDFE96B0FAE51000000000C050000",
-    "subject": "TEST — Deputy Outlook write certification",
-    "to": "g.ohanyan@housenet.am",
     "folder": "Drafts",
+    "id": "00000000798228EC5B7EB94D84CD7A75BC3AC9D9070034AD76187591974DBF6C4F76951C873A01000000000000003C56836AF6C22C4F9E7BDFE96B0FAE51000000000C050000",
+    "last_modified": "2026-09-12T04:34:03",
+    "subject": "TEST — Deputy Outlook write certification",
     "submitted": false,
+    "to": "g.ohanyan@housenet.am",
     "unread": true,
-    "last_modified": "2026-09-12T04:34:03"
+    "approved_by": "Gev",
+    "approval_token": "APR-611586cc391c",
+    "approved_at": "2026-09-12T04:34:03",
+    "fingerprint": "0265051b2cfb997a64a821369a911998",
+    "ticket_id": "02bd88fb17",
+    "read_back": "read-back matches (Drafts, unsent)",
+    "migrated_from": "2026-09-12T04:34:04"
    }
   },
   "mail.send": {
    "action_id": "ACT-9c1792bad7",
-   "verified_at": "2026-09-12T04:39:55",
+   "verified_at": "2026-09-12T04:49:44",
    "evidence": {
-    "id": "00000000798228EC5B7EB94D84CD7A75BC3AC9D90700C3B68E10F77511CEB4CD00AA00BBB6E600000000000E00003C56836AF6C22C4F9E7BDFE96B0FAE510000000010020000",
-    "record_id": "INT-OL-MAIL:4c830a9dfc41",
-    "source_record_id": "00000000798228EC5B7EB94D84CD7A75BC3AC9D90700C3B68E10F77511CEB4CD00AA00BBB6E600000000000E00003C56836AF6C22C4F9E7BDFE96B0FAE510000000010020000",
+    "attachments": 0,
+    "cc": "",
     "conversation_id": "5DA74DCCA8B04E3390E9D9AA25DE9F77",
     "conversation_topic": "TEST — Deputy Outlook write certification",
-    "subject": "TEST — Deputy Outlook write certification",
+    "flagged": false,
+    "folder": "Sent",
+    "id": "00000000798228EC5B7EB94D84CD7A75BC3AC9D90700C3B68E10F77511CEB4CD00AA00BBB6E600000000000E00003C56836AF6C22C4F9E7BDFE96B0FAE510000000010020000",
+    "importance": 1,
+    "preview": "Harmless Command-center / Deputy Outlook write certification test. No reply required. ",
+    "received": "2026-09-12T04:39:00",
+    "record_id": "INT-OL-MAIL:4c830a9dfc41",
     "sender": "g.ohanyan@housenet.am",
     "sender_name": "g.ohanyan@housenet.am",
-    "to": "'g.ohanyan@housenet.am'",
-    "cc": "",
-    "received": "2026-09-12T04:39:00",
     "sent": "2026-09-12T04:39:28",
+    "source_record_id": "00000000798228EC5B7EB94D84CD7A75BC3AC9D90700C3B68E10F77511CEB4CD00AA00BBB6E600000000000E00003C56836AF6C22C4F9E7BDFE96B0FAE510000000010020000",
+    "source_updated_at": "2026-09-12T04:39:32",
+    "subject": "TEST — Deputy Outlook write certification",
+    "to": "'g.ohanyan@housenet.am'",
     "unread": false,
-    "importance": 1,
-    "flagged": false,
-    "attachments": 0,
-    "preview": "Harmless Command-center / Deputy Outlook write certification test. No reply required. ",
-    "folder": "Sent",
-    "source_updated_at": "2026-09-12T04:39:32"
+    "approved_by": "Gev",
+    "approval_token": "APR-f809453d1250",
+    "approved_at": "2026-09-12T04:39:28",
+    "fingerprint": "91be32315e3961a536e2c8ff7009e364",
+    "ticket_id": "8128077927",
+    "read_back": "Sent Items evidence found",
+    "migrated_from": "2026-09-12T04:39:55"
    }
   }
  }

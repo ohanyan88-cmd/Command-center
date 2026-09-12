@@ -39,6 +39,15 @@ try {
       Emit @{ ok = $true; op = $Op; retrieved_at = $started; entry_id = $id; cancelled = $true }; exit 0
     }
   }
+  if ($Op -eq "mail.send" -and $EntryId) {
+    # natural Outlook behaviour: send the EXISTING draft item (reviewed by the owner) — it leaves Drafts and lands in Sent Items
+    $m = $ns.GetItemFromID($EntryId)
+    if ($null -eq $m -or $m.Class -ne 43) { Emit @{ ok = $false; code = "BAD_PARAMS"; error = "EntryId is not a mail item" }; exit 3 }
+    if ($m.Submitted -or $m.Sent) { Emit @{ ok = $false; code = "ALREADY_SENT"; error = "the item was already submitted/sent" }; exit 3 }
+    $id = [string]$m.EntryID; $conv = [string]$m.ConversationID; $subj = [string]$m.Subject; $to = [string]$m.To
+    $m.Send()
+    Emit @{ ok = $true; op = $Op; retrieved_at = $started; submitted = $true; sent_draft = $true; entry_id = $id; subject = $subj; to = $to; conversation_id = $conv }; exit 0
+  }
   if ($Op -eq "mail.draft" -or $Op -eq "mail.send") {
     if (-not $To -and -not $ReplyToEntryId) { Emit @{ ok = $false; code = "BAD_PARAMS"; error = "To required" }; exit 3 }
     if ($ReplyToEntryId) { $src = $ns.GetItemFromID($ReplyToEntryId); $m = $src.Reply(); if ($Body) { $m.Body = $Body + "`r`n`r`n" + $m.Body } } else { $m = $ol.CreateItem(0); $m.To = $To; if ($Cc) { $m.CC = $Cc }; $m.Subject = $Subject; $m.Body = $Body }

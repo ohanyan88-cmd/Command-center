@@ -132,6 +132,37 @@ class O02_DraftGovernance(unittest.TestCase):
         real = json.loads(REAL_CERTS.read_text(encoding="utf-8")) if REAL_CERTS.exists() else {}
         self.assertNotIn("mail.draft", real.get("INT-OL-MAIL", {}), "the durable certification file is untouched by tests") if "INT-OL-MAIL" not in real else None
 
+class O02b_SendTheReviewedDraft(unittest.TestCase):
+    """Natural Outlook flow: draft → Gev reviews → OK → the SAME item is sent, leaves Drafts, lands in Sent Items."""
+    def setUp(self):
+        engine.STATE_DIR = TMP / f"state-{self._testMethodName}"; engine.STATE_DIR.mkdir(parents=True, exist_ok=True); store.reset(); A.PROVIDER_OVERRIDES.pop("INT-OL-MAIL", None)
+        for iid in ("INT-OL-MAIL", "INT-OL-CAL"): health.record(iid, True, op="probe", mode="REAL")
+    @covers(AR, "management_communication", *GOV, kinds=("unit", "authority", "completion", "adversarial"))
+    def test_send_it_targets_the_verified_provider_draft_and_needs_its_own_approval(self):
+        p = fake({"mail.draft": {"id": "DRAFT-E1"}}); d = A.prepare(req(), session_id="s1"); A.approve("GO", action_id=d["action_id"]); self.assertEqual(A.execute(d["action_id"])["state"], "VERIFIED")
+        spec = executors._parse_action_intent("send it", {}, datetime.date.fromisoformat(T)); self.assertEqual(spec["op"], "mail.send"); self.assertEqual(spec["object_id"], "DRAFT-E1"); self.assertIn("leaves Drafts", spec["effect"])
+        for t in ("ուղարկիր", "ուղարկիր դռաֆտը", "Send that draft"): self.assertEqual(executors._parse_action_intent(t, {}, datetime.date.fromisoformat(T))["object_id"], "DRAFT-E1", t)
+        r = executors.action_runtime({"text": "ուղարկիր", "session_id": "s1"}, REG["_index"][AR], REG)
+        self.assertEqual(r["status"], "ASSISTED"); self.assertEqual(r["action_state"], "APPROVAL_REQUIRED"); self.assertFalse(r["mutation_performed"]); self.assertEqual([c[0] for c in p.calls], ["mail.draft"], "nothing sent before approval")
+        a = A.get(r["action_id"]); self.assertEqual(a["request"]["target_object_id"], "DRAFT-E1"); self.assertNotEqual(a["request"]["action_fingerprint"], d["request"]["action_fingerprint"])
+        r2 = executors.action_runtime({"approval_text": "GO", "session_id": "s1"}, REG["_index"][AR], REG); self.assertEqual(r2["status"], "VERIFIED"); self.assertEqual([c[0] for c in p.calls], ["mail.draft", "mail.send"]); self.assertEqual(p.calls[1][1]["target_object_id"], "DRAFT-E1")
+        self.assertIsNone(executors._last_provider_draft(), "a sent draft is never offered for 'send it' again")
+        self.assertEqual(executors._parse_action_intent("send it", {}, datetime.date.fromisoformat(T))["kind"], "blocked")
+    @covers(AR, "completion_verification", *GOV, kinds=("unit", "failure", "failure_injection"))
+    def test_adapter_send_of_a_draft_is_verified_only_when_it_left_drafts_and_is_in_sent(self):
+        saved = (W._get, W._sent_evidence)
+        try:
+            W._sent_evidence = lambda params: {"id": "S1", "subject": DRAFT["subject"], "to": DRAFT["to"]}
+            W._get = lambda eid: None; v = W.verify("mail.send", dict(DRAFT, target_object_id="E1"), {"id": "E1"}); self.assertTrue(v["verified"]); self.assertTrue(v["evidence"]["left_drafts"])
+            W._get = lambda eid: {"entry_id": eid, "folder": "Drafts", "submitted": False, "class": 43}; v2 = W.verify("mail.send", dict(DRAFT, target_object_id="E1"), {"id": "E1"}); self.assertFalse(v2["verified"]); self.assertIn("still in Drafts", v2["reason"])
+            W._sent_evidence = lambda params: None; W._get = lambda eid: None; v3 = W.verify("mail.send", dict(DRAFT, target_object_id="E1"), {"id": "E1"}); self.assertFalse(v3["verified"])
+            # reconciliation: a draft that already left Drafts is 'already sent' → no second send
+            W._get = lambda eid: {"entry_id": eid, "folder": "Sent Items", "submitted": True, "class": 43}; W._sent_evidence = lambda params: {"id": "S1"}; self.assertTrue(W.find_existing("mail.send", dict(DRAFT, target_object_id="E1"))["sent_draft"])
+            W._get = lambda eid: {"entry_id": eid, "folder": "Drafts", "submitted": False, "class": 43}; self.assertIsNone(W.find_existing("mail.send", dict(DRAFT, target_object_id="E1")))
+            pre = W.precondition("mail.send", {"target_object_id": "E1"}); self.assertEqual(pre["object"]["folder"], "Drafts"); self.assertFalse(pre["object"]["submitted"])
+        finally: W._get, W._sent_evidence = saved
+        self.assertEqual(W.writer_problems(), [], "writer pin must match the shipped writer")
+
 class O03_ReadOnlyIntelligence(unittest.TestCase):
     @covers("management_snapshot", "open_loop_memory", AR, *GOV, kinds=("unit", "authority", "completion"))
     def test_mail_calendar_intelligence_never_touches_the_writer(self):
