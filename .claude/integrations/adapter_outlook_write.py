@@ -57,12 +57,14 @@ def precondition(op, params):
     keys = ("subject", "start", "end", "location", "required", "to", "unread", "folder", "submitted")       # folder/submitted: a draft that was edited, sent or moved after the card → STALE_CONFLICT
     return {"exists": True, "object": {k: it.get(k) for k in keys if k in it}}
 
-def _sent_evidence(params):
-    """Sent Items evidence through the READ-ONLY reader: same subject and recipient."""
+def _sent_evidence(params, since=None):
+    """Sent Items evidence through the READ-ONLY reader: same subject and recipient — and, when `since` (the execution start) is known,
+    sent at or after it: an OLDER message with the same subject never verifies a new send."""
     d = adapter_outlook.read("mail.search", {"folder": "Sent", "query": str(params.get("subject", ""))[:60], "limit": 20}, {}, integration_id="INT-OL-MAIL")
-    for r in d["records"]:
-        if r["subject"].strip().lower() == str(params.get("subject", "")).strip().lower() and str(params.get("to", "")).lower() in (r.get("to") or "").lower(): return {"id": r["source_record_id"], **r}
-    return None
+    hits = [r for r in d["records"] if r["subject"].strip().lower() == str(params.get("subject", "")).strip().lower() and str(params.get("to", "")).lower() in (r.get("to") or "").lower()]
+    if since: hits = [r for r in hits if (r.get("sent") or r.get("received") or "") >= str(since)[:19]]
+    hits.sort(key=lambda r: r.get("sent") or "", reverse=True)
+    return {"id": hits[0]["source_record_id"], **hits[0]} if hits else None
 
 def _draft_left_drafts(entry_id):
     """After sending an existing draft the item is gone from Drafts (its EntryID changes when Outlook moves it to Sent Items)."""
@@ -115,18 +117,20 @@ def execute(op, params):
         if params.get("body"): args += ["-Body", str(params["body"])]
         if params.get("reply_to_entry_id"): args += ["-ReplyToEntryId", str(params["reply_to_entry_id"])]
     d = _run(args)
-    return {"ok": True, "id": d.get("entry_id") or d.get("conversation_id"), "subject": d.get("subject"), "start": d.get("start"), "end": d.get("end"), "to": d.get("to"), "submitted": d.get("submitted"), "cancelled": d.get("cancelled")}
+    return {"ok": True, "id": d.get("entry_id") or d.get("conversation_id"), "subject": d.get("subject"), "start": d.get("start"), "end": d.get("end"), "to": d.get("to"), "submitted": d.get("submitted"), "cancelled": d.get("cancelled"),
+            "at": d.get("retrieved_at"), "inline_closed": d.get("inline_closed")}                       # `at` = writer start time: verification only accepts Sent evidence from this execution onward
 
 def verify(op, params, result):
     """Independent read-back via the read-only reader; provider success alone never verifies."""
     try:
         if op == "mail.send":
-            found = _sent_evidence(params)
+            since = (result or {}).get("at")                              # only a message sent during/after THIS execution is evidence
+            found = _sent_evidence(params, since=since)
             if params.get("target_object_id"):                        # a sent draft must ALSO have left Drafts — natural Outlook behaviour, verified independently
                 left = _draft_left_drafts(params["target_object_id"])
                 ok = bool(found) and left
-                return {"verified": ok, "reason": ("Sent Items evidence found and the draft left Drafts" if ok else ("draft still in Drafts" if not left else "no Sent Items evidence for this recipient/subject")), "evidence": {"draft_entry_id": params["target_object_id"], "left_drafts": left, "sent": found}}
-            return {"verified": bool(found), "reason": "Sent Items evidence found" if found else "no Sent Items evidence for this recipient/subject", "evidence": found}
+                return {"verified": ok, "reason": ("Sent Items evidence found (sent ≥ execution start) and the draft left Drafts" if ok else ("draft still in Drafts" if not left else "no Sent Items evidence for this recipient/subject since the execution started")), "evidence": {"draft_entry_id": params["target_object_id"], "left_drafts": left, "since": since, "sent": found}}
+            return {"verified": bool(found), "reason": "Sent Items evidence found (sent ≥ execution start)" if found else "no Sent Items evidence for this recipient/subject since the execution started", "evidence": found}
         eid = (result or {}).get("id") or params.get("target_object_id")
         it = _get(eid) if eid else None
         if op == "calendar.cancel":
