@@ -143,7 +143,7 @@ def main(argv):
         return 0
 
     if cmd == "test":
-        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations", "test_portability", "test_actions", "test_live_data", "test_intelligence"], cwd=str(HERE.parent / "tests"))
+        return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_skills", "test_store", "test_failclosed", "test_enforcement", "test_workspace", "test_runtime", "test_business", "test_boundary", "test_integrations", "test_portability", "test_actions", "test_live_data", "test_intelligence", "test_outlook_write"], cwd=str(HERE.parent / "tests"))
     if cmd == "hardening":
         return subprocess.call([sys.executable, "-m", "unittest", "-v", "test_hardening"], cwd=str(HERE.parent / "tests"))
     if cmd == "eval":
