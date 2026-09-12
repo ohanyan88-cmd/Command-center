@@ -31,6 +31,31 @@
     "unread": true,
     "last_modified": "2026-09-12T04:34:03"
    }
+  },
+  "mail.send": {
+   "action_id": "ACT-9c1792bad7",
+   "verified_at": "2026-09-12T04:39:55",
+   "evidence": {
+    "id": "00000000798228EC5B7EB94D84CD7A75BC3AC9D90700C3B68E10F77511CEB4CD00AA00BBB6E600000000000E00003C56836AF6C22C4F9E7BDFE96B0FAE510000000010020000",
+    "record_id": "INT-OL-MAIL:4c830a9dfc41",
+    "source_record_id": "00000000798228EC5B7EB94D84CD7A75BC3AC9D90700C3B68E10F77511CEB4CD00AA00BBB6E600000000000E00003C56836AF6C22C4F9E7BDFE96B0FAE510000000010020000",
+    "conversation_id": "5DA74DCCA8B04E3390E9D9AA25DE9F77",
+    "conversation_topic": "TEST — Deputy Outlook write certification",
+    "subject": "TEST — Deputy Outlook write certification",
+    "sender": "g.ohanyan@housenet.am",
+    "sender_name": "g.ohanyan@housenet.am",
+    "to": "'g.ohanyan@housenet.am'",
+    "cc": "",
+    "received": "2026-09-12T04:39:00",
+    "sent": "2026-09-12T04:39:28",
+    "unread": false,
+    "importance": 1,
+    "flagged": false,
+    "attachments": 0,
+    "preview": "Harmless Command-center / Deputy Outlook write certification test. No reply required. ",
+    "folder": "Sent",
+    "source_updated_at": "2026-09-12T04:39:32"
+   }
   }
  }
 }
