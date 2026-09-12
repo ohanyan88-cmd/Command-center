@@ -1,9 +1,9 @@
 {
  "skill_id": "completion_verification",
  "skill_version": "1.2.0",
- "maturity_level": "L4",
+ "maturity_level": "L1",
  "declared_maturity": "L4",
- "computed_maturity": "L4",
+ "computed_maturity": "L1",
  "tests": [
   "test_actions.H01_Governance.test_ambiguous_pending_target_fails_closed",
   "test_actions.H01_Governance.test_approval_text_recognition",
@@ -100,6 +100,8 @@
   "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
   "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
   "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O02b_SendTheReviewedDraft.test_adapter_send_of_a_draft_is_verified_only_when_it_left_drafts_and_is_in_sent",
+  "test_outlook_write.O02b_SendTheReviewedDraft.test_send_it_targets_the_verified_provider_draft_and_needs_its_own_approval",
   "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer",
   "test_portability.P01_TreeManifest.test_manifest_is_derived_from_policy_and_current",
   "test_portability.P01_TreeManifest.test_out_of_date_manifest_is_detected",
@@ -112,10 +114,8 @@
   "test_portability.P04_SecureRecovery.test_workspace_artifact_manifest_has_no_values_and_key_is_external",
   "test_portability.P05_MachineSpecificAndPaths.test_machine_dependencies_are_declared",
   "test_portability.P05_MachineSpecificAndPaths.test_no_dependence_on_the_original_absolute_path",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key",
   "test_portability.P06_CleanCloneBootstrap.test_recovery_carries_the_latest_synced_live_register_and_the_same_static_model",
-  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore",
   "test_skills.T07_VerificationAudit.test_completion_verification"
  ],
  "failure_tests": [
@@ -162,6 +162,7 @@
   "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
   "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
   "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O02b_SendTheReviewedDraft.test_adapter_send_of_a_draft_is_verified_only_when_it_left_drafts_and_is_in_sent",
   "test_portability.P01_TreeManifest.test_out_of_date_manifest_is_detected",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
   "test_skills.T07_VerificationAudit.test_completion_verification_blocked_paths"
@@ -233,10 +234,11 @@
   "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
   "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
   "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O02b_SendTheReviewedDraft.test_adapter_send_of_a_draft_is_verified_only_when_it_left_drafts_and_is_in_sent",
+  "test_outlook_write.O02b_SendTheReviewedDraft.test_send_it_targets_the_verified_provider_draft_and_needs_its_own_approval",
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
@@ -275,6 +277,7 @@
   "test_outlook_write.O02_DraftGovernance.test_certification_only_from_gev_approved_verified_evidence",
   "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
   "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O02b_SendTheReviewedDraft.test_send_it_targets_the_verified_provider_draft_and_needs_its_own_approval",
   "test_portability.P02_EmptyDirectoriesAndGitignore.test_no_plaintext_credential_in_git_history",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
   "test_portability.P06_CleanCloneBootstrap.test_clone_used_nothing_from_the_original_workspace_but_git_and_the_key"
@@ -320,9 +323,9 @@
   "test_outlook_write.O01_TruthAndIdentity.test_unavailable_mail_and_calendar_are_honest",
   "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result",
   "test_outlook_write.O02_DraftGovernance.test_provider_success_is_not_verified_and_a_draft_must_be_in_drafts_unsent",
+  "test_outlook_write.O02b_SendTheReviewedDraft.test_adapter_send_of_a_draft_is_verified_only_when_it_left_drafts_and_is_in_sent",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_portability.P04_SecureRecovery.test_backup_restore_wrong_key_missing_key_and_no_secret_leak",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_runtime.R02_LauncherIndependentOfPath.test_broken_path_python_does_not_change_behaviour",
   "test_runtime.R02_LauncherIndependentOfPath.test_hooks_run_with_no_python_and_no_git_on_path",
   "test_runtime.R03_FailClosedWhenRuntimeBroken.test_entry_point_outside_venv_fails_closed_without_bootstrap",
@@ -343,6 +346,7 @@
   "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval",
   "test_outlook_write.O02_DraftGovernance.test_parameter_change_invalidates_the_approval",
   "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O02b_SendTheReviewedDraft.test_send_it_targets_the_verified_provider_draft_and_needs_its_own_approval",
   "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer"
  ],
  "completion_verification": [
@@ -374,11 +378,10 @@
   "test_outlook_write.O02_DraftGovernance.test_local_text_draft_is_not_a_provider_draft_and_provider_draft_needs_approval",
   "test_outlook_write.O02_DraftGovernance.test_no_duplicate_on_retry_and_reconcile_first_on_uncertain_result",
   "test_outlook_write.O02_DraftGovernance.test_send_is_a_separate_approval_bound_to_its_own_fingerprint",
+  "test_outlook_write.O02b_SendTheReviewedDraft.test_send_it_targets_the_verified_provider_draft_and_needs_its_own_approval",
   "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
   "test_portability.P06_CleanCloneBootstrap.test_recovery_carries_the_latest_synced_live_register_and_the_same_static_model",
-  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore",
   "test_skills.T07_VerificationAudit.test_completion_verification"
  ],
  "concurrency_tests": [
@@ -450,11 +453,14 @@
   "test_enforcement.E06_MaintenanceRoutingBoundary.test_system_prompt_with_business_words_is_not_routed_to_sales",
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
- "failed_tests": [],
- "certified_at": "2026-09-12T04:30:16",
+ "failed_tests": [
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
+  "test_portability.P06_CleanCloneBootstrap.test_tree_parity_and_content_integrity_after_restore"
+ ],
+ "certified_at": "2026-09-12T04:52:52",
  "fingerprint": "86f1b0f6b879932273b2d8e9",
  "core_fingerprint": "332eefd5f0bb8296",
- "result": "PASS",
+ "result": "FAIL",
  "suites": [
   "test_skills",
   "test_store",
