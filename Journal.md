@@ -190,3 +190,10 @@
 - Sales framework (11 չափում) և ops framework (12 չափում)՝ live աղբյուր չկա → UNAVAILABLE / NOT CONNECTED + պակասող capability; fixture-ներով թեստավորված, production-ում թիվ չի հորինվում։
 - Թեստեր՝ test_intelligence 19, evals +25 (routing 12 + management 13); store՝ `checkpoints`, `loops` աղյուսակներ durable export/import-ում; manifest 74 entry։
 - Իրական production proof (read-only)՝ live Daily Brief՝ Tasks LIVE, Outlook calendar/mail LIVE, B24/MB NOT_CONFIGURED — տես Mission 5 զեկույցը։
+
+## 2026-09-12 · Outlook Desktop production proof — identity → live reads → intelligence → controlled DRAFT write → VERIFIED_WRITE
+- Identity live՝ g.ohanyan@housenet.am (Outlook Classic 16.0, verified), reader/writer pins անփոփոխ, fixture չկա։ Mail LIVE (3 ծանուցում 3 օրում, 0 candidate), Calendar LIVE (0 event)։ Mission 5 հարցերը live-ով՝ ազնիվ «ոչինչ չկա», հորինված urgency չկա։
+- Change/open-loop՝ երկու change_review cycle (04:23:16 → 04:23:58), 0 փոփոխություն, checkpoint-ները՝ միայն id/դաս, loops՝ միայն հղումներ։
+- Կոդ (PR #6, main 3ade80b)՝ draft read-back-ը վավեր է միայն Drafts + unsent վիճակում; `test_outlook_write` 10 թեստ (writer-ը թեստերից երբեք չի կանչվում)։
+- Գև-ի «օկ»-ով (ticket 8128077927, token APR-611586cc391c) կատարվեց ACT-2a34741598՝ մեկ draft `TEST — Deputy Outlook write certification` → g.ohanyan@housenet.am; անկախ read-back՝ Drafts, submitted=false, հասցեատեր/թեմա ճշգրիտ → VERIFIED; Sent/Inbox՝ 0 համընկնում (ոչինչ չի ուղարկվել)։ INT-OL-MAIL mail.draft → VERIFIED_WRITE (durable ապացույցից)։
+- Send (ACT նոր քարտ) և draft-ի ջնջումը՝ առանձին հաստատումներ, չեն կատարվել։

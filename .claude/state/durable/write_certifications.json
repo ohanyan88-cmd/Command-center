@@ -17,5 +17,20 @@
     "ticket_id": "8297f25baf"
    }
   }
+ },
+ "INT-OL-MAIL": {
+  "mail.draft": {
+   "action_id": "ACT-2a34741598",
+   "verified_at": "2026-09-12T04:34:04",
+   "evidence": {
+    "id": "00000000798228EC5B7EB94D84CD7A75BC3AC9D9070034AD76187591974DBF6C4F76951C873A01000000000000003C56836AF6C22C4F9E7BDFE96B0FAE51000000000C050000",
+    "subject": "TEST — Deputy Outlook write certification",
+    "to": "g.ohanyan@housenet.am",
+    "folder": "Drafts",
+    "submitted": false,
+    "unread": true,
+    "last_modified": "2026-09-12T04:34:03"
+   }
+  }
  }
 }
