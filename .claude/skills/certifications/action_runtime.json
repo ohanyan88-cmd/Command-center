@@ -146,7 +146,7 @@
   "test_actions.H05_CapabilityAndSkill.test_routing_and_executor_boundaries"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T06:58:21",
+ "certified_at": "2026-09-12T07:02:02",
  "fingerprint": "08c9727d49d509bf37065e7f",
  "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",

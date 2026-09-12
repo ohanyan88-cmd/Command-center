@@ -1,9 +1,9 @@
 {
  "skill_id": "business_model_query",
  "skill_version": "1.2.0",
- "maturity_level": "L1",
+ "maturity_level": "L3",
  "declared_maturity": "L3",
- "computed_maturity": "L1",
+ "computed_maturity": "L4",
  "tests": [
   "test_business.B01_ProvenanceAndPrecedence.test_conflict_not_silently_chosen_and_reference_precedence",
   "test_business.B01_ProvenanceAndPrecedence.test_current_vs_historical_and_archive_never_overrides",
@@ -38,7 +38,8 @@
   "test_live_data.L02_ModelBinding.test_real_model_declares_the_live_register",
   "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
   "test_live_data.L02_ModelBinding.test_task_row_mutations_never_invalidate_the_certified_core",
-  "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness"
+  "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
  ],
  "failure_tests": [
   "test_business.B01_ProvenanceAndPrecedence.test_conflict_not_silently_chosen_and_reference_precedence",
@@ -64,7 +65,8 @@
   "test_live_data.L01_StructureFingerprint.test_schema_changes_change_the_structure_fingerprint",
   "test_live_data.L02_ModelBinding.test_extracted_model_source_change_still_invalidates",
   "test_live_data.L02_ModelBinding.test_live_register_binding_is_certified_not_assumed",
-  "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary"
+  "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
  ],
  "adversarial": [
   "test_business.B02_CoreOverlaySeparation.test_core_has_no_compensation_or_names_and_overlay_merges_at_runtime",
@@ -82,7 +84,8 @@
   "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_live_data.L01_StructureFingerprint.test_schema_changes_change_the_structure_fingerprint",
   "test_live_data.L02_ModelBinding.test_extracted_model_source_change_still_invalidates",
-  "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary"
+  "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
  ],
  "authority_tests": [
   "test_business.B05_TargetsAndPromotion.test_promotion_rules_and_observations_never_touch_core",
@@ -93,7 +96,8 @@
   "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
   "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
   "test_live_data.L02_ModelBinding.test_task_row_mutations_never_invalidate_the_certified_core",
-  "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness"
+  "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness",
+  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
  ],
  "concurrency_tests": [],
  "enforcement_tests": [],
@@ -109,13 +113,11 @@
  "routing_evals": [
   "test_business.B08_RealModel.test_real_queries"
  ],
- "failed_tests": [
-  "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
- ],
- "certified_at": "2026-09-12T06:58:21",
+ "failed_tests": [],
+ "certified_at": "2026-09-12T07:02:02",
  "fingerprint": "a12c4a2b535a6539b6c44f62",
  "core_fingerprint": "b66d5af33dd07bf1",
- "result": "FAIL",
+ "result": "PASS",
  "suites": [
   "test_skills",
   "test_store",
@@ -133,5 +135,5 @@
   "test_intelligence",
   "test_outlook_write"
  ],
- "audit_infrastructure": true
+ "audit_infrastructure": false
 }
