@@ -311,7 +311,9 @@ def _verify(a, prov, ticket_id=None):
         if (req.get("source_context") or {}).get("certification"):          # Gev-approved live certification write → durable VERIFIED_WRITE evidence (never inferred from tests)
             try:
                 from capabilities import record_write_certification
-                a["certification"] = record_write_certification(req["target_system"], req["target_operation"], a["action_id"], v.get("evidence")); _save(a)
+                ev = {**(v.get("evidence") or {}), "approved_by": (a.get("approval") or {}).get("approved_by"), "approval_token": (a.get("approval") or {}).get("token_id"), "approved_at": (a.get("approval") or {}).get("approved_at"),
+                      "fingerprint": req.get("action_fingerprint"), "ticket_id": ticket_id, "read_back": v.get("reason")}      # the durable certification carries the whole evidence chain, not only the read-back
+                a["certification"] = record_write_certification(req["target_system"], req["target_operation"], a["action_id"], ev); _save(a)
             except Exception as e:
                 a["codes"].append("CERTIFICATION_NOT_RECORDED"); a["history"].append({"at": _now(), "state": "VERIFIED", "code": "CERTIFICATION_NOT_RECORDED", "reason": str(e)[:200]}); _save(a)
     else:

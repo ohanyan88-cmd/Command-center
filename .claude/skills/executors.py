@@ -808,6 +808,17 @@ def _last_local_draft():
     rows = [r for r in _read_state("decisions") if r.get("kind") == "LOCAL_DRAFT"]
     return rows[-1] if rows else None
 
+def _last_provider_draft():
+    """Most recent VERIFIED provider-side Outlook draft (Action Runtime evidence) that has not been sent yet — 'send it' means THAT item."""
+    ac = _ac()
+    drafts = [a for a in ac.list_actions("status='VERIFIED'") if (a.get("request") or {}).get("target_operation") == "mail.draft" and ((a.get("verification") or {}).get("evidence") or {}).get("id")]
+    if not drafts: return None
+    sent = {(a.get("request") or {}).get("target_object_id") for a in ac.list_actions("status IN ('VERIFIED','APPROVED','EXECUTING','EXECUTED_UNVERIFIED','RESULT_UNKNOWN')") if (a.get("request") or {}).get("target_operation") == "mail.send"}
+    for a in reversed(drafts):
+        ev = a["verification"]["evidence"]
+        if ev["id"] not in sent: return {"entry_id": ev["id"], "to": ev.get("to") or a["request"]["parameters"].get("to"), "subject": ev.get("subject") or a["request"]["parameters"].get("subject"), "draft_action": a["action_id"]}
+    return None
+
 def _parse_action_intent(text, inputs, today):
     """Deterministic understanding of the common management intents → Action Request spec(s) or a non-mutating verdict."""
     t = " ".join(str(text or "").split()); tl = t.lower()
@@ -845,7 +856,11 @@ def _parse_action_intent(text, inputs, today):
         d = inputs.get("draft") or _last_local_draft()
         if not d: return {"kind": "blocked", "code": "MISSING_INPUT", "reason": "no local draft to place — draft it first"}
         return {"kind": "action", "system": "INT-OL-MAIL", "op": "mail.draft", "object_type": "email_draft", "params": {"to": d.get("to"), "subject": d.get("subject"), "body": d.get("body")}, "domain": "G_COMMUNICATION", "effect": f"a DRAFT appears in Outlook Drafts addressed to {d.get('to')} (nothing is sent)", "post": "draft read back by EntryID (recipient, subject)"}
-    if re.search(r"^send it\b|^send (?:that|the) (?:draft|e-?mail|message)", tl):
+    if re.search(r"^send it\b|^send (?:that|the) (?:draft|e-?mail|message)|^ուղարկիր?(?: (?:դա|էդ|այն|նամակը|դռաֆտը|draft-?ը))?[.!]?$", tl):
+        pd = None if inputs.get("draft") else _last_provider_draft()
+        if pd:                                                        # natural Outlook flow: the reviewed draft ITEM is sent, leaves Drafts, lands in Sent Items
+            return {"kind": "action", "system": "INT-OL-MAIL", "op": "mail.send", "object_type": "email_draft", "object_id": pd["entry_id"], "params": {"to": pd["to"], "subject": pd["subject"], "content": "as saved in the Outlook draft (reviewed by Gev; sent unchanged)"},
+                    "domain": "G_COMMUNICATION", "effect": f"the Outlook draft '{pd['subject']}' is SENT to {pd['to']} — it leaves Drafts and appears in Sent Items", "post": "draft gone from Drafts + Sent Items evidence (recipient, subject)", "recipients_resolved": bool(pd["to"] and "@" in str(pd["to"]))}
         d = inputs.get("draft") or _last_local_draft()
         if not d: return {"kind": "blocked", "code": "MISSING_INPUT", "reason": "nothing pending to send — draft it first"}
         return {"kind": "action", "system": "INT-OL-MAIL", "op": "mail.send", "object_type": "email", "params": {"to": d.get("to"), "cc": d.get("cc") or "", "subject": d.get("subject"), "body": d.get("body"), "attachments": d.get("attachments") or []}, "domain": "G_COMMUNICATION", "effect": f"the e-mail is SENT to {d.get('to')}", "post": "Sent Items evidence", "recipients_resolved": bool(d.get("to") and "@" in str(d.get("to")))}

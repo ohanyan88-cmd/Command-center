@@ -10,7 +10,7 @@ import adapter_outlook, registry
 from contracts import IntegrationError
 
 WRITER = HERE / "outlook_write.ps1"
-WRITER_SHA256 = "51bfec7a37d76364f9f772a37f28a07a2b39a1f6a3483af2055854b038c77f43"
+WRITER_SHA256 = "3380546bc07ae958bc6bb4280488e7b21f7db85b4804c4fa84bf6810fc3ab134"
 OPS = ("calendar.create", "calendar.update", "calendar.cancel", "mail.draft", "mail.send")
 _ISO = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$")
 
@@ -54,8 +54,23 @@ def precondition(op, params):
         if e.code in ("UNAVAILABLE", "TOOL_UNAVAILABLE"): raise
         it = None
     if not it: return {"exists": False, "object": None}
-    keys = ("subject", "start", "end", "location", "required", "to", "unread")
+    keys = ("subject", "start", "end", "location", "required", "to", "unread", "folder", "submitted")       # folder/submitted: a draft that was edited, sent or moved after the card → STALE_CONFLICT
     return {"exists": True, "object": {k: it.get(k) for k in keys if k in it}}
+
+def _sent_evidence(params):
+    """Sent Items evidence through the READ-ONLY reader: same subject and recipient."""
+    d = adapter_outlook.read("mail.search", {"folder": "Sent", "query": str(params.get("subject", ""))[:60], "limit": 20}, {}, integration_id="INT-OL-MAIL")
+    for r in d["records"]:
+        if r["subject"].strip().lower() == str(params.get("subject", "")).strip().lower() and str(params.get("to", "")).lower() in (r.get("to") or "").lower(): return {"id": r["source_record_id"], **r}
+    return None
+
+def _draft_left_drafts(entry_id):
+    """After sending an existing draft the item is gone from Drafts (its EntryID changes when Outlook moves it to Sent Items)."""
+    try: it = _get(entry_id)
+    except IntegrationError as e:
+        if e.code in ("UNAVAILABLE", "TOOL_UNAVAILABLE"): raise
+        it = None
+    return (it is None) or bool(it.get("submitted")) or ("draft" not in str(it.get("folder", "")).lower())
 
 def find_existing(op, params):
     """Idempotency / reconciliation through read-only ops: same subject+start in the calendar; same subject+recipient in Drafts/Sent."""
@@ -65,13 +80,12 @@ def find_existing(op, params):
             for r in d["records"]:
                 if r["title"].strip().lower() == str(params.get("subject", "")).strip().lower() and (r["start"] or "")[:16] == params["start"][:16]: return {"id": r["source_record_id"], **r}
             return None
-        if op in ("mail.draft", "mail.send"):
-            folder = "Sent" if op == "mail.send" else "Drafts"
-            if folder == "Drafts": return None                       # the reader exposes Inbox/Sent only; drafts are verified by EntryID after execution
-            d = adapter_outlook.read("mail.search", {"folder": folder, "query": str(params.get("subject", ""))[:60], "limit": 20}, {}, integration_id="INT-OL-MAIL")
-            for r in d["records"]:
-                if r["subject"].strip().lower() == str(params.get("subject", "")).strip().lower() and str(params.get("to", "")).lower() in (r.get("to") or "").lower(): return {"id": r["source_record_id"], **r}
-            return None
+        if op == "mail.draft": return None                            # the reader exposes Inbox/Sent only; drafts are verified by EntryID after execution
+        if op == "mail.send":
+            if params.get("target_object_id"):                        # sending an EXISTING draft: already sent ⇔ it left Drafts (idempotent, never a second send)
+                if _draft_left_drafts(params["target_object_id"]): return {"id": params["target_object_id"], "sent_draft": True, **(_sent_evidence(params) or {})}
+                return None
+            return _sent_evidence(params)
         if op in ("calendar.update", "calendar.cancel"):
             it = _get(params.get("target_object_id"))
             if op == "calendar.cancel": return None if it and not it.get("cancelled") else ({"id": params.get("target_object_id"), "cancelled": True} if it is None or it.get("cancelled") else None)
@@ -92,6 +106,8 @@ def execute(op, params):
         if params.get("target_object_id"): args += ["-EntryId", str(params["target_object_id"])]
         for k in ("start", "end"):
             if params.get(k) and not _ISO.match(str(params[k])): raise ProviderError(f"{k} must be ISO local time")
+    elif op == "mail.send" and params.get("target_object_id"):
+        args += ["-EntryId", str(params["target_object_id"])]         # send the reviewed draft item as it is — content is what Gev saw in Outlook
     else:
         if params.get("to"): args += ["-To", ";".join(params["to"]) if isinstance(params["to"], list) else str(params["to"])]
         if params.get("cc"): args += ["-Cc", ";".join(params["cc"]) if isinstance(params["cc"], list) else str(params["cc"])]
@@ -105,7 +121,11 @@ def verify(op, params, result):
     """Independent read-back via the read-only reader; provider success alone never verifies."""
     try:
         if op == "mail.send":
-            found = find_existing("mail.send", params)
+            found = _sent_evidence(params)
+            if params.get("target_object_id"):                        # a sent draft must ALSO have left Drafts — natural Outlook behaviour, verified independently
+                left = _draft_left_drafts(params["target_object_id"])
+                ok = bool(found) and left
+                return {"verified": ok, "reason": ("Sent Items evidence found and the draft left Drafts" if ok else ("draft still in Drafts" if not left else "no Sent Items evidence for this recipient/subject")), "evidence": {"draft_entry_id": params["target_object_id"], "left_drafts": left, "sent": found}}
             return {"verified": bool(found), "reason": "Sent Items evidence found" if found else "no Sent Items evidence for this recipient/subject", "evidence": found}
         eid = (result or {}).get("id") or params.get("target_object_id")
         it = _get(eid) if eid else None
