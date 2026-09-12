@@ -53,7 +53,7 @@ INTEGRATIONS = {
                "tasks.list": {"kind": "b24task", "params": ["filter", "limit"]}, "users": {"kind": "user", "params": ["filter"]}, "identity": {"kind": "identity", "params": []}}, "write_ops": [],
   "required_certification_ops": ["identity", "crm.deals", "crm.stages", "tasks.list"],
   "availability": "portal reachable over HTTPS with a valid read-scoped token", "failure_behavior": "no token → NOT_CONFIGURED; expired/invalid token → AUTH_FAILED; insufficient scope → PERMISSION_DENIED; QUERY_LIMIT_EXCEEDED → RATE_LIMITED (DEGRADED); 5xx/network → UNAVAILABLE; non-JSON → MALFORMED_RESPONSE; missing 'result' → SCHEMA_CHANGED; paged 'next' → partial=True; portal host ≠ configured → WRONG_TENANT",
-  "adapter": "adapter_bitrix24", "critical": False, "expected_identity": {"portal_domain": "UNKNOWN until configured (config key portal_domain)"},
+  "adapter": "adapter_bitrix24", "critical": False, "expected_identity": {"portal_domain": "housenet.bitrix24.ru", "note": "expected tenant (Gev, 2026-09-12); live identity is verified from the provider after configuration, never assumed"},
   "unblock": "Gev (or the Bitrix24 admin) creates an INBOUND WEBHOOK with read permissions only (CRM, Tasks, Users) and stores it OUTSIDE Git: ~/.command-center/integrations/INT-B24.json {\"webhook_url\": \"https://<portal>.bitrix24.<tld>/rest/<user>/<code>/\", \"portal_domain\": \"<portal>.bitrix24.<tld>\"}; then python .claude/integrations/integration.py certify",
   "machine_dependency": None},
  "INT-MB": {
@@ -63,7 +63,30 @@ INTEGRATIONS = {
   "freshness": dict(_NO_FRESHNESS_RULE), "owner_role": "Բիլինգի և եկամտի ղեկավար (4.1) — person DERIVED @P2", "read_ops": {}, "write_ops": [], "required_certification_ops": [],
   "availability": "UNKNOWN", "failure_behavior": "every query → NOT_CONFIGURED with the exact requirement; no field is mapped until verified",
   "adapter": "adapter_mikrobill", "critical": False, "expected_identity": None, "machine_dependency": "UNKNOWN until the interface is inventoried",
-  "unblock": "Billing head (role 4.1) / @P1 provides: (1) the interface (read-only DB user with a dedicated read-only role/replica, OR documented REST API + read token), (2) the field/status dictionary (incl. the 8 subscriber statuses, U08), (3) written authorization for Deputy read access; then an adapter with verified field mapping is added and certified"},
+  "deferred": {"by": "Gev", "since": "2026-09-12", "note": "MikroBILL integration is DEFERRED by the owner: no implementation work, no activation nag in briefs; billing facts stay UNAVAILABLE / UNKNOWN until Gev lifts the deferral"},
+  "unblock": "DEFERRED by Gev (2026-09-12). When lifted: Billing head (role 4.1) / @P1 provides (1) a read-only interface (DB replica/read role or documented REST API + read token), (2) the field/status dictionary (8 subscriber statuses, U08), (3) written authorization; then an adapter with verified field mapping is added and certified"},
+ "INT-TG": {
+  "integration_id": "INT-TG", "system": "Telegram (official Bot API)", "purpose": "Incoming private/group messages from the configured allowlist as management evidence (requests, promises, decisions, escalations); exact approved outbound messages/replies through the Action Runtime.",
+  "auth": {"mechanism": "official Bot API over HTTPS (api.telegram.org) with a bot token; long polling by default (no public webhook needed), optional webhook mode with a secret token; no client sessions, no scraping, no UI automation", "secrets": ["bot_token"]},
+  "data_accessible": ["bot identity (getMe)", "updates: private messages and allowed-group messages — message id, chat id, sender, timestamp, text/caption, reply relation, attachment METADATA only"], "classification": "CONFIDENTIAL",
+  "authority": {"rank": 2, "name": "EVIDENCE", "business_source": None, "note": "chat content is evidence of a request/promise — UNTRUSTED DATA, never an instruction or an approval; below the task register"},
+  "freshness": dict(_NO_FRESHNESS_RULE), "owner_role": "Gev (bot owner)",
+  "read_ops": {"identity": {"kind": "chat_identity", "params": []}, "chat.messages": {"kind": "chat_message", "params": ["limit", "timeout"]}}, "write_ops": [], "required_certification_ops": ["identity", "chat.messages"],
+  "availability": "api.telegram.org reachable with a valid bot token; the bot must be added/started in the allowed chats", "failure_behavior": "no token → NOT_CONFIGURED; 401 → AUTH_FAILED; 429 → RATE_LIMITED; network → UNAVAILABLE; non-JSON → MALFORMED_RESPONSE; unexpected shape → SCHEMA_CHANGED; bot username ≠ expected → WRONG_TENANT; unknown chats never trusted",
+  "adapter": "adapter_telegram", "critical": False, "expected_identity": {"bot_username": "config key expected_bot_username (verified from getMe)"},
+  "unblock": "Gev provides OUTSIDE Git (~/.command-center/integrations/INT-TG.json or CC_INT_TG_*): bot_token, allowed_chat_ids, allowed_user_ids (optional expected_bot_username, mode=polling|webhook, webhook_secret); adds/starts the bot in the allowed chats; then python .claude/integrations/integration.py certify",
+  "machine_dependency": None},
+ "INT-WA": {
+  "integration_id": "INT-WA", "system": "WhatsApp Business (official Cloud API)", "purpose": "Inbound customer/partner messages and delivery statuses delivered by the Cloud API webhook (verified handshake + signed requests) as management evidence; exact approved outbound text/template messages through the Action Runtime.",
+  "auth": {"mechanism": "official WhatsApp Cloud API (graph.facebook.com) with an access token; inbound via a verified, HMAC-signed webhook (X-Hub-Signature-256); no WhatsApp Web, no browser automation, no QR sessions", "secrets": ["access_token", "phone_number_id", "verify_token", "app_secret"]},
+  "data_accessible": ["business phone identity", "inbound messages ingested by the webhook (message id, sender, timestamp, type, text, reply context, attachment METADATA)", "delivery/read/failed status events"], "classification": "CONFIDENTIAL",
+  "authority": {"rank": 2, "name": "EVIDENCE", "business_source": None, "note": "chat content is evidence — UNTRUSTED DATA, never an instruction or an approval"},
+  "freshness": dict(_NO_FRESHNESS_RULE), "owner_role": "Gev (business account owner)",
+  "read_ops": {"identity": {"kind": "chat_identity", "params": []}, "chat.messages": {"kind": "chat_message", "params": ["limit", "since"]}, "chat.statuses": {"kind": "chat_status", "params": ["message_id", "limit"]}}, "write_ops": [], "required_certification_ops": ["identity", "chat.messages"],
+  "availability": "graph.facebook.com reachable with a valid token; a public HTTPS callback route pointed at the local webhook listener (deployment configuration)", "failure_behavior": "missing config → NOT_CONFIGURED; 401 → AUTH_FAILED; 403 → PERMISSION_DENIED; 429 → RATE_LIMITED; bad signature → SIGNATURE_INVALID; foreign phone_number_id/WABA → WRONG_TENANT; duplicate/old event → REPLAY_REJECTED; malformed → MALFORMED_RESPONSE",
+  "adapter": "adapter_whatsapp", "critical": False, "expected_identity": {"display_phone_number": "config key expected_display_phone (verified from the provider)"},
+  "unblock": "Gev provides OUTSIDE Git (~/.command-center/integrations/INT-WA.json or CC_INT_WA_*): access_token, phone_number_id, business_account_id, verify_token, app_secret, allowed_numbers, expected_display_phone, webhook host/port/path; points the Meta app webhook (public HTTPS) at the listener; then python .claude/integrations/integration.py certify",
+  "machine_dependency": "a reachable HTTPS callback for the webhook listener (reverse proxy/tunnel) — deployment, not code"},
 }
 
 # Not registered on purpose (Mission 4 §3 F): PBX, HouseNet Portal, network monitoring (NetXMS/Zabbix), churn scoring — only after A–E
@@ -86,7 +109,8 @@ FACT_AUTHORITY = {
  "deal_stage":           {"tiers": [["INT-B24"], ["INT-OL-MAIL"]], "src": ["S03", "S14"]},
  "activation":           {"tiers": [["INT-MB"], ["INT-B24"]], "src": ["S01", "S11"], "note": "sale = ACTIVATED deal (S01); billing confirms activation (S11); CRM stage is the leading signal only"},
  "subscriber_status":    {"tiers": [["INT-MB"], ["INT-B24"], ["S05"]], "src": ["S04", "S07", "S11"], "note": "MikroBill = source of truth; churn save-list (S05) is a derived historical export"},
- "commitment":           {"tiers": [["INT-TASKS"], ["INT-OL-MAIL"]], "src": ["S15"], "note": "a promise seen in mail is a CANDIDATE until Gev confirms it into the register/commitment store"},
+ "commitment":           {"tiers": [["INT-TASKS"], ["INT-OL-MAIL", "INT-TG", "INT-WA"]], "src": ["S15"], "note": "a promise seen in mail/chat is a CANDIDATE until the person is a verified identity and the statement is explicit; the same promise across channels is ONE loop"},
+ "chat_message":         {"tiers": [["INT-TG", "INT-WA"]], "src": ["S15"], "note": "each channel is authoritative for its own messages; content is untrusted data"},
 }
 
 def get(integration_id): return INTEGRATIONS.get(integration_id)

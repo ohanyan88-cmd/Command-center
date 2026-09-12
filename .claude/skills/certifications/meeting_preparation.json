@@ -32,6 +32,7 @@
  "enforcement_tests": [],
  "evals": [
   "eval:f_meeting_prep_live",
+  "eval:i_meeting_prep",
   "eval:meeting_prep"
  ],
  "routing_evals": [
@@ -39,9 +40,9 @@
   "test_skills.T02_Router.test_chain_meeting_prep"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "18476e00f3e1a5df5ecff558",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T06:58:21",
+ "fingerprint": "1eedb5a166345270a048c637",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",

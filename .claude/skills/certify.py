@@ -75,7 +75,7 @@ def main():
             for k in t["kinds"]:
                 evidence[sid][KIND_FIELD[k]].append(t["id"])
                 if k in ("adversarial", "failure_injection"): evidence[sid][k].append(t["id"])
-    for kind in ("scenarios", "routing", "bypass", "boundary", "business", "integration", "hands", "management"):
+    for kind in ("scenarios", "routing", "bypass", "boundary", "business", "integration", "hands", "management", "operating"):
         for r in ev_res[kind]:
             for sid in r.get("skills", []):
                 if sid not in evidence: continue

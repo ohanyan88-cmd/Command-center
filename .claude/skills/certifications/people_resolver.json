@@ -1,0 +1,49 @@
+{
+ "skill_id": "people_resolver",
+ "skill_version": "1.2.0",
+ "maturity_level": "L1",
+ "declared_maturity": "L3",
+ "computed_maturity": "L1",
+ "tests": [],
+ "failure_tests": [],
+ "hardening_cases": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "adversarial": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "failure_injection": [],
+ "authority_tests": [
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+ ],
+ "completion_verification": [],
+ "concurrency_tests": [],
+ "enforcement_tests": [],
+ "evals": [
+  "eval:i_person_role"
+ ],
+ "routing_evals": [],
+ "failed_tests": [],
+ "certified_at": "2026-09-12T06:58:21",
+ "fingerprint": "f678c16ab11944f8859d47ad",
+ "core_fingerprint": "b66d5af33dd07bf1",
+ "result": "PASS",
+ "suites": [
+  "test_skills",
+  "test_store",
+  "test_failclosed",
+  "test_hardening",
+  "test_enforcement",
+  "test_workspace",
+  "test_runtime",
+  "test_business",
+  "test_boundary",
+  "test_integrations",
+  "test_portability",
+  "test_actions",
+  "test_live_data",
+  "test_intelligence",
+  "test_outlook_write"
+ ],
+ "audit_infrastructure": true
+}

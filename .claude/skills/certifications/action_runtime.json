@@ -137,16 +137,18 @@
   "eval:g_send_it",
   "eval:g_tariff",
   "eval:g_timeout_retry",
-  "eval:h_execute_routes_to_hands"
+  "eval:h_execute_routes_to_hands",
+  "eval:i_prompt_injection",
+  "eval:i_send_routes_to_approval"
  ],
  "routing_evals": [
   "eval:r_email_tool",
   "test_actions.H05_CapabilityAndSkill.test_routing_and_executor_boundaries"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "34aa12b38aad8362e4f0f403",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T06:58:21",
+ "fingerprint": "08c9727d49d509bf37065e7f",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",

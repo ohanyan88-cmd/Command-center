@@ -56,7 +56,8 @@ class I01_Registry(unittest.TestCase):
             for f in registry.REQUIRED_FIELDS: self.assertIn(f, spec, f"{iid}.{f}")
             self.assertEqual(spec["write_ops"], [], iid); self.assertIn(spec["classification"], ("INTERNAL", "CONFIDENTIAL"))
             self.assertIsInstance(spec["freshness"]["rule"], str); self.assertIn("cache_ttl_seconds", spec["freshness"])
-        self.assertEqual(set(registry.INTEGRATIONS), {"INT-TASKS", "INT-OL-CAL", "INT-OL-MAIL", "INT-B24", "INT-MB"})
+        self.assertEqual(set(registry.INTEGRATIONS), {"INT-TASKS", "INT-OL-CAL", "INT-OL-MAIL", "INT-B24", "INT-MB", "INT-TG", "INT-WA"})
+        self.assertEqual(registry.INTEGRATIONS["INT-MB"]["deferred"]["by"], "Gev")       # MikroBILL deferred by the owner: declared, not worked on, not nagged
         self.assertTrue(registry.DEFERRED)      # PBX/Portal/NET/churn deliberately not connected — explicit
         for ft, fa in registry.FACT_AUTHORITY.items():
             self.assertTrue(fa["tiers"] and fa.get("src"), ft)

@@ -28,6 +28,10 @@ TABLES = {
     # Mission 5 — intelligence continuity: immutable observation checkpoints (signatures only) and mutable open loops (references only, upsert)
     "checkpoints": "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, payload TEXT NOT NULL, checksum TEXT NOT NULL",
     "loops":       "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, payload TEXT NOT NULL, checksum TEXT NOT NULL",
+    # operating layer: chat channel evidence log (LOCAL only — ids, sender refs, timestamps, short excerpts; never versioned), confirmed identity links (LOCAL), alert state (durable, upsert)
+    "channel_events": "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, payload TEXT NOT NULL, checksum TEXT NOT NULL",
+    "identities":  "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, payload TEXT NOT NULL, checksum TEXT NOT NULL",
+    "alerts":      "op_id TEXT PRIMARY KEY, recorded_at TEXT NOT NULL, payload TEXT NOT NULL, checksum TEXT NOT NULL",
     "meta":        "key TEXT PRIMARY KEY, value TEXT",
 }
 

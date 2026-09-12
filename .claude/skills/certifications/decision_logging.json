@@ -62,13 +62,14 @@
  ],
  "enforcement_tests": [],
  "evals": [
+  "eval:i_decision_recall",
   "eval:log_decision"
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "46e614d7e39c7510be287486",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T06:58:21",
+ "fingerprint": "6a85d10ca15812458fcab033",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",

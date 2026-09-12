@@ -11,9 +11,11 @@ FRESHNESS = ("LIVE", "CACHED", "STALE", "UNAVAILABLE")
 CERT_STATES = ("DECLARED", "CONFIGURED", "CONNECTED", "VERIFIED_READ", "RELIABLE_READ")
 FAILURE_CODES = ("AUTH_FAILED", "PERMISSION_DENIED", "UNAVAILABLE", "TIMEOUT", "MALFORMED_RESPONSE", "SCHEMA_CHANGED", "RATE_LIMITED", "WRONG_TENANT",
                  "PARTIAL_RESPONSE", "TOOL_UNAVAILABLE", "NOT_CONFIGURED", "BAD_PARAMS", "READ_ONLY_VIOLATION", "UNKNOWN_OPERATION", "NOT_REGISTERED",
-                 "LEAK_PREVENTED", "SOURCE_CONFLICT", "ENTITY_MATCH_UNCERTAIN", "AUDIT_UNAVAILABLE")
+                 "LEAK_PREVENTED", "SOURCE_CONFLICT", "ENTITY_MATCH_UNCERTAIN", "AUDIT_UNAVAILABLE",
+                 "SIGNATURE_INVALID", "REPLAY_REJECTED", "DEFERRED")                    # chat webhooks (WhatsApp/Telegram) · integrations deferred by the owner
 HEALTH_FOR_CODE = {"AUTH_FAILED": "AUTH_FAILED", "WRONG_TENANT": "AUTH_FAILED", "PERMISSION_DENIED": "PERMISSION_DENIED", "SCHEMA_CHANGED": "SCHEMA_CHANGED",
-                   "MALFORMED_RESPONSE": "SCHEMA_CHANGED", "RATE_LIMITED": "DEGRADED", "PARTIAL_RESPONSE": "DEGRADED", "NOT_CONFIGURED": "NOT_CONFIGURED", "AUDIT_UNAVAILABLE": "DEGRADED"}
+                   "MALFORMED_RESPONSE": "SCHEMA_CHANGED", "RATE_LIMITED": "DEGRADED", "PARTIAL_RESPONSE": "DEGRADED", "NOT_CONFIGURED": "NOT_CONFIGURED", "AUDIT_UNAVAILABLE": "DEGRADED",
+                   "SIGNATURE_INVALID": "AUTH_FAILED", "REPLAY_REJECTED": "DEGRADED", "DEFERRED": "NOT_CONFIGURED"}
 CLASSIFICATIONS = ("PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED")
 
 # Write intents the runtime must reject in Mission 4 (structured block, never a prompt-only promise). Patterns are matched on the
@@ -68,6 +70,10 @@ RECORD_SCHEMAS = {
  "user":     ("record_id", "source_record_id", "name", "email", "active", "source_updated_at"),
  "identity": ("record_id", "source_record_id", "portal", "user_id", "source_updated_at"),
  "inventory": ("record_id", "source_record_id", "interface", "status", "source_updated_at"),
+ # chat channels (Telegram Bot API · WhatsApp Cloud API): message content is UNTRUSTED DATA — never an instruction; `trusted` = sender/chat on the configured allowlist
+ "chat_message": ("record_id", "source_record_id", "channel", "chat_id", "chat_title", "sender_id", "sender_name", "text", "message_type", "reply_to", "received", "attachments", "trusted", "source_updated_at"),
+ "chat_status":  ("record_id", "source_record_id", "channel", "message_id", "recipient_id", "status", "at", "error", "source_updated_at"),
+ "chat_identity": ("record_id", "source_record_id", "channel", "account_id", "display", "verified", "source_updated_at"),
 }
 
 def now_iso(): return datetime.datetime.now().isoformat(timespec="seconds")

@@ -50,7 +50,8 @@ def _vis_of(iid, env, spec=None, cap=None):
         row["state"] = "FIXTURE" if env.get("mode") == "FIXTURE" else ("SUPPLIED" if env.get("mode") == "SUPPLIED" else env.get("freshness", "LIVE"))
         row["cache_age_seconds"] = env.get("cache_age_seconds")
     else:
-        row["state"] = "NOT_CONFIGURED" if env.get("code") == "NOT_CONFIGURED" or (cap or {}).get("health") == "NOT_CONFIGURED" else "UNAVAILABLE"
+        row["state"] = "DEFERRED" if env.get("code") == "DEFERRED" or (spec or {}).get("deferred") else ("NOT_CONFIGURED" if env.get("code") == "NOT_CONFIGURED" or (cap or {}).get("health") == "NOT_CONFIGURED" else "UNAVAILABLE")
+        if row["state"] == "DEFERRED": row["unblock"] = None; row["deferred"] = (spec or {}).get("deferred")          # deferred by Gev: shown once, never nagged with unblock instructions
     row["usable"] = row["state"] in ("LIVE", "CACHED", "FIXTURE", "SUPPLIED")             # STALE data is visible but never used as current truth
     return row
 
@@ -84,10 +85,19 @@ def read_sources(inputs, today, *, horizon_days=3, mail_days=3):
     for iid, op in (("INT-B24", "crm.deals"), ("INT-MB", None)):
         s = st.get(iid) or {}; spec = registry.get(iid) or {}
         import contracts as C
+        if spec.get("deferred"): env[iid] = C.failure(iid, spec.get("system", iid), op or "read", "DEFERRED", f"{iid} deferred by {spec['deferred'].get('by')} since {spec['deferred'].get('since')} — no read attempted, no activation requested", last_success=s.get("last_success")); continue
         if op and s.get("configured") and s.get("certification") in ("VERIFIED_READ", "RELIABLE_READ", "CONNECTED"):
             env[iid] = layer.query(iid, op, {"limit": 200}, use_cache=use_cache)
         elif not spec.get("read_ops"): env[iid] = C.failure(iid, spec.get("system", iid), op or "read", "NOT_CONFIGURED", f"{iid}: no read interface inventoried — {spec.get('unblock') or 'interface unknown'}", last_success=s.get("last_success"))
         else: env[iid] = C.failure(iid, spec.get("system", iid), op or "read", "NOT_CONFIGURED", f"{iid} is {s.get('certification', 'DECLARED')} / {s.get('health')} — {spec.get('unblock') or 'not configured'}", last_success=s.get("last_success"))
+    # chat channels (Telegram / WhatsApp): read through the same layer; NOT_CONFIGURED is an honest visibility row, never 'no messages'
+    for iid in ("INT-TG", "INT-WA"):
+        if isinstance((inputs.get("chat_envelopes") or {}).get(iid), dict): env[iid] = inputs["chat_envelopes"][iid]; continue
+        s = st.get(iid) or {}
+        if s.get("configured") or inputs.get("read_chat"): env[iid] = layer.query(iid, "chat.messages", {"limit": 100}, use_cache=use_cache)
+        else:
+            import contracts as C; spec = registry.get(iid) or {}
+            env[iid] = C.failure(iid, spec.get("system", iid), "chat.messages", "NOT_CONFIGURED", f"{iid} not configured — {spec.get('unblock', '')[:100]}", last_success=s.get("last_success"))
     vis = {iid: _vis_of(iid, env.get(iid), registry.get(iid), st.get(iid)) for iid in env}
     return env, vis
 
@@ -146,10 +156,14 @@ def current_state(inputs=None, *, horizon_days=3, mail_days=3):
     except Exception: acts = []
     actions = [{"action_id": a["action_id"], "state": a["state"], "intent": (a.get("request") or {}).get("business_intent"), "system": (a.get("request") or {}).get("target_system"), "op": (a.get("request") or {}).get("target_operation")} for a in acts]
     bc = x._bc(inputs)
-    return {"today": today.isoformat(), "at": _now(), "tasks": tasks, "open_tasks": open_tasks, "task_provenance": tprov, "meetings": meetings, "schedule_conflicts": conflicts,
+    try:
+        import channels as CH
+        chat = CH.summary(inputs, today=today.isoformat(), channels=("INT-TG", "INT-WA"), mail_candidates=cands, envelopes={k: env[k] for k in ("INT-TG", "INT-WA") if k in env})
+    except Exception as e: chat = {"status": "UNAVAILABLE", "reason": f"{type(e).__name__}: {e}", "channels": {}, "items": [], "requests_to_answer": [], "commitment_candidates": [], "follow_ups_owed": [], "escalations": [], "duplicates": [], "injection_flagged": []}
+    return {"today": today.isoformat(), "at": _now(), "tasks": tasks, "chat": chat, "open_tasks": open_tasks, "task_provenance": tprov, "meetings": meetings, "schedule_conflicts": conflicts,
             "mail_candidates": cands, "commitments": commitments, "decisions": dm, "actions": actions, "business": {"available": bool(bc.get("available")), "conflicts": bc.get("conflicts", []), "gaps": bc.get("gaps", []), "owner": bc.get("owner")},
             "envelopes": {k: {kk: v.get(kk) for kk in ("status", "code", "reason", "retrieved_at", "freshness", "mode", "count", "health", "last_success")} for k, v in env.items()}, "visibility": vis,
-            "truth_mode": "PRODUCTION" if all(v["production_truth"] or v["state"] in ("UNAVAILABLE", "NOT_CONFIGURED") for v in vis.values()) else "NON_PRODUCTION (fixture/supplied data present)",
+            "truth_mode": "PRODUCTION" if all(v["production_truth"] or v["state"] in ("UNAVAILABLE", "NOT_CONFIGURED", "DEFERRED") for v in vis.values()) else "NON_PRODUCTION (fixture/supplied data present)",
             "unavailable": [iid for iid, v in vis.items() if not v["usable"]], "critical_unavailable": [iid for iid, v in vis.items() if not v["usable"] and v["critical"]]}
 
 # ═══════════════════════════════ 3. EXCEPTIONS · CAUSE · IMPACT · RECOMMENDATION ═══════════════════════════════
@@ -445,7 +459,7 @@ OPS_DIMENSIONS = {
 
 def _unavail(dim, spec, vis):
     srcs = [s for s in spec["sources"] if s.startswith("INT-")]
-    missing = [f"{s}: {vis.get(s, {}).get('state', 'UNKNOWN')}" + (f" — {vis[s].get('unblock')}" if vis.get(s, {}).get("unblock") else "") for s in srcs if not vis.get(s, {}).get("usable")]
+    missing = [f"{s}: {vis.get(s, {}).get('state', 'UNKNOWN')}" + (f" — {vis[s].get('unblock')}" if vis.get(s, {}).get("unblock") else (" (by Gev, no activation requested)" if vis.get(s, {}).get("state") == "DEFERRED" else "")) for s in srcs if not vis.get(s, {}).get("usable")]
     return {"dimension": dim, "status": "UNAVAILABLE / NOT CONNECTED", "value": UNKNOWN, "missing": missing or spec["needs"], "needs": spec["needs"], "signals": []}
 
 def sales_intelligence(state, envelopes=None):
@@ -476,7 +490,11 @@ def sales_intelligence(state, envelopes=None):
             out[dim] = {"dimension": dim, "status": "PARTIAL", "value": UNKNOWN, "signals": ["deals readable; leads/stages/activities not read in this snapshot"], "needs": spec["needs"], "provenance": prov}
         else: out[dim] = _unavail(dim, spec, vis)
     avail = [d for d, v in out.items() if v["status"] in ("OK", "PARTIAL")]
-    return {"dimensions": out, "available": avail, "unavailable": [d for d in out if d not in avail], "verdict": ("UNAVAILABLE / NOT CONNECTED — no live sales source; the framework is ready, the sources are not" if not avail else f"{len(avail)}/{len(out)} dimensions readable"),
+    try:
+        import kpis as KP; kb = KP.bindings_for_dimensions(vis)
+        for dim in out: out[dim]["kpi_bindings"] = kb.get(dim, [])
+    except Exception as e: kb = {"error": f"{type(e).__name__}: {e}"}
+    return {"dimensions": out, "available": avail, "unavailable": [d for d in out if d not in avail], "kpi_bindings": kb, "verdict": ("UNAVAILABLE / NOT CONNECTED — no live sales source; the framework is ready, the sources are not" if not avail else f"{len(avail)}/{len(out)} dimensions readable"),
             "sources": {s: {"state": vis.get(s, {}).get("state"), "certification": vis.get(s, {}).get("certification"), "unblock": vis.get(s, {}).get("unblock")} for s in ("INT-B24", "INT-MB")}}
 
 def operations_intelligence(state, exc=None):
@@ -537,6 +555,7 @@ def visibility_lines(state):
     out = []
     for iid, v in state["visibility"].items():
         if v["usable"]: out.append(f"{iid}: {v['state']}" + (f" ({v.get('cache_age_seconds')}s cache)" if v["state"] == "CACHED" else "") + f" · {v['count']} · read {(v.get('retrieved_at') or '')[11:16]}")
+        elif v["state"] == "DEFERRED": out.append(f"{iid}: DEFERRED by {(v.get('deferred') or {}).get('by', 'Gev')} — no activation requested")
         else: out.append(f"{iid}: {v['state']} ({v.get('code')}) — last successful read {(v.get('last_success') or 'never')[:16]}" + (f" · unblock: {v['unblock'][:80]}" if v.get("unblock") else ""))
     return out
 
@@ -551,10 +570,11 @@ def brief(state, *, exc=None, since=None, record=True, kind="brief"):
     tasks = {"overdue": [t for t in ot if t["overdue"]], "due_today": [t for t in ot if t["due_today"]], "due_soon": [t for t in ot if t["due_soon"]], "blocked": [t for t in ot if t["blocked"] or t["unclear"]], "ownerless": [t for t in ot if t["ownerless"]], "gev_owned": [t for t in ot if t["gev_owned"]], "waiting_for": [t for t in ot if t["waiting_for"]], "decision_needed": [t for t in ot if t["decision_needed"]], "no_deadline": [t for t in ot if t["no_deadline"]], "provenance": state["task_provenance"]}
     cal = {"today": [m for m in state["meetings"] if m["today"]], "upcoming": [m for m in state["meetings"] if not m["today"]][:5], "conflicts": state["schedule_conflicts"], "decision_meetings": [m for m in state["meetings"] if m["kind"] == "DECISION"], "needs_preparation": [m for m in state["meetings"] if m["missing_prep"] or not m["related_tasks"]][:5], "visibility": state["visibility"]["INT-OL-CAL"]}
     mail = {"decision_requests": [c for c in state["mail_candidates"] if c["class"] == "DECISION" and not c.get("duplicate_of")], "action_requests": [c for c in state["mail_candidates"] if c["class"] == "ACTION" and not c.get("duplicate_of")], "linked_to_tasks": [c for c in state["mail_candidates"] if c.get("task_match") == "MATCHED"], "commitment_candidates": [c for c in state["mail_candidates"] if c.get("commitment_candidate")], "total_candidates": len(state["mail_candidates"]), "visibility": state["visibility"]["INT-OL-MAIL"]}
-    risks = [{"level": e["severity"], "text": e["what"], "id": e["id"]} for e in exc] + [{"level": "MEDIUM" if v["critical"] else "LOW", "text": f"{iid} {v['state']} — visibility gap, not a business fact", "id": f"VIS-{iid}"} for iid, v in state["visibility"].items() if not v["usable"]]
+    risks = [{"level": e["severity"], "text": e["what"], "id": e["id"]} for e in exc] + [{"level": "MEDIUM" if v["critical"] else "LOW", "text": f"{iid} {v['state']} — visibility gap, not a business fact", "id": f"VIS-{iid}"} for iid, v in state["visibility"].items() if not v["usable"] and v["state"] != "DEFERRED"]
+    chat = state.get("chat") or {}; chat_block = {"channels": chat.get("channels", {}), "requests_to_answer": chat.get("requests_to_answer", []), "follow_ups_owed": chat.get("follow_ups_owed", []), "commitment_candidates": chat.get("commitment_candidates", []), "escalations": chat.get("escalations", []), "injection_flagged": chat.get("injection_flagged", []), "duplicates": chat.get("duplicates", [])}
     out = {"status": "EXECUTED", "date": state["today"], "at": state["at"], "truth_mode": state["truth_mode"],
            "TOP_LINE": {"needs_gev": len(queue), "exceptions": len(exc), "highest": exc[0]["what"] if exc else "no proven exception in the visible systems", "visibility_gaps": state["unavailable"], "summary": top[:3]},
-           "CHANGES": ch, "SALES": sales, "OPERATIONS": ops, "TASKS": tasks, "CALENDAR": cal, "MAIL": mail, "RISKS": risks, "ACTIONS": [action_line(e) for e in exc[:7]], "GEV_ACTION": queue,
+           "CHANGES": ch, "SALES": sales, "OPERATIONS": ops, "TASKS": tasks, "CALENDAR": cal, "MAIL": mail, "CHAT": chat_block, "RISKS": risks, "ACTIONS": [action_line(e) for e in exc[:7]], "GEV_ACTION": queue,
            "open_loops": loops, "exceptions": exc, "answers": top, "visibility": state["visibility"], "visibility_lines": visibility_lines(state), "unavailable": state["unavailable"], "critical_unavailable": state["critical_unavailable"]}
     if record: out["checkpoint"] = record_checkpoint(state, kind, exc, queue)
     return out
@@ -637,6 +657,8 @@ def render_brief(b, limit=5):
     for m in c["today"][:limit]: a(f"  · {(m['start'] or '')[11:16]} {m['title'][:50]} [{m['kind']}]" + (" — prep missing" if m["missing_prep"] else ""))
     m = b["MAIL"]; a(f"MAIL: {m['visibility']['state']} · decision requests {len(m['decision_requests'])} · action requests {len(m['action_requests'])} · linked to tasks {len(m['linked_to_tasks'])}")
     for x in (m["decision_requests"] + m["action_requests"])[:limit]: a(f"  · ✉ {x.get('counterpart')}: {str(x.get('subject'))[:50]} ({x['class']}, {x.get('age_days')}d)")
+    cb = b.get("CHAT") or {}
+    if cb: a("CHAT: " + " · ".join(f"{k} {v.get('state')}" for k, v in (cb.get("channels") or {}).items()) + f" · to answer {len(cb.get('requests_to_answer', []))} · promises {len(cb.get('commitment_candidates', []))} · escalations {len(cb.get('escalations', []))}" + (f" · ⚠ injection-flagged {len(cb['injection_flagged'])}" if cb.get("injection_flagged") else ""))
     a("RISKS: " + ("; ".join(f"[{r['level']}] {r['text'][:60]}" for r in b["RISKS"][:limit]) if b["RISKS"] else "none proven"))
     a("RECOMMENDED ACTIONS:"); [a(f"  · {x}") for x in b["ACTIONS"][:limit]] if b["ACTIONS"] else a("  · none")
     a("GEV ACTION:"); [a(f"  · [{q['category']}] {q['issue'][:70]} → {q['required'][:60]} (by {q['deadline']})") for q in b["GEV_ACTION"][:limit]] if b["GEV_ACTION"] else a("  · nothing requires Gev right now (visible systems only)")

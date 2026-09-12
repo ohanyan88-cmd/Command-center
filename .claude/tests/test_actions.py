@@ -217,7 +217,7 @@ class H05_CapabilityAndSkill(unittest.TestCase):
     @covers(AR, *GOV, kinds=("unit",))
     def test_capability_registry_is_honest(self):
         rows = {(r["integration_id"], r["operation"]): r for r in CAP.table()}
-        self.assertEqual(rows[("INT-MB", "tariff.change")]["level"], "UNAVAILABLE"); self.assertEqual(rows[("INT-MB", "tariff.change")]["risk_class"], "R3")
+        self.assertEqual(rows[("INT-MB", "tariff.change")]["level"], "DEFERRED"); self.assertEqual(rows[("INT-MB", "tariff.change")]["risk_class"], "R3")      # deferred by Gev: still no hands, honestly labelled
         self.assertIn(rows[("INT-B24", "crm.deal.update")]["level"], ("IMPLEMENTED", "DECLARED")); self.assertTrue(all(r["gev_approval_required"] for r in rows.values() if r["read_or_write"] == "write"))
         certs = CAP._write_certs()
         for k, r in rows.items():

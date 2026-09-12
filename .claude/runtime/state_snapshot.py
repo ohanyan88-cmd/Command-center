@@ -15,8 +15,9 @@ ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE)); import python_runtime; python_runtime.ensure()
 sys.path.insert(0, str(ROOT / ".claude" / "skills"))
 
-DURABLE_TABLES = ("commitments", "decisions", "audit", "actions", "checkpoints", "loops")
-MUTABLE_TABLES = ("actions", "loops")                 # rows that change state in place (upsert): the export restores the latest exported state
+DURABLE_TABLES = ("commitments", "decisions", "audit", "actions", "checkpoints", "loops", "alerts")
+MUTABLE_TABLES = ("actions", "loops", "alerts", "commitments", "decisions")     # rows that change state in place (upsert): the export restores the latest exported state
+# LOCAL-ONLY tables (never exported): channel_events (chat evidence excerpts), identities (confirmed external identity links), tickets, meta
 EXTRA_COLS = {"audit": ("execution_id", "skill_id", "result_status"), "actions": ("status", "fingerprint", "idempotency_key", "session_id", "batch_id")}
 
 def _index_cols(t, payload):

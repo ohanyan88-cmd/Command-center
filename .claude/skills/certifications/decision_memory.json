@@ -55,13 +55,16 @@
  "enforcement_tests": [],
  "evals": [
   "eval:b_decided_process",
+  "eval:i_decision_conflict",
+  "eval:i_decision_recall",
+  "eval:i_meeting_prep",
   "eval:what_did_we_decide"
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "d236be1dfc312474281fbe76",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T06:58:21",
+ "fingerprint": "e4992f501739efbec6dd23e2",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",

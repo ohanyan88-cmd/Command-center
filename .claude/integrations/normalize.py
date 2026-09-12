@@ -41,6 +41,20 @@ def task(iid, t, source_updated_at=None):
     return {"record_id": rid(iid, t.get("id")), "source_record_id": str(t.get("id")), "title": _s(t.get("task"), 300), "status": _s(t.get("status"), 40), "open": bool(t.get("open")),
             "owner": _s(t.get("owner"), 120), "due": due, "comment": _s(t.get("comment"), 400), "row": t.get("row"), "source_updated_at": source_updated_at}
 
+def chat_message(iid, r, updated=None):
+    """Chat message (Telegram / WhatsApp) → fixed shape. Text is truncated (data minimization); attachments keep metadata only (kind, name, size, mime) — never content."""
+    atts = [{"kind": _s(a.get("kind"), 20), "name": _s(a.get("name"), 120), "size": a.get("size"), "mime": _s(a.get("mime"), 80)} for a in (r.get("attachments") or []) if isinstance(a, dict)]
+    return {"record_id": rid(iid, f"{r.get('chat_id')}|{r.get('message_id')}"), "source_record_id": _s(f"{r.get('chat_id')}|{r.get('message_id')}", 200), "channel": iid, "chat_id": _s(r.get("chat_id"), 80), "chat_title": _s(r.get("chat_title"), 120),
+            "sender_id": _s(r.get("sender_id"), 80), "sender_name": _s(r.get("sender_name"), 120), "text": _s(r.get("text"), 1200), "message_type": _s(r.get("message_type") or "text", 24), "reply_to": _s(r.get("reply_to"), 80) or None,
+            "received": _iso(r.get("received")), "attachments": atts, "trusted": bool(r.get("trusted")), "update_id": r.get("update_id"), "source_updated_at": _iso(r.get("received")) or updated}
+
+def chat_status(iid, r, updated=None):
+    return {"record_id": rid(iid, f"status|{r.get('message_id')}|{r.get('status')}|{r.get('at')}"), "source_record_id": _s(f"{r.get('message_id')}|{r.get('status')}", 200), "channel": iid, "message_id": _s(r.get("message_id"), 120),
+            "recipient_id": _s(r.get("recipient_id"), 80), "status": _s(r.get("status"), 20), "at": _iso(r.get("at")), "error": _s(r.get("error"), 200) or None, "source_updated_at": _iso(r.get("at")) or updated}
+
+def chat_identity(iid, r, updated=None):
+    return {"record_id": rid(iid, f"identity|{r.get('account_id')}"), "source_record_id": _s(r.get("account_id"), 120), "channel": iid, "account_id": _s(r.get("account_id"), 120), "display": _s(r.get("display"), 120), "verified": bool(r.get("verified")), "source_updated_at": updated}
+
 def deal(iid, d, updated=None):
     return {"record_id": rid(iid, d.get("ID")), "source_record_id": _s(d.get("ID")), "title": _s(d.get("TITLE"), 200), "stage_id": _s(d.get("STAGE_ID"), 60), "owner_id": _s(d.get("ASSIGNED_BY_ID"), 20),
             "opportunity": d.get("OPPORTUNITY"), "currency": _s(d.get("CURRENCY_ID"), 8), "date_create": _iso(d.get("DATE_CREATE")), "date_modify": _iso(d.get("DATE_MODIFY")), "closed": _bool(d.get("CLOSED")),

@@ -66,7 +66,8 @@
   "eval:h_ops_partial",
   "eval:h_recommend_no_write",
   "eval:h_sales_unavailable",
-  "eval:h_tasks_overdue"
+  "eval:h_tasks_overdue",
+  "eval:i_mikrobill_deferred"
  ],
  "routing_evals": [
   "eval:r_en_attention",
@@ -76,9 +77,9 @@
   "eval:r_hy_todo"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "6056dc14d72a43e290bcd1aa",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T06:58:21",
+ "fingerprint": "f004dfe237922bdd517e1fda",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",

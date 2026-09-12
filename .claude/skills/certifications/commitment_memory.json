@@ -65,14 +65,17 @@
  "enforcement_tests": [],
  "evals": [
   "eval:f_email_no_permanent_fact",
+  "eval:i_ambiguous_commitment",
+  "eval:i_commitment_extraction",
+  "eval:i_meeting_prep",
   "eval:open_loops",
   "eval:what_did_i_promise"
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "479683e1240ea17ffcd3b87a",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T06:58:21",
+ "fingerprint": "13e4f5e61623880eed5b785c",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",
