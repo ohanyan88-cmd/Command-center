@@ -10,7 +10,7 @@ import adapter_outlook, registry
 from contracts import IntegrationError
 
 WRITER = HERE / "outlook_write.ps1"
-WRITER_SHA256 = "3380546bc07ae958bc6bb4280488e7b21f7db85b4804c4fa84bf6810fc3ab134"
+WRITER_SHA256 = "30bd639c153b5e7926652e73978c95682598dfb14454bddddb31bf3a689f2dbe"
 OPS = ("calendar.create", "calendar.update", "calendar.cancel", "mail.draft", "mail.send")
 _ISO = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$")
 
@@ -37,7 +37,7 @@ def _run(args, timeout=90):
     try: d = json.loads(lines[-1])
     except ValueError: raise ProviderUnknown("writer output not JSON — outcome unknown")
     if not d.get("ok"):
-        if d.get("code") == "BAD_PARAMS": raise ProviderError(str(d.get("error")))
+        if d.get("code") in ("BAD_PARAMS", "INLINE_RESPONSE", "ALREADY_SENT"): raise ProviderError(f"{d.get('code')}: {str(d.get('error'))[:200]}")     # nothing was written — a clean, explained refusal
         raise ProviderError(f"Outlook refused: {str(d.get('error'))[:160]}")
     return d
 

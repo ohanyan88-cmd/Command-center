@@ -45,8 +45,15 @@ try {
     if ($null -eq $m -or $m.Class -ne 43) { Emit @{ ok = $false; code = "BAD_PARAMS"; error = "EntryId is not a mail item" }; exit 3 }
     if ($m.Submitted -or $m.Sent) { Emit @{ ok = $false; code = "ALREADY_SENT"; error = "the item was already submitted/sent" }; exit 3 }
     $id = [string]$m.EntryID; $conv = [string]$m.ConversationID; $subj = [string]$m.Subject; $to = [string]$m.To
-    $m.Send()
-    Emit @{ ok = $true; op = $Op; retrieved_at = $started; submitted = $true; sent_draft = $true; entry_id = $id; subject = $subj; to = $to; conversation_id = $conv }; exit 0
+    # If the owner is looking at this very draft in the reading pane, Outlook holds it as an INLINE RESPONSE and refuses Send().
+    # Natural behaviour: close the inline editor (saving the owner's edits), re-open the saved item by EntryID and send THAT.
+    $inline = $false
+    try { $exp = $ol.ActiveExplorer(); if ($null -ne $exp) { $ir = $exp.ActiveInlineResponse; if ($null -ne $ir -and ([string]$ir.EntryID -eq $id)) { $inline = $true; $ir.Close(0); Start-Sleep -Milliseconds 400; $m = $ns.GetItemFromID($id) } } } catch {}
+    try { $m.Send() } catch {
+      if ($_.Exception.Message -match "inline response") { Emit @{ ok = $false; code = "INLINE_RESPONSE"; error = "the draft is open in the Outlook reading pane (inline editor) — close it or select another item, then approve a new card"; entry_id = $id }; exit 3 }
+      throw
+    }
+    Emit @{ ok = $true; op = $Op; retrieved_at = $started; submitted = $true; sent_draft = $true; inline_closed = $inline; entry_id = $id; subject = $subj; to = $to; conversation_id = $conv }; exit 0
   }
   if ($Op -eq "mail.draft" -or $Op -eq "mail.send") {
     if (-not $To -and -not $ReplyToEntryId) { Emit @{ ok = $false; code = "BAD_PARAMS"; error = "To required" }; exit 3 }
