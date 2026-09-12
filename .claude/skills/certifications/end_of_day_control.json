@@ -6,9 +6,11 @@
  "computed_maturity": "L2",
  "tests": [
   "test_intelligence.Q07_Governance.test_brief_eod_weekly_and_open_loops_carry_the_management_block",
+  "test_operating_layer.B01_DocumentsRoutinesRouting.test_routines_run_on_demand_and_scheduler_is_not_configured",
   "test_skills.T05_Execution.test_eod"
  ],
  "failure_tests": [
+  "test_operating_layer.B01_DocumentsRoutinesRouting.test_routines_run_on_demand_and_scheduler_is_not_configured",
   "test_skills.T05_Execution.test_eod"
  ],
  "hardening_cases": [
@@ -30,7 +32,7 @@
  "evals": [],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T07:02:02",
+ "certified_at": "2026-09-12T07:10:57",
  "fingerprint": "ab2efc353c6c7f3927aefeca",
  "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
@@ -49,7 +51,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }

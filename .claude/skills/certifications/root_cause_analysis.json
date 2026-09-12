@@ -46,7 +46,7 @@
   "test_skills.T02_Router.test_chain_sales_decline"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T07:02:02",
+ "certified_at": "2026-09-12T07:10:57",
  "fingerprint": "914a754c6cfe245e6c31bcfc",
  "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
@@ -65,7 +65,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": true
 }

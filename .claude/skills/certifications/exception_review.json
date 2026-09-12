@@ -10,11 +10,13 @@
   "test_intelligence.Q04_IntelligenceDiscipline.test_cause_kinds_with_evidence",
   "test_intelligence.Q04_IntelligenceDiscipline.test_impact_and_priority_ranking",
   "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
-  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register"
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
+  "test_operating_layer.B01_DocumentsRoutinesRouting.test_routines_run_on_demand_and_scheduler_is_not_configured"
  ],
  "failure_tests": [
   "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
-  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register"
+  "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
+  "test_operating_layer.B01_DocumentsRoutinesRouting.test_routines_run_on_demand_and_scheduler_is_not_configured"
  ],
  "hardening_cases": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
@@ -47,7 +49,7 @@
   "eval:r_hy_worry"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T07:02:02",
+ "certified_at": "2026-09-12T07:10:57",
  "fingerprint": "48d0d2da1d3ea61d7f3ea161",
  "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
@@ -66,7 +68,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }

@@ -1,11 +1,16 @@
 {
  "skill_id": "kpi_intelligence",
  "skill_version": "1.2.0",
- "maturity_level": "L1",
+ "maturity_level": "L3",
  "declared_maturity": "L3",
- "computed_maturity": "L1",
- "tests": [],
- "failure_tests": [],
+ "computed_maturity": "L3",
+ "tests": [
+  "test_operating_layer.K01_KPIs.test_executor_and_mission5_bindings",
+  "test_operating_layer.K01_KPIs.test_resolution_statuses_and_no_invented_values"
+ ],
+ "failure_tests": [
+  "test_operating_layer.K01_KPIs.test_resolution_statuses_and_no_invented_values"
+ ],
  "hardening_cases": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
@@ -16,7 +21,9 @@
  "authority_tests": [
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
- "completion_verification": [],
+ "completion_verification": [
+  "test_operating_layer.K01_KPIs.test_executor_and_mission5_bindings"
+ ],
  "concurrency_tests": [],
  "enforcement_tests": [],
  "evals": [
@@ -24,9 +31,11 @@
   "eval:i_kpi_target_unknown",
   "eval:i_mikrobill_deferred"
  ],
- "routing_evals": [],
+ "routing_evals": [
+  "test_operating_layer.B01_DocumentsRoutinesRouting.test_natural_language_routing_regression"
+ ],
  "failed_tests": [],
- "certified_at": "2026-09-12T07:02:02",
+ "certified_at": "2026-09-12T07:10:57",
  "fingerprint": "c2ca19d0a14762a5efeae066",
  "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
@@ -45,7 +54,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
- "audit_infrastructure": true
+ "audit_infrastructure": false
 }

@@ -54,7 +54,7 @@
   "test_skills.T02_Router.test_trigger_resolution"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T07:02:02",
+ "certified_at": "2026-09-12T07:10:57",
  "fingerprint": "dca3d298089f8efe4c28cb77",
  "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
@@ -73,7 +73,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }

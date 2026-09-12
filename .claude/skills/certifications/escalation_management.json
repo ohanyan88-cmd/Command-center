@@ -5,20 +5,24 @@
  "declared_maturity": "L2",
  "computed_maturity": "L2",
  "tests": [
+  "test_operating_layer.A01_Alerts.test_dedupe_ack_reopen_resolve_suppress_escalate",
   "test_skills.T05_Execution.test_escalation"
  ],
  "failure_tests": [
   "test_skills.T05_Execution.test_escalation"
  ],
  "hardening_cases": [
-  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_operating_layer.A01_Alerts.test_dedupe_ack_reopen_resolve_suppress_escalate"
  ],
  "adversarial": [
-  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_operating_layer.A01_Alerts.test_dedupe_ack_reopen_resolve_suppress_escalate"
  ],
  "failure_injection": [],
  "authority_tests": [
-  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_operating_layer.A01_Alerts.test_dedupe_ack_reopen_resolve_suppress_escalate"
  ],
  "completion_verification": [
   "test_skills.T05_Execution.test_escalation"
@@ -28,7 +32,7 @@
  "evals": [],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T07:02:02",
+ "certified_at": "2026-09-12T07:10:57",
  "fingerprint": "2bc7f9c1723115f5358d8e48",
  "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
@@ -47,7 +51,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }

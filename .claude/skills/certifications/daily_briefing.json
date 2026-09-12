@@ -6,6 +6,7 @@
  "computed_maturity": "L4",
  "tests": [
   "test_business.B07_SkillIntegration.test_business_context_injected_into_governed_execution",
+  "test_channels.C05_SecretsAndReadiness.test_intelligence_sees_chat_channels_honestly_and_never_nags_deferred",
   "test_integrations.A01_ConfidentialCache.test_mail_payload_never_written_to_disk_and_expired_entries_are_unrecoverable",
   "test_integrations.I03_Envelope.test_normalized_envelope_provenance_freshness_and_cache",
   "test_integrations.I08_DailyBriefLive.test_brief_consumes_live_calendar_and_mail_without_creating_facts",
@@ -18,6 +19,7 @@
   "test_intelligence.Q07_Governance.test_brief_eod_weekly_and_open_loops_carry_the_management_block",
   "test_live_data.L02_ModelBinding.test_task_row_mutations_never_invalidate_the_certified_core",
   "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness",
+  "test_operating_layer.B01_DocumentsRoutinesRouting.test_routines_run_on_demand_and_scheduler_is_not_configured",
   "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth",
   "test_outlook_write.O01_TruthAndIdentity.test_unavailable_mail_and_calendar_are_honest",
   "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent",
@@ -25,6 +27,7 @@
   "test_skills.T08_MultiSkill.test_multi_skill_execution_daily_brief"
  ],
  "failure_tests": [
+  "test_channels.C05_SecretsAndReadiness.test_intelligence_sees_chat_channels_honestly_and_never_nags_deferred",
   "test_failclosed.F01_EveryBlockedCode.test_AUTHORITY_EXCEEDED",
   "test_failclosed.F01_EveryBlockedCode.test_DISABLED_SKILL",
   "test_failclosed.F01_EveryBlockedCode.test_INVALID_SOURCE",
@@ -42,6 +45,7 @@
   "test_intelligence.Q01_Truthfulness.test_fixture_and_supplied_data_are_never_production_truth",
   "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
   "test_intelligence.Q03_ChangeDetectionDurable.test_no_checkpoint_is_honest_and_production_checkpoints_persist",
+  "test_operating_layer.B01_DocumentsRoutinesRouting.test_routines_run_on_demand_and_scheduler_is_not_configured",
   "test_outlook_write.O01_TruthAndIdentity.test_unavailable_mail_and_calendar_are_honest"
  ],
  "hardening_cases": [
@@ -135,7 +139,7 @@
   "test_skills.T02_Router.test_dependency_order"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T07:02:02",
+ "certified_at": "2026-09-12T07:10:57",
  "fingerprint": "28ce6e678ccb9759119c2725",
  "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
@@ -154,7 +158,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }
