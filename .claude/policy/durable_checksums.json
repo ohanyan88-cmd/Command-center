@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-12T05:05:12",
+ "generated_at": "2026-09-12T05:08:43",
  "algorithm": "sha256",
  "files": {
   ".claude/business/bm_company.py": {
@@ -103,7 +103,7 @@
    "size": 7952
   },
   ".claude/integrations/adapter_outlook_write.py": {
-   "sha256": "2bff1bc58039dbe8bb980e096efb547dd5e74bcf2eed85de266978c3c8194b86",
+   "sha256": "dca54b3cdf566e9fccf7620a3446735593a488d6b6597f4c02ea6acab7bb45bc",
    "size": 10942
   },
   ".claude/integrations/adapter_tasks.py": {
@@ -151,8 +151,8 @@
    "size": 8141
   },
   ".claude/integrations/outlook_write.ps1": {
-   "sha256": "30bd639c153b5e7926652e73978c95682598dfb14454bddddb31bf3a689f2dbe",
-   "size": 6336
+   "sha256": "fc3e3219c012ee1f690b67d9da8bae51b2a0e642a661322a8a54cfe0e9b496c3",
+   "size": 6609
   },
   ".claude/integrations/reconcile.py": {
    "sha256": "d1aea07dcd54a893500ec93b05720dfa998e7cf208cf192b1499a03beb70cbea",
