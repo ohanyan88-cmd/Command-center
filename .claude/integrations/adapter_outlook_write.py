@@ -10,7 +10,7 @@ import adapter_outlook, registry
 from contracts import IntegrationError
 
 WRITER = HERE / "outlook_write.ps1"
-WRITER_SHA256 = "30bd639c153b5e7926652e73978c95682598dfb14454bddddb31bf3a689f2dbe"
+WRITER_SHA256 = "fc3e3219c012ee1f690b67d9da8bae51b2a0e642a661322a8a54cfe0e9b496c3"
 OPS = ("calendar.create", "calendar.update", "calendar.cancel", "mail.draft", "mail.send")
 _ISO = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$")
 

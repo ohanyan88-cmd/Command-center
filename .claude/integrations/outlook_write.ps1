@@ -48,7 +48,18 @@ try {
     # If the owner is looking at this very draft in the reading pane, Outlook holds it as an INLINE RESPONSE and refuses Send().
     # Natural behaviour: close the inline editor (saving the owner's edits), re-open the saved item by EntryID and send THAT.
     $inline = $false
-    try { $exp = $ol.ActiveExplorer(); if ($null -ne $exp) { $ir = $exp.ActiveInlineResponse; if ($null -ne $ir -and ([string]$ir.EntryID -eq $id)) { $inline = $true; $ir.Close(0); Start-Sleep -Milliseconds 400; $m = $ns.GetItemFromID($id) } } } catch {}
+    try {
+      $exp = $ol.ActiveExplorer()
+      if ($null -ne $exp) {
+        $ir = $exp.ActiveInlineResponse
+        if ($null -ne $ir -and ([string]$ir.EntryID -eq $id)) {
+          # Close() does not release an inline editor; clearing the Explorer selection does. Save first so the owner's edits survive and no prompt appears.
+          $inline = $true; if (-not $ir.Saved) { $ir.Save() }
+          $exp.ClearSelection(); Start-Sleep -Milliseconds 600
+          $m = $ns.GetItemFromID($id)
+        }
+      }
+    } catch {}
     try { $m.Send() } catch {
       if ($_.Exception.Message -match "inline response") { Emit @{ ok = $false; code = "INLINE_RESPONSE"; error = "the draft is open in the Outlook reading pane (inline editor) — close it or select another item, then approve a new card"; entry_id = $id }; exit 3 }
       throw
