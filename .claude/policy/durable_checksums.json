@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-12T04:41:27",
+ "generated_at": "2026-09-12T04:50:43",
  "algorithm": "sha256",
  "files": {
   ".claude/business/bm_company.py": {
@@ -103,8 +103,8 @@
    "size": 7952
   },
   ".claude/integrations/adapter_outlook_write.py": {
-   "sha256": "b25240ec51ad9ba0b65a9e91203a47462f8ff685bc5d44c61fa5bdba1c226f54",
-   "size": 9089
+   "sha256": "d71ef3fdc7f9a6df9a4c7b1133dea81b603c45f97d4496e96b19337b4786bc56",
+   "size": 10820
   },
   ".claude/integrations/adapter_tasks.py": {
    "sha256": "f4e29a490f1611a44157ada94d8276010f25c730301d75b0fcd803c0aaee5593",
@@ -151,8 +151,8 @@
    "size": 8141
   },
   ".claude/integrations/outlook_write.ps1": {
-   "sha256": "51bfec7a37d76364f9f772a37f28a07a2b39a1f6a3483af2055854b038c77f43",
-   "size": 4689
+   "sha256": "3380546bc07ae958bc6bb4280488e7b21f7db85b4804c4fa84bf6810fc3ab134",
+   "size": 5479
   },
   ".claude/integrations/reconcile.py": {
    "sha256": "d1aea07dcd54a893500ec93b05720dfa998e7cf208cf192b1499a03beb70cbea",
@@ -215,12 +215,12 @@
    "size": 6486
   },
   ".claude/skills/actions.py": {
-   "sha256": "3960dabbdff178958c2cb75c1818c363145c1fd1b52471a0dcb54149c7aeb362",
-   "size": 38330
+   "sha256": "05f635f7b5668082af8276706e486a9af2d321d7fdc8749ba53b6ed538a3fede",
+   "size": 38761
   },
   ".claude/skills/build_registry.py": {
-   "sha256": "02f0510270bc85ff1307a6c5dc3cd580f12aef26df7aaab35daa1e481060683a",
-   "size": 63625
+   "sha256": "7be2e177f5bc514246b8dcdcaa51c9f0510acdda571fee433852b3cd4a919cbc",
+   "size": 63644
   },
   ".claude/skills/business.py": {
    "sha256": "643751d77f1cbd0457bf14fb8572dc355d049d51b60c8c41c06659374bf53dac",
@@ -235,8 +235,8 @@
    "size": 47003
   },
   ".claude/skills/executors.py": {
-   "sha256": "745a6c2e7cc563bda1c69ff21d13e9b5246298dd0e8a0fb5df63c269b5b4eab7",
-   "size": 89324
+   "sha256": "a922b1f5f34a6d2289fdfd5e0e15298745e893a99025323ac5448b5316d7b588",
+   "size": 91218
   },
   ".claude/skills/intelligence.py": {
    "sha256": "76828d4f757915c104d2cd052bde428364972e47cd1c6a6b8c71da3db594d083",
@@ -291,8 +291,8 @@
    "size": 27525
   },
   ".claude/tests/test_outlook_write.py": {
-   "sha256": "b3dd40fa1ddd3e36c6077a1f4cec149ce37451486e8c1cb5081ce7eaef5bbd71",
-   "size": 17998
+   "sha256": "3adcf90b128483607dbaee79473527cc52affeadf397cf57e6afece5d004776e",
+   "size": 22246
   },
   ".claude/tests/test_portability.py": {
    "sha256": "1a9ca7d19c66fd63248806315650f7bedd7b8dfe8b6c3652ca14770c708eae27",
