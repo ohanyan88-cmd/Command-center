@@ -59,6 +59,7 @@
   ".claude/state/durable/write_certifications.json",
   ".claude/state/durable/checkpoints.jsonl",
   ".claude/state/durable/loops.jsonl",
+  ".claude/state/durable/alerts.jsonl",
   ".claude/policy/durable_checksums.json"
  ],
  "entries": [
@@ -332,6 +333,14 @@
    "required": true,
    "durability": "VERSION_DIRECTLY",
    "restore": "git clone → state_snapshot.py import (governed mutations: idempotency survives restart)",
+   "classification": "CONFIDENTIAL"
+  },
+  {
+   "path": ".claude/state/durable/alerts.jsonl",
+   "kind": "file",
+   "required": true,
+   "durability": "VERSION_DIRECTLY",
+   "restore": "git clone → state_snapshot.py import (alert state: dedupe/escalation/ack/resolution, references only)",
    "classification": "CONFIDENTIAL"
   },
   {

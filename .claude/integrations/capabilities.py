@@ -44,6 +44,15 @@ WRITE_OPS = {
 
 def write_spec(iid): return {"adapter": None, "ops": {}} | {"adapter": next((o["adapter"] for o in WRITE_OPS.get(iid, {}).values() if o.get("adapter")), None), "ops": WRITE_OPS.get(iid, {})}
 
+WRITE_OPS["INT-TG"] = {
+ "chat.send":  {"risk_class": "R2", "authority_required": "EXECUTE_EXTERNAL", "idempotency_method": "runtime key (no provider read-back)", "verification_method": "PROVIDER_ACCEPTED only (message_id) — no independent read-back; full certification needs a second-source confirmation", "adapter": "adapter_telegram_write", "retry_safe_when_absent": False, "category": "MATERIAL_WRITE", "note": "outbound to allowlisted chats only"},
+ "chat.reply": {"risk_class": "R2", "authority_required": "EXECUTE_EXTERNAL", "idempotency_method": "runtime key (no provider read-back)", "verification_method": "PROVIDER_ACCEPTED only (message_id) — no independent read-back", "adapter": "adapter_telegram_write", "retry_safe_when_absent": False, "category": "MATERIAL_WRITE"},
+}
+WRITE_OPS["INT-WA"] = {
+ "chat.send_text":     {"risk_class": "R2", "authority_required": "EXECUTE_EXTERNAL", "idempotency_method": "runtime key + outbound log (wamid)", "verification_method": "provider delivery status events via the verified webhook (sent/delivered/read; failed surfaced) — async, reconcile first", "adapter": "adapter_whatsapp_write", "retry_safe_when_absent": False, "category": "MATERIAL_WRITE", "note": "free-form text only inside the provider's customer-service window"},
+ "chat.send_template": {"risk_class": "R2", "authority_required": "EXECUTE_EXTERNAL", "idempotency_method": "runtime key + outbound log (wamid)", "verification_method": "provider delivery status events via the verified webhook — async, reconcile first", "adapter": "adapter_whatsapp_write", "retry_safe_when_absent": False, "category": "MATERIAL_WRITE", "note": "approved template + exact variables; never substituted for a text message"},
+}
+
 def _write_certs():
     try: return json.loads(WRITE_CERTS.read_text(encoding="utf-8")) if WRITE_CERTS.exists() else {}
     except ValueError: return {}
@@ -72,7 +81,9 @@ def capability(iid, op):
            "idempotency_method": (w or {}).get("idempotency_method", "n/a (read)"), "verification_method": (w or {}).get("verification_method", "n/a (read)"), "machine_dependency": spec.get("machine_dependency"),
            "system": spec.get("system"), "unblock": spec.get("unblock"), "note": (w or {}).get("note"), "category": (w or {}).get("category", "READ" if read else "SAFE_WRITE" if (w or {}).get("risk_class") == "R1" else "MATERIAL_WRITE"),
            "retry_safe_when_absent": (w or {}).get("retry_safe_when_absent", False), "last_verified_at": (wc or {}).get("verified_at") if w else (rc.get("health") or {}).get("last_success")}
-    if not implemented: row["level"] = "UNAVAILABLE" if (w and not w.get("adapter")) else "DECLARED"
+    row["deferred"] = bool(spec.get("deferred"))
+    if spec.get("deferred"): row["level"] = "DEFERRED"; row["note"] = spec["deferred"].get("note")
+    elif not implemented: row["level"] = "UNAVAILABLE" if (w and not w.get("adapter")) else "DECLARED"
     elif not configured: row["level"] = "IMPLEMENTED"
     elif not connected: row["level"] = "CONFIGURED"
     elif w: row["level"] = "VERIFIED_WRITE" if wc else "CONNECTED"

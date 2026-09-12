@@ -150,6 +150,12 @@ def main(argv):
         return subprocess.call([sys.executable, str(HERE.parent / "tests" / "evals.py")], cwd=str(HERE.parent / "tests"))
     if cmd == "certify":
         return subprocess.call([sys.executable, str(HERE / "certify.py")], cwd=str(HERE))
+    if cmd == "routine":
+        import routines
+        name = args[0] if args else ""; r = routines.run(name, ticket_id=_opt(args, "--ticket"), from_scheduler="--from-scheduler" in args)
+        print(routines.render(r) if r.get("steps") is not None else json.dumps(r, ensure_ascii=False)); return 0 if r.get("status") in ("EXECUTED", "PARTIAL") else 1
+    if cmd == "readiness":
+        sys.path.insert(0, str(HERE.parent / "integrations")); import readiness; print(readiness.render()); return 0
     if cmd == "sync":
         # LIVE DATA SYNC (data only): classify → export durable state → static model still certified → checksums → commit → push. Product changes are refused → release.
         return subprocess.call([sys.executable, str(HERE.parent / "runtime" / "data_sync.py")] + rest, cwd=str(HERE.parent.parent))

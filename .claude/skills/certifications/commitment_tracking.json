@@ -5,6 +5,7 @@
  "declared_maturity": "L4",
  "computed_maturity": "L4",
  "tests": [
+  "test_operating_layer.M01_Commitments.test_extraction_strength_due_and_cross_channel_dedupe",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_skills.T06_StateIdempotency.test_commitment_tracking_and_duplicate_protection",
   "test_store.S04_LegacyMigration.test_jsonl_migrated_once_and_moved_aside"
@@ -27,6 +28,7 @@
   "test_hardening.H03_StateHardening.test_write_claim_without_store_row_is_verification_failed",
   "test_hardening.H04_AdversarialInputs.test_bad_user_input_types",
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_operating_layer.M01_Commitments.test_extraction_strength_due_and_cross_channel_dedupe",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_store.S02_AtomicityInterruption.test_crash_before_commit_leaves_no_partial_row",
   "test_store.S02_AtomicityInterruption.test_journal_written_but_db_row_lost_is_healed_by_recovery",
@@ -40,7 +42,8 @@
   "test_hardening.H01_RegistryFailureInjection.test_self_awarded_maturity_rejected_without_fresh_certification",
   "test_hardening.H03_StateHardening.test_idempotency_key_normalization",
   "test_hardening.H04_AdversarialInputs.test_bad_user_input_types",
-  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
+  "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill",
+  "test_operating_layer.M01_Commitments.test_extraction_strength_due_and_cross_channel_dedupe"
  ],
  "failure_injection": [
   "test_hardening.H03_StateHardening.test_concurrent_duplicate_writes_exactly_one_record",
@@ -61,6 +64,7 @@
   "test_hardening.H04_AdversarialInputs.test_material_and_external_blocked_on_every_skill"
  ],
  "completion_verification": [
+  "test_operating_layer.M01_Commitments.test_executor_answers",
   "test_portability.P03_DurableState.test_export_is_deterministic_and_import_is_idempotent",
   "test_skills.T06_StateIdempotency.test_commitment_tracking_and_duplicate_protection"
  ],
@@ -78,13 +82,14 @@
   "eval:d_network_maintenance",
   "eval:r_remind",
   "eval:r_remind_hy",
+  "test_operating_layer.M01_Commitments.test_executor_answers",
   "test_skills.T02_Router.test_chain_reminder",
   "test_skills.T02b_DomainBoundary.test_business_intents_with_overlapping_words_still_route"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "ca38743c06d6fade907b0c11",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T07:10:57",
+ "fingerprint": "e010d008b292f3673e866834",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -101,7 +106,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }

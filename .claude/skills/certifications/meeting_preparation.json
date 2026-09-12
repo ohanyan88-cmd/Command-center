@@ -8,9 +8,12 @@
   "test_integrations.I03_Envelope.test_normalized_envelope_provenance_freshness_and_cache",
   "test_integrations.I09_MeetingPrepAndOpenLoops.test_meeting_pack_from_live_calendar_with_related_context",
   "test_intelligence.Q05_MailCalendar.test_calendar_kinds_conflicts_and_preparation",
+  "test_operating_layer.N01_Meetings.test_post_meeting_extraction_is_candidates_only",
+  "test_operating_layer.N01_Meetings.test_pre_meeting_pack",
   "test_skills.T05_Execution.test_meeting_preparation"
  ],
  "failure_tests": [
+  "test_operating_layer.N01_Meetings.test_post_meeting_extraction_is_candidates_only",
   "test_skills.T05_Execution.test_meeting_preparation"
  ],
  "hardening_cases": [
@@ -26,22 +29,26 @@
  "completion_verification": [
   "test_integrations.I09_MeetingPrepAndOpenLoops.test_meeting_pack_from_live_calendar_with_related_context",
   "test_intelligence.Q05_MailCalendar.test_calendar_kinds_conflicts_and_preparation",
+  "test_operating_layer.N01_Meetings.test_post_meeting_extraction_is_candidates_only",
+  "test_operating_layer.N01_Meetings.test_pre_meeting_pack",
   "test_skills.T05_Execution.test_meeting_preparation"
  ],
  "concurrency_tests": [],
  "enforcement_tests": [],
  "evals": [
   "eval:f_meeting_prep_live",
+  "eval:i_meeting_prep",
   "eval:meeting_prep"
  ],
  "routing_evals": [
   "eval:r_meeting",
+  "test_operating_layer.B01_DocumentsRoutinesRouting.test_natural_language_routing_regression",
   "test_skills.T02_Router.test_chain_meeting_prep"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "18476e00f3e1a5df5ecff558",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T07:10:57",
+ "fingerprint": "1eedb5a166345270a048c637",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -58,7 +65,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }

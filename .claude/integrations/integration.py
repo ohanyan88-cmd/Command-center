@@ -5,7 +5,8 @@
   python .claude/integrations/integration.py probe                        Outlook reader probe (accounts, calendars, counts)
   python .claude/integrations/integration.py brief [YYYY-MM-DD]           live context for the Daily Brief (calendar + mail + health)
   python .claude/integrations/integration.py capability "<intent>"        structured write-intent verdict
-  python .claude/integrations/integration.py certify [--no-real]          evidence-based certification (writes certification.json)"""
+  python .claude/integrations/integration.py certify [--no-real]          evidence-based certification (writes certification.json)
+  python .claude/integrations/integration.py readiness                    activation view: implementation · configuration (missing field NAMES) · identity · read/write certification · deferral"""
 import sys, json, pathlib
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "runtime")); import python_runtime; python_runtime.ensure()
@@ -40,6 +41,8 @@ def main(argv):
         print(_j(layer.capability(argv[1]))); return 0
     if cmd == "certify":
         import certify_integrations; return certify_integrations.main(argv[1:])
+    if cmd == "readiness":
+        import readiness; print(readiness.render()); return 0
     print(__doc__); return 1
 
 if __name__ == "__main__":

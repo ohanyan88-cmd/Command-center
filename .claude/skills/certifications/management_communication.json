@@ -41,12 +41,13 @@
  ],
  "routing_evals": [
   "eval:r_send_finance",
-  "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
+  "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate",
+  "test_operating_layer.B01_DocumentsRoutinesRouting.test_natural_language_routing_regression"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "4b847a4c7ee0be23d5b6a25a",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T07:10:57",
+ "fingerprint": "50ea841dec58f0775e06a7a5",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -63,7 +64,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }

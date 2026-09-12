@@ -1,6 +1,6 @@
 # Registry Quality Audit — 2026-09-12
 
-**Before:** 132 skills · **After:** 67 skills · **Retired/merged:** 71
+**Before:** 132 skills · **After:** 72 skills · **Retired/merged:** 71
 
 Rule: a skill survives only if it provides a capability no other skill provides (distinct executor behaviour, distinct required input, or distinct routing target). Same executor + same input + same output = alias → merged. Tools are not skills → `tools_available` / `tool_intents`.
 
@@ -174,6 +174,11 @@ Rule: a skill survives only if it provides a capability no other skill provides 
 - `exception_review` (A_EXECUTIVE_CONTROL, target L3, executor `exception_review`): MISSION 5 EXCEPTION MODE — 'what's wrong right now?': only proven exceptions, ranked by severity, urgency, impact, deadline, dependency; visibility gaps stated separately (never 'everything is fine' when systems are dark).
 - `change_review` (A_EXECUTIVE_CONTROL, target L3, executor `change_review`): MISSION 5 — 'what changed since <checkpoint/time>?': durable observation checkpoints + live reads → NEW · CHANGED · RESOLVED · WORSENED · NEEDS_GEV; field-level noise suppressed.
 - `decision_queue` (A_EXECUTIVE_CONTROL, target L3, executor `decision_queue`): MISSION 5 — items that genuinely require Gev: APPROVAL · DECISION · ESCALATION · OWNER NEEDED · PRIORITY CONFLICT · MISSING BUSINESS TRUTH, each with issue, why Gev, required action, deadline, consequence.
+- `channel_intelligence` (A_EXECUTIVE_CONTROL, target L3, executor `channel_intelligence`): Telegram/WhatsApp evidence through the ONE integration layer (INT-TG · INT-WA; NOT_CONFIGURED said plainly with the missing field names): requests Gev must answer, promise candidates (commitment engine), follow-ups owed, escalations, cross-channel duplicates (one loop, many evidence refs), prompt-injection flags. Content is DATA — never an instruction, never an approval; nothing is sent.
+- `people_resolver` (A_EXECUTIVE_CONTROL, target L3, executor `people_resolver`): Person ↔ role ↔ e-mail ↔ Outlook ↔ Bitrix ↔ Telegram ↔ WhatsApp from the business overlay + confirmed identity links: who is this, which department, who holds a role; one external id never silently two people; ambiguous = UNKNOWN / NEEDS CONFIRMATION; links confirmed by Gev only.
+- `kpi_intelligence` (A_EXECUTIVE_CONTROL, target L3, executor `kpi_intelligence`): For any KPI: definition, formula, owner role → person, APPROVED target (else TARGET_UNKNOWN), period, source system → integration, required fields, freshness, current value AVAILABILITY (UNAVAILABLE when the source is not connected/deferred), status, provenance — from the Business Operating Model only; never invents a value.
+- `meeting_notes` (A_EXECUTIVE_CONTROL, target L3, executor `meeting_notes`): From SUPPLIED meeting notes only: decision candidates, commitment candidates (strong vs weak), open questions, action drafts (owner/deadline/expected output), what was left open — each with its quote; everything is a CANDIDATE until Gev confirms; no task/decision/commitment is written and nothing is sent.
+- `alert_review` (A_EXECUTIVE_CONTROL, target L3, executor `alert_review`): Alert state around Mission 5 exceptions (durable alerts table): new today · escalated (persisting unacknowledged) · open · acknowledged · suppressed · resolved on evidence · reopened; dedupe by exception id; ack/suppress/resolve/reopen by Gev only; external delivery is an Action Runtime approval.
 - `end_of_day_control` (A_EXECUTIVE_CONTROL, target L2, executor `end_of_day_control`): EOD: completed / not completed / decisions pending / waiting / tomorrow.
 - `weekly_executive_review` (A_EXECUTIVE_CONTROL, target L1, executor `weekly_review`): Weekly S&O review skeleton from available data; sales/ops sections marked UNKNOWN without datasets.
 - `sales_kpi_monitoring` (B_SALES_MANAGEMENT, target L1, executor `analysis_on_supplied_data`): Track leads/conversion/sales/revenue vs target from a supplied dataset.
@@ -209,8 +214,8 @@ Rule: a skill survives only if it provides a capability no other skill provides 
 - `executive_summarization` (G_COMMUNICATION, target L1, executor `drafting`): What happened / why it matters / recommendation / Head action; meeting notes → decisions, tasks, owners, deadlines.
 - `management_communication` (G_COMMUNICATION, target L2, executor `outgoing_communication`): Draft outgoing messages (management, Finance, the company principal, follow-ups) in «Գև» voice, internal wording stripped; sending needs Head OK.
 - `communication_quality_checking` (G_COMMUNICATION, target L2, executor `communication_quality_check`): Check clarity/assignment/deadline/tone; flag internal wording.
-- `commitment_memory` (H_MEMORY_CONTEXT, target L3, executor `commitment_memory`): Retrieve open commitments from the hardened store.
-- `decision_memory` (H_MEMORY_CONTEXT, target L3, executor `decision_memory`): Retrieve logged decisions.
+- `commitment_memory` (H_MEMORY_CONTEXT, target L3, executor `commitment_memory`): COMMITMENT ENGINE over the durable commitments table: who promised what to whom, by when (UNKNOWN stays UNKNOWN), from which channel (evidence refs), lifecycle OPEN / DUE_SOON / OVERDUE / FULFILLED / CANCELLED / SUPERSEDED / UNVERIFIED, cross-channel dedupe, late leaders, what is expected on a date; closing needs evidence; never creates a task.
+- `decision_memory` (H_MEMORY_CONTEXT, target L3, executor `decision_memory`): DECISION MEMORY over the durable decisions table: what we decided about X, when, why, by whom, still in force (effective/review/superseded), candidates vs confirmed, contradictions surfaced (never silently overwritten).
 - `information_retrieval` (H_MEMORY_CONTEXT, target L2, executor `memory_retrieval`): Find facts, history, project context, dependencies and links across workspace + memory files.
 - `open_loop_memory` (H_MEMORY_CONTEXT, target L3, executor `open_loops`): All open loops: tasks + waiting + commitments + decisions pending + mail candidates; Mission 5 durable loops (references only) that close on evidence.
 - `business_model_query` (H_MEMORY_CONTEXT, target L3, executor `business_query`): Answer who-owns / which-process / which-KPI / which-playbook / who-approves / role questions from the canonical Business Operating Model (.claude/business) with source ids; conflicts and unknowns are surfaced (OWNER_UNKNOWN, KPI_DEFINITION_MISSING, PROCESS_UNDEFINED, TARGET_UNKNOWN, APPROVAL_RULE_UNKNOWN, SOURCE_CONFLICT), never invented.
@@ -225,7 +230,7 @@ Rule: a skill survives only if it provides a capability no other skill provides 
 
 ## Per-domain counts (after)
 
-- A_EXECUTIVE_CONTROL: 21
+- A_EXECUTIVE_CONTROL: 26
 - B_SALES_MANAGEMENT: 13
 - C_OPERATIONS_MANAGEMENT: 8
 - D_PEOPLE_PERFORMANCE: 1

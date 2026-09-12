@@ -39,6 +39,8 @@
   "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
   "test_live_data.L02_ModelBinding.test_task_row_mutations_never_invalidate_the_certified_core",
   "test_live_data.L03_ProvenanceAndEvidence.test_live_task_reads_carry_provenance_and_freshness",
+  "test_operating_layer.K01_KPIs.test_resolution_statuses_and_no_invented_values",
+  "test_operating_layer.P01_People.test_card_role_department_and_unknowns",
   "test_portability.P06_CleanCloneBootstrap.test_bootstrap_restores_canonical_workspace_and_is_idempotent"
  ],
  "failure_tests": [
@@ -49,7 +51,9 @@
   "test_business.B08_RealModel.test_extraction_invariants_green_and_tamper_detected",
   "test_business.B08_RealModel.test_missing_source_fails_build_explicitly",
   "test_business.B08_RealModel.test_overlay_backup_encrypts_verifies_restores_and_fails_on_wrong_key",
-  "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary"
+  "test_live_data.L02_ModelBinding.test_register_schema_change_still_hits_the_certification_boundary",
+  "test_operating_layer.K01_KPIs.test_resolution_statuses_and_no_invented_values",
+  "test_operating_layer.P01_People.test_card_role_department_and_unknowns"
  ],
  "hardening_cases": [
   "test_business.B02_CoreOverlaySeparation.test_core_has_no_compensation_or_names_and_overlay_merges_at_runtime",
@@ -114,9 +118,9 @@
   "test_business.B08_RealModel.test_real_queries"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "98ec588d600bc199423bbc0e",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T07:10:57",
+ "fingerprint": "a12c4a2b535a6539b6c44f62",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -133,7 +137,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }

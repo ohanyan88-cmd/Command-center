@@ -317,8 +317,10 @@ def _verify(a, prov, ticket_id=None):
             except Exception as e:
                 a["codes"].append("CERTIFICATION_NOT_RECORDED"); a["history"].append({"at": _now(), "state": "VERIFIED", "code": "CERTIFICATION_NOT_RECORDED", "reason": str(e)[:200]}); _save(a)
     else:
-        a["state"] = "EXECUTED_UNVERIFIED"; a["codes"].append("VERIFICATION_MISMATCH"); a["history"].append({"at": _now(), "state": "EXECUTED_UNVERIFIED", "code": "VERIFICATION_MISMATCH", "reason": v.get("reason")}); _save(a)
-        _audit({"execution_id": a["action_id"], "ticket_id": ticket_id, "result_status": "VERIFICATION_FAILED", "reason": v.get("reason")}, required=False)
+        # honest sub-states of "not independently verified": no read-back exists (Telegram bot message) · provider evidence pending (WhatsApp status) · read-back contradicts
+        code = "NO_INDEPENDENT_READBACK" if v.get("independent") is False else ("AWAITING_PROVIDER_STATUS" if v.get("pending") else "VERIFICATION_MISMATCH")
+        a["state"] = "EXECUTED_UNVERIFIED"; a["codes"].append(code); a["history"].append({"at": _now(), "state": "EXECUTED_UNVERIFIED", "code": code, "reason": v.get("reason")}); _save(a)
+        _audit({"execution_id": a["action_id"], "ticket_id": ticket_id, "result_status": "VERIFICATION_FAILED" if code == "VERIFICATION_MISMATCH" else code, "reason": v.get("reason")}, required=False)
     return report(a)
 
 def reconcile(action_id, *, ticket_id=None):
@@ -386,7 +388,11 @@ def report(a):
     req = a["request"]; st = a["state"]
     canon = {"VERIFIED": "DONE", "EXECUTED_UNVERIFIED": "NOT DONE", "FAILED": "NOT DONE", "DENIED": "BLOCKED", "REJECTED": "BLOCKED", "RESULT_UNKNOWN": "RESULT_UNKNOWN", "PARTIAL": "PARTIAL", "APPROVAL_REQUIRED": "NOT DONE", "APPROVED": "NOT DONE", "PREPARED": "NOT DONE", "EXECUTING": "RESULT_UNKNOWN"}[st]
     ver = a.get("verification") or {}
-    gev = {"VERIFIED": "none", "APPROVAL_REQUIRED": "approve or reject the presented action", "RESULT_UNKNOWN": "decide after reconciliation (retry only if reconciliation proved the write is absent)", "EXECUTED_UNVERIFIED": "check the target system — provider reported success but the read-back does not match", "REJECTED": "a new decision/approval is required", "DENIED": "see reason", "FAILED": "see reason"}.get(st, "see reason")
+    codes = a.get("codes", [])
+    if st == "EXECUTED_UNVERIFIED" and ("NO_INDEPENDENT_READBACK" in codes or "AWAITING_PROVIDER_STATUS" in codes): canon = "PARTIAL"     # provider accepted; independent evidence absent/pending — never DONE, never NOT DONE
+    gev = {"VERIFIED": "none", "APPROVAL_REQUIRED": "approve or reject the presented action", "RESULT_UNKNOWN": "decide after reconciliation (retry only if reconciliation proved the write is absent)",
+           "EXECUTED_UNVERIFIED": ("confirm in the chat that the message is visible (no read-back exists for a bot's own message)" if "NO_INDEPENDENT_READBACK" in codes else "none yet — Deputy reconciles when the provider's delivery status arrives" if "AWAITING_PROVIDER_STATUS" in codes else "check the target system — provider reported success but the read-back does not match"),
+           "REJECTED": "a new decision/approval is required", "DENIED": "see reason", "FAILED": "see reason"}.get(st, "see reason")
     return {"canonical": canon, "state": st, "action_id": a["action_id"], "what": f"{req['target_operation']} — {req['business_intent']}", "target": f"{req['target_system']} {req['target_object_type']} {req.get('target_object_id') or ''}".strip(),
             "result": (a.get("execution") or {}).get("provider_result") or a.get("reason") or (a.get("reconciliation") or {}).get("outcome"), "verification": ver.get("reason") if ver else "not verified", "evidence": ver.get("evidence"),
             "open_loop": a.get("memory"), "gev_action": gev, "codes": a.get("codes", []), "mutation_performed": st in ("VERIFIED", "EXECUTED_UNVERIFIED", "RESULT_UNKNOWN"), "approval": {k: (a.get("approval") or {}).get(k) for k in ("token_id", "approved_by", "approved_at", "consumed")} if a.get("approval") else None,

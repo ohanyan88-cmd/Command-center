@@ -5,6 +5,7 @@
  "declared_maturity": "L3",
  "computed_maturity": "L4",
  "tests": [
+  "test_channels.C05_SecretsAndReadiness.test_intelligence_sees_chat_channels_honestly_and_never_nags_deferred",
   "test_intelligence.Q01_Truthfulness.test_conflicting_evidence_surfaced_and_unknowns_stay_unknown",
   "test_intelligence.Q01_Truthfulness.test_fixture_and_supplied_data_are_never_production_truth",
   "test_intelligence.Q01_Truthfulness.test_stale_is_not_live_and_cached_is_labelled",
@@ -19,10 +20,12 @@
   "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
   "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
   "test_intelligence.Q08_ProductionGuards.test_real_register_read_is_provenanced_and_untouched",
+  "test_operating_layer.K01_KPIs.test_executor_and_mission5_bindings",
   "test_outlook_write.O01_TruthAndIdentity.test_fixture_mode_is_always_labelled_and_never_production_truth",
   "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer"
  ],
  "failure_tests": [
+  "test_channels.C05_SecretsAndReadiness.test_intelligence_sees_chat_channels_honestly_and_never_nags_deferred",
   "test_intelligence.Q01_Truthfulness.test_fixture_and_supplied_data_are_never_production_truth",
   "test_intelligence.Q01_Truthfulness.test_unavailable_is_not_no_problem_and_is_named",
   "test_intelligence.Q05_MailCalendar.test_mail_meaningful_items_only_and_evidence_linkage",
@@ -55,6 +58,7 @@
  "completion_verification": [
   "test_intelligence.Q02_TaskIntelligence.test_overdue_due_today_blocked_ownerless_and_provenance",
   "test_intelligence.Q07_Governance.test_intelligence_never_mutates_and_execution_routes_to_the_action_runtime",
+  "test_operating_layer.K01_KPIs.test_executor_and_mission5_bindings",
   "test_outlook_write.O03_ReadOnlyIntelligence.test_mail_calendar_intelligence_never_touches_the_writer"
  ],
  "concurrency_tests": [],
@@ -66,7 +70,8 @@
   "eval:h_ops_partial",
   "eval:h_recommend_no_write",
   "eval:h_sales_unavailable",
-  "eval:h_tasks_overdue"
+  "eval:h_tasks_overdue",
+  "eval:i_mikrobill_deferred"
  ],
  "routing_evals": [
   "eval:r_en_attention",
@@ -76,9 +81,9 @@
   "eval:r_hy_todo"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "6056dc14d72a43e290bcd1aa",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T07:10:57",
+ "fingerprint": "f004dfe237922bdd517e1fda",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -95,7 +100,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }

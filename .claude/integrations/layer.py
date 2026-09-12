@@ -157,6 +157,9 @@ def query(integration_id, op, params=None, *, use_cache=True, transport=None, in
         code = "READ_ONLY_VIOLATION" if C.WRITE_OP_RX.search(op or "") else "UNKNOWN_OPERATION"
         env = C.failure(integration_id, system, op, code, f"{integration_id} exposes read operations {sorted(spec['read_ops'])} only; {op!r} refused")
         env["audit_recorded"] = bool(_audit({"integration_id": integration_id, "op": op, "result_status": "FAILED", "code": code, "execution_id": execution_id}, required=False)); return env
+    if spec.get("deferred"):                                                        # deferred by the owner: a declared read is not attempted — honest DEFERRED envelope, no unblock nag
+        env = C.failure(integration_id, system, op, "DEFERRED", f"{integration_id} deferred by {spec['deferred'].get('by')} since {spec['deferred'].get('since')} — no read attempted, no activation requested")
+        env["audit_recorded"] = bool(_audit({"integration_id": integration_id, "op": op, "result_status": "FAILED", "code": "DEFERRED", "execution_id": execution_id}, required=False)); return env
     kind = spec["read_ops"][op]["kind"]; fr = spec["freshness"]; ttl = fr.get("cache_ttl_seconds") or 0; max_age = fr.get("max_age_seconds")
     k = _key(integration_id, op, params); h = health.get(integration_id) or {}
     fx = _fixture(); fixture_active = bool(fx) and integration_id in fx           # fixtures always win over the cache and are never written into it
@@ -181,7 +184,7 @@ def query(integration_id, op, params=None, *, use_cache=True, transport=None, in
         else:
             ad = importlib.import_module(spec["adapter"])
             cfg = _secrets.load_config(integration_id) if spec["auth"].get("secrets") else {}
-            raw = ad.read(op, params, cfg, transport=transport) if spec["adapter"] == "adapter_bitrix24" else (ad.read(op, params, cfg, integration_id=integration_id) if spec["adapter"] == "adapter_outlook" else ad.read(op, params, cfg))
+            raw = ad.read(op, params, cfg, transport=transport) if spec["adapter"] in ("adapter_bitrix24", "adapter_telegram", "adapter_whatsapp") else (ad.read(op, params, cfg, integration_id=integration_id) if spec["adapter"] == "adapter_outlook" else ad.read(op, params, cfg))
         records = raw.get("records", [])
         probs = C.check_records(kind, records)
         if probs: raise C.IntegrationError("SCHEMA_CHANGED", f"normalized records do not match schema {kind}: {probs[:2]}")
@@ -230,7 +233,7 @@ def status():
         if spec["auth"].get("secrets"):
             try: cfg = _secrets.load_config(iid); cfg_ok = all(cfg.get(s) for s in spec["auth"]["secrets"]) if spec["adapter"] != "adapter_mikrobill" else False
             except Exception: cfg_ok = False
-        out.append({"integration_id": iid, "system": spec["system"], "critical": spec["critical"], "read_ops": sorted(spec["read_ops"]), "write_ops": [], "configured": cfg_ok,
+        out.append({"integration_id": iid, "system": spec["system"], "critical": spec["critical"], "read_ops": sorted(spec["read_ops"]), "write_ops": [], "configured": cfg_ok, "deferred": spec.get("deferred"),
                     "health": h.get("status") or "NOT_CONFIGURED", "last_check": h.get("last_check"), "last_success": h.get("last_success"), "consecutive_failures": h.get("consecutive_failures", 0),
                     "last_error": h.get("last_error"), "certification": (cert.get(iid) or {}).get("state", "DECLARED"), "authority": spec["authority"]["name"], "classification": spec["classification"],
                     "freshness_rule": spec["freshness"]["rule"], "unblock": spec["unblock"]})
@@ -265,5 +268,5 @@ def live_source_status(kinds=("sales", "operations")):
     st = {s["integration_id"]: s for s in status()}
     out = {}
     for k in kinds:
-        out[k] = [{"integration_id": i, "system": st[i]["system"], "certification": st[i]["certification"], "health": st[i]["health"], "last_success": st[i]["last_success"], "unblock": st[i]["unblock"]} for i in want.get(k, []) if i in st]
+        out[k] = [{"integration_id": i, "system": st[i]["system"], "certification": st[i]["certification"], "health": st[i]["health"], "last_success": st[i]["last_success"], "unblock": st[i]["unblock"], "deferred": st[i].get("deferred")} for i in want.get(k, []) if i in st]
     return out

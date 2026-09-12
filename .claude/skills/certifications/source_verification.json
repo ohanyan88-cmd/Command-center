@@ -7,6 +7,7 @@
  "tests": [
   "test_business.B01_ProvenanceAndPrecedence.test_every_fact_has_source_and_confidence_and_source_status_answers",
   "test_business.B08_RealModel.test_extraction_invariants_green_and_tamper_detected",
+  "test_channels.C05_SecretsAndReadiness.test_registry_contract_capabilities_and_certification_scan",
   "test_intelligence.Q07b_FailClosed.test_intelligence_skills_fail_closed_on_an_invalid_register",
   "test_live_data.L01_StructureFingerprint.test_schema_changes_change_the_structure_fingerprint",
   "test_live_data.L02_ModelBinding.test_extracted_model_source_change_still_invalidates",
@@ -72,9 +73,9 @@
  ],
  "routing_evals": [],
  "failed_tests": [],
- "certified_at": "2026-09-12T05:18:10",
- "fingerprint": "c3523d86e5da6a06cebe6d8e",
- "core_fingerprint": "332eefd5f0bb8296",
+ "certified_at": "2026-09-12T07:10:57",
+ "fingerprint": "dda2d27d518b47c871a0f2ba",
+ "core_fingerprint": "b66d5af33dd07bf1",
  "result": "PASS",
  "suites": [
   "test_skills",
@@ -91,7 +92,9 @@
   "test_actions",
   "test_live_data",
   "test_intelligence",
-  "test_outlook_write"
+  "test_outlook_write",
+  "test_channels",
+  "test_operating_layer"
  ],
  "audit_infrastructure": false
 }
