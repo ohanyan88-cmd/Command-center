@@ -473,7 +473,7 @@
   "test_integrations.I02_ReadOnlyBoundary.test_write_intents_blocked_structurally_and_at_the_gate"
  ],
  "failed_tests": [],
- "certified_at": "2026-09-12T04:55:13",
+ "certified_at": "2026-09-12T05:04:55",
  "fingerprint": "2c11514c527399959a82afe3",
  "core_fingerprint": "332eefd5f0bb8296",
  "result": "PASS",
